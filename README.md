@@ -1,7 +1,7 @@
 # 白い地図
 
 ## ER図
-![ER図](https://gyazo.com/4fdd48b1d2cea7774cf6bf35bd981297.png)
+![ER図](https://gyazo.com/69071e21f42e0fd9e0bc71c1f8c4b3b6.png)
 
 ## サービス概要
 

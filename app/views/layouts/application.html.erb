@@ -23,9 +23,11 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex font-sans">
+  <body class="bg-green-900 min-h-[200vh]" >
+    <main class="font-sans">
       <%= yield %>
     </main>
+    <%# フッター %>
+    <%= render "shared/footer" %>
   </body>
 </html>

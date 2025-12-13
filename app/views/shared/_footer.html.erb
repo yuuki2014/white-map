@@ -1,0 +1,27 @@
+<footer class="fixed bottom-0 left-0 w-full pb-4 z-50 pointer-events-none">
+  <div class="mx-auto max-w-md px-4 pointer-events-auto">
+    <div class="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg px-6 py-3">
+      <nav class="flex">
+        <%= link_to root_path, class: tab_class(root_path) do %>
+          <%= lucide_icon('map') %>
+          <span class="text-xs">地図</span>
+        <% end %>
+
+        <%= link_to "###", class: tab_class("###") do %>
+          <%= lucide_icon('history') %>
+          <span class="text-xs">履歴</span>
+        <% end %>
+
+        <%= link_to "###", class: tab_class("###") do %>
+          <%= lucide_icon('users') %>
+          <span class="text-xs">みんなの地図</span>
+        <% end %>
+
+        <%= link_to "###", class: tab_class("###") do %>
+          <%= lucide_icon('circle-user-round') %>
+          <span class="text-xs">マイページ</span>
+        <% end %>
+      </nav>
+    </div>
+  </div>
+</footer>

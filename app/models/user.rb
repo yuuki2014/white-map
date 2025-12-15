@@ -22,8 +22,37 @@ class User < ApplicationRecord
   end
 
   # 「ゲスト以外」のときだけ、パスワードを必須にする
-  def password_required?
+  # def password_required?
     # ゲストなら false (いらない)、それ以外なら true (いる)
-    !guest?
+    # !guest?
+  # end
+
+  def remember_expires_at
+    # time = remember_created_at || Time.now.utc
+
+    time = Time.now.utc
+    case role
+    when 'guest'
+      time + 180.day
+    when 'general'
+      time + 365.day
+    when 'admin'
+      time + 1.day
+    else
+      time + 2.weeks
+    end
+  end
+
+  # guestユーザー作成
+  def self.create_guest
+    guest_password = SecureRandom.urlsafe_base64
+
+    create!(
+      nickname: "ゲスト",
+      role: "guest",
+      map_privacy: "private",
+      email: nil,
+      password: guest_password,
+    )
   end
 end

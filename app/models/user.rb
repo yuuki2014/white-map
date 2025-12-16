@@ -21,16 +21,9 @@ class User < ApplicationRecord
     !guest?
   end
 
-  # 「ゲスト以外」のときだけ、パスワードを必須にする
-  # def password_required?
-    # ゲストなら false (いらない)、それ以外なら true (いる)
-    # !guest?
-  # end
-
   def remember_expires_at
-    # time = remember_created_at || Time.now.utc
+    time = remember_created_at || Time.now.utc
 
-    time = Time.now.utc
     case role
     when 'guest'
       time + 180.day
@@ -54,5 +47,23 @@ class User < ApplicationRecord
       email: nil,
       password: guest_password,
     )
+  end
+
+  # 認証が完了した瞬間に自動で呼ばれるメソッド(Devise)
+  def after_confirmation
+    # デフォルトの処理を実行
+    super
+
+    # 認証時にゲストの場合はroleとユーザー名を更新
+    if role == 'guest'
+      updates = { role: :general }
+
+      if nickname.blank? || nickname == 'ゲスト'
+        updates[:nickname] = 'ユーザー'
+      end
+
+      # バリデーションを無視して強制更新
+      update_columns(updates)
+    end
   end
 end

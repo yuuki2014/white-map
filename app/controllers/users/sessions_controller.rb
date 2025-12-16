@@ -18,10 +18,22 @@ class Users::SessionsController < Devise::SessionsController
   #   super
   # end
 
-  # protected
+  protected
 
   # If you have extra params to permit, append them to the sanitizer.
   # def configure_sign_in_params
   #   devise_parameter_sanitizer.permit(:sign_in, keys: [:attribute])
   # end
+
+  def require_no_authentication
+    # ログインしてるかチェック
+    if current_user
+      # ゲストなら何もしない
+      if current_user.role == 'guest'
+        return
+      end
+    end
+    # ゲスト以外はDeviseの標準処理を実行
+    super
+  end
 end

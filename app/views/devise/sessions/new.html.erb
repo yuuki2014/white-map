@@ -45,7 +45,7 @@
 
         <% if devise_mapping.rememberable? %>
           <div class="flex items-center gap-2">
-            <%= f.check_box :remember_me, class: "w-5 h-5 rounded border-gray-300 text-orange-400 focus:ring-orange-400" %>
+            <%= f.check_box :remember_me, checked: true, class: "w-5 h-5 rounded border-gray-300 text-orange-400 focus:ring-orange-400" %>
             <%= f.label :remember_me, "ログインしたままにする", class: "text-sm font-medium" %>
           </div>
         <% end %>

@@ -25,11 +25,11 @@ class User < ApplicationRecord
     time = remember_created_at || Time.now.utc
 
     case role
-    when 'guest'
+    when "guest"
       time + 180.day
-    when 'general'
+    when "general"
       time + 365.day
-    when 'admin'
+    when "admin"
       time + 1.day
     else
       time + 2.weeks
@@ -55,15 +55,20 @@ class User < ApplicationRecord
     super
 
     # 認証時にゲストの場合はroleとユーザー名を更新
-    if role == 'guest'
+    if role == "guest"
       updates = { role: :general }
 
-      if nickname.blank? || nickname == 'ゲスト'
-        updates[:nickname] = 'ユーザー'
+      if nickname.blank? || nickname == "ゲスト"
+        updates[:nickname] = "ユーザー"
       end
 
       # バリデーションを無視して強制更新
       update_columns(updates)
     end
+  end
+
+  # User モデルの :id を public_uidに
+  def to_param
+    public_uid
   end
 end

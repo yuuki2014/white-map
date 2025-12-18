@@ -29,12 +29,7 @@
     <main class="font-sans">
       <%= yield %>
     </main>
-    <%# フッター %>
-    <%# ▼ フッターを表示したいURLのリスト %>
-    <% footer_allowed_paths = [
-      root_path,
-    ] %>
-    <% if footer_allowed_paths.include?(request.path) %>
+    <% if show_footer? %>
       <%= render "shared/footer" %>
     <% end %>
   </body>

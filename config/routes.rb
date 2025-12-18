@@ -5,9 +5,12 @@ Rails.application.routes.draw do
 
   # devise_for :users
   devise_for :users, controllers: {
-    registrations: 'users/registrations',
-    sessions: 'users/sessions'
+    registrations: "users/registrations",
+    sessions: "users/sessions"
   }
+  # resources :users, param: :public_uid, only: [ :show ]
+  get "users/:public_uid", to: "users#show", as: "user"
+  get "mypage", to: "users#mypage", as: "mypage"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

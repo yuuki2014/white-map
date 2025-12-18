@@ -15,7 +15,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
   def create
     # ゲストユーザーが本登録する場合
-    if current_user && current_user.role == 'guest'
+    if current_user && current_user&.role == "guest"
       self.resource = current_user
 
       # フォームの入力値（メアド・パスワード）をセット
@@ -26,8 +26,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
         # 認証後にゲストデータを会員用に変更
       else
         # 会員用にデータを変更
-        resource.role = 'general'
-        resource.nickname = 'ユーザー'
+        resource.role = "general"
+        resource.nickname = "ユーザー"
       end
 
       if resource.save
@@ -65,8 +65,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
       build_resource(sign_up_params)
 
       # 新規登録用の初期データ
-      resource.role = 'general'
-      resource.nickname = 'ユーザー'
+      resource.role = "general"
+      resource.nickname = "ユーザー"
       resource.remember_me = true
 
       resource.save
@@ -134,13 +134,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super(resource)
   # end
 
+  # ログインしている人は入れない設定
   def require_no_authentication
-    # ログインしてるかチェック
-    if current_user
-      # ゲストなら何もしない
-      if current_user.role == 'guest'
-        return
-      end
+    # ゲストなら何もしない
+    if current_user&.role == "guest"
+      return
     end
     # ゲスト以外はDeviseの標準処理を実行
     super

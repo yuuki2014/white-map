@@ -1,0 +1,80 @@
+<div class="min-h-screen pb-20 bg-gray-100 flex justify-center">
+
+  <%# 各カードを包むコンテナ %>
+  <div class="max-w-md w-full flex flex-col gap-4 p-4">
+
+    <%# ユーザープロフィールカード %>
+    <div class="bg-white rounded-xl shadow-md p-4 mb-4 flex items-center">
+      <div class="w-16 h-16 p-1 bg-orange-400 rounded-full flex items-center justify-center">
+        <%= lucide_icon('user-round', class: "w-full h-full text-white") %>
+      </div>
+      <div class="ml-4 flex-1 flex justify-between items-center">
+        <div class="text-xl font-bold text-gray-800">
+          <%= @user.nickname %>
+        </div>
+        <div class="text-xl font-bold text-gray-800">
+          <%= @user.id %>
+        </div>
+        <% if current_user&.general? %>
+          <button class="p-2 rounded-full hover:bg-gray-200">
+            <%= lucide_icon('square-pen', class: "text-gray-700")%>
+          </button>
+        <% end %>
+      </div>
+    </div>
+
+    <%# 新規会員登録 & ログイン ボタン %>
+    <% if current_user&.guest? %>
+      <div class="flex flex-col items-center gap-4 text-center mb-4">
+        <div class="text-sm text-red-300">
+          データが消えないように会員登録をしよう！
+        </div>
+        <%= link_to new_registration_path(:user), class: "block w-full" do %>
+          <div class="bg-gradient-to-b from-orange-300 to-orange-500 text-white text-center font-bold text-lg py-4 rounded-2xl shadow-lg hover:opacity-90 transition">
+            新規会員登録（無料）
+          </div>
+        <% end %>
+        <%= link_to "ログインはこちら", new_user_session_path, class: "font-bold underline mt-7" %>
+      </div>
+    <% end %>
+
+    <%# 実績カード %>
+    <% if current_user&.guest? %>
+      <% user_achievements = [
+        tag.span("[累計距離]", class: "") +
+        tag.span("-- km / -- マス", class: "text-gray-900 font-semibold"),
+        tag.span("[開拓エリア]", class: "") +
+        tag.span("--", class: "text-gray-900 font-semibold"),
+      ] %>
+      <%= mypage_card(user_achievements) %>
+    <% elsif current_user&.general? %>
+      <% user_achievements = [
+        tag.span("[累計距離]", class: "") +
+        tag.span("124.5 km / 300 マス", class: "text-gray-900 font-semibold"),
+        tag.span("[開拓エリア]", class: "") +
+        tag.span("東京都、埼玉県", class: "text-gray-900 font-semibold"),
+      ] %>
+      <%= mypage_card(user_achievements) %>
+    <% end %>
+
+
+    <%# 各種リンクカード %>
+    <% if current_user.guest? %>
+      <% account_links = [
+        link_to("・利用規約", "#", class: "hover:text-gray-900"),
+        link_to("・プライバシーポリシー", "#", class: "hover:text-gray-900"),
+      ] %>
+      <%= mypage_card(account_links) %>
+    <% elsif current_user.general? %>
+      <% account_links = [
+        link_to("・アカウント設定", "#", class: "hover:text-gray-900"),
+        link_to("・利用規約", "#", class: "hover:text-gray-900"),
+        link_to("・プライバシーポリシー", "#", class: "hover:text-gray-900"),
+        button_to("・ログアウト", destroy_user_session_path, method: :delete, class: "text-red-500 hover:text-red-700"),
+      ] %>
+      <%= mypage_card(account_links) %>
+    <% end %>
+
+
+  </div>
+</div>

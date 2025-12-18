@@ -1,0 +1,49 @@
+<div class="min-h-screen pb-20 bg-gray-100 flex justify-center">
+
+  <%# 各カードを包むコンテナ %>
+  <div class="max-w-md w-full flex flex-col gap-4 p-4">
+
+    <%# 規約同意カード %>
+    <div class="bg-white rounded-xl shadow-md p-4 mb-4 flex flex-col items-center gap-4">
+      <div class="w-16 h-16 p-1 bg-orange-400 rounded-full text-center items-center justify-center">
+        <%= lucide_icon('footprints', class: "w-full h-full text-white") %>
+      </div>
+      <div class="font-bold">
+        地図作りを始めよう！！
+      </div>
+      <div class="text-center text-sm">
+        規約に同意すると、ゲストとして地図の作成・記録が出来ます。
+      </div>
+      <%# ゲスト利用ボタン %>
+      <%= link_to guest_sessions_create_path, data: { turbo_method: :post }, class: "block w-full"  do %>
+        <div class="bg-gradient-to-b from-orange-300 to-orange-500 text-white text-center font-bold text-lg py-4 rounded-2xl shadow-lg hover:opacity-90 transition">
+          同意してゲスト利用を開始
+        </div>
+      <% end %>
+      <div class="text-xs text-gray-300 text-center">
+        ※ボタン押下をもって利用規約・プライバシーポリシーに同意したものとみなします
+      </div>
+    </div>
+
+    <div class="flex flex-col items-center gap-4 text-center mb-4">
+      <div class="text-sm text-red-300">
+        データが消えないように会員登録をしよう！
+      </div>
+      <%= link_to new_registration_path(:user), class: "block w-full" do %>
+        <div class="bg-gradient-to-b from-orange-300 to-orange-500 text-white text-center font-bold text-lg py-4 rounded-2xl shadow-lg hover:opacity-90 transition">
+          新規会員登録（無料）
+        </div>
+      <% end %>
+      <%= link_to "ログインはこちら", new_user_session_path, class: "font-bold underline mt-7" %>
+    </div>
+
+    <%# 各種リンクカード %>
+    <% account_links = [
+      link_to("・利用規約", "#", class: "hover:text-gray-900"),
+      link_to("・プライバシーポリシー", "#", class: "hover:text-gray-900"),
+    ] %>
+
+    <%= mypage_card(account_links) %>
+
+  </div>
+</div>

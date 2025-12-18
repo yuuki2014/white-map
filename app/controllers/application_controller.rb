@@ -6,6 +6,6 @@ class ApplicationController < ActionController::Base
   private
 
   def refresh_session_expiration
-    current_user
+    current_user if current_user
   end
 end

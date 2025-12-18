@@ -4,8 +4,25 @@
 # model remove the "{}" from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: {}
+# one: {}
 # column: value
 #
-two: {}
+# two: {}
 # column: value
+
+# 1人目：一般ユーザー（ログインテスト用）
+one:
+  nickname: UserOne
+  email: one@example.com
+  role: general # あなたのアプリで定義しているroleに合わせてください
+  # Deviseの暗号化パスワード（パスワードは 'password' になります）
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
+  # 他にも NOT NULL 制約があるカラムがあればここに追加
+  # 例: public_uid: "uid-1"
+
+# 2人目：ゲストユーザー（ゲスト機能テスト用）
+guest:
+  nickname: GuestUser
+  email: guest@example.com
+  role: guest
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>

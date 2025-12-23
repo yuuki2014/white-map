@@ -14,6 +14,9 @@ class User < ApplicationRecord
   # UUIDは保存の直前にDBが生成してくれるので、ここでは設定しない
   validates :nickname, :role, :map_privacy, presence: true
 
+  # アソシエーション定義
+  has_many :maps, dependent: :destroy
+
   # Devise の機能をオーバーライド
   # ゲスト以外の時だけメールアドレスを必須にする
   def email_required?

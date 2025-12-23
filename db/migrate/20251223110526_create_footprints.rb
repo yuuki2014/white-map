@@ -11,7 +11,7 @@ class CreateFootprints < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :footprints, [:trip_id, :recorded_at]
-    add_index :footprints, [:trip_id, :geohash]
+    add_index :footprints, [ :trip_id, :recorded_at ]
+    add_index :footprints, [ :trip_id, :geohash ]
   end
 end

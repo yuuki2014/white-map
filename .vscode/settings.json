@@ -4,6 +4,10 @@
     "exifr",
     "Geoapify",
     "Geohash",
-    "ngeohash"
+    "geolocate",
+    "maplibre",
+    "maplibregl",
+    "ngeohash",
+    "styleimagemissing"
   ]
 }

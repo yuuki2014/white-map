@@ -4,6 +4,8 @@
     <title><%= content_for(:title) || "Myapp" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -20,10 +22,11 @@
     <link rel="apple-touch-icon" href="/icon.png">
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "my_style", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="min-h-[100vh]" >
+  <body class="" >
     <%= yield :header %>
     <main class="font-sans">
       <%= yield %>

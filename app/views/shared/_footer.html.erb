@@ -2,12 +2,12 @@
   <div class="mx-auto max-w-md px-4 pointer-events-auto">
     <div class="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg px-6 py-3">
       <nav class="flex">
-        <%= link_to new_map_path, class: tab_class(new_map_path) do %>
+        <%= link_to root_path, class: tab_class(root_path) do %>
           <%= lucide_icon('map') %>
           <span class="text-xs">地図</span>
         <% end %>
 
-        <%= link_to maps_path, class: tab_class(maps_path) do %>
+        <%= link_to trips_path, class: tab_class(trips_path) do %>
           <%= lucide_icon('history') %>
           <span class="text-xs">履歴</span>
         <% end %>

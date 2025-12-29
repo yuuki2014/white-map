@@ -1,0 +1,12 @@
+<%= turbo_stream.update "modal-container",
+      partial: "shared/modal",
+      locals: {
+        title: "地図機能を使うには同意が必要です",
+        close_button: false,
+        modal_backdrop: false,
+        content_partial: "tutorials/required",
+        context: "required",
+        content_locals: {
+          context: "terms"
+        }
+      } %>

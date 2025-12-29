@@ -1,28 +1,58 @@
-<div class="fixed inset-0 min-h-screen w-full z-40 flex justify-center items-center opacity-0 transition-all duration-300 transition-opacity p-10" data-controller="modal">
-    <div class="modal-backdrop absolute inset-0 bg-black/50 z-0" data-modal-target="modalBackdrop" <% if local_assigns.fetch(:close, true) %>data-action="click->modal#close"<% end %>></div>
+<%# locals: (title: nil, close_button: true, choice: false, content_partial: nil, content_locals: {}, context: nil, modal_backdrop: true, close_backdrop: true) %>
 
-  <div class="relative max-w-sm  modal-box w-full bg-orange-100 p-4 gap-3 flex flex-col items-center rounded-xl z-10 transition duration-500 ease-out translate-y-40 opacity-0" data-modal-target="modalBox">
-    <% if local_assigns.fetch(:close, true) %>
-      <button class="absolute right-1 top-1 h-6 w-6 flex items-center justify-center leading-none bg-blue-400 rounded-full z-30" data-action="click->modal#close">
+<div class="fixed inset-0 min-h-screen pointer-events-none w-full z-40 flex justify-center items-center opacity-0 transition-all duration-300 p-10" data-controller="modal">
+  <% if modal_backdrop %>
+    <div class="modal-backdrop absolute inset-0 bg-black/50 z-0 pointer-events-auto" data-modal-target="modalBackdrop" <% if close_backdrop %>data-action="click->modal#close"<% end %>></div>
+  <% end %>
+
+  <div class="relative max-w-sm pointer-events-auto modal-box max-h-[90vh] w-full bg-orange-100 p-4 gap-3 flex flex-col items-center rounded-xl z-10 transition-all duration-500 ease-out translate-y-40 opacity-0 overflow-hidden" data-modal-target="modalBox">
+    <% if close_button && context == "terms" %>
+      <%= form_with url: decisions_path, method: :post, data: { turbo: true }, class: "absolute right-2 top-2 h-6 w-6 flex items-center justify-center leading-none bg-gray-500/50 rounded-full z-30" do %>
+        <%= hidden_field_tag :context, context %>
+        <button type="submit" name="decision" value="dismissed" class="btn" data-action="click->modal#close">
+          <%= lucide_icon('x') %>
+        </button>
+      <% end %>
+    <% elsif close_button %>
+      <button class="absolute right-2 top-2 h-6 w-6 flex items-center justify-center leading-none bg-gray-500/50 rounded-full z-30" data-action="click->modal#close">
         <%= lucide_icon('x') %>
       </button>
     <% end %>
-    <div class="modal-header flex z-20">
+
+    <div class="modal-header shrink-0 z-20">
       <div class="text-lg font-bold">
-          <%= local_assigns.fetch(:title, "") %>
+        <%= title %>
       </div>
     </div>
 
-    <div class="modal-body z-20">
+    <%# モーダル本文 %>
+    <div class="modal-body flex-1 min-h-0 px-4 z-20">
       <% if defined?(content_partial) && content_partial.present? %>
         <%= render partial: content_partial, locals: (local_assigns[:content_locals] || {}) %>
       <% end %>
     </div>
 
-    <div class="modal-footer z-20">
-      <% if local_assigns.fetch(:close, true) %>
-        <button data-action="click->modal#close">閉じる</button>
+    <% if local_assigns.fetch(:choice, false) %>
+      <%= form_with url: decisions_path, method: :post, data: { turbo: true }, class: "modal-footer shrink-0 flex justify-between z-20 w-full px-5" do %>
+        <%= hidden_field_tag :context, context %>
+        <% content_locals&.dig(:choices).each do |key, choice| %>
+          <button type="submit" name="decision" value="<%= choice[:value] %>" class="btn" data-action="click->modal#close">
+            <% case choice[:label] %>
+            <% when "スキップ" %>
+              <% text_color = "text-gray-400" %>
+              <% show_index = "0,1"%>
+            <% when "はじめる" %>
+              <% text_color = "text-orange-400" %>
+              <% show_index = "2" %>
+            <% else %>
+              <% text_color = "" %>
+            <% end %>
+            <div class="<%= text_color %>" data-show-on="<%= show_index || "all" %>">
+              <%= choice[:label] %>
+            </div>
+          </button>
+        <% end %>
       <% end %>
-    </div>
+    <% end %>
   </div>
 </div>

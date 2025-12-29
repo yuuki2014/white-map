@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import DispatchController from "./dispatch_controller"
+application.register("dispatch", DispatchController)
+
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 
@@ -15,3 +18,6 @@ application.register("map", MapController)
 
 import ModalController from "./modal_controller"
 application.register("modal", ModalController)
+
+import SwiperController from "./swiper_controller"
+application.register("swiper", SwiperController)

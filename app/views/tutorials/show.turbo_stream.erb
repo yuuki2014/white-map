@@ -1,8 +1,1 @@
-<%= turbo_stream.update "modal-container",
-      partial: "shared/modal",
-      locals: {
-        title: "チュートリアル",
-        close: true,
-        content_partial: "tutorials/step1_map",
-        content_locals: { map_center: [22.4, 120.2] }
-      } %>
+<%= turbo_stream.update "modal-container", partial: "tutorials/tutorials_modal" %>

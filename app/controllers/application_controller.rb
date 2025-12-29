@@ -6,6 +6,10 @@ class ApplicationController < ActionController::Base
   private
 
   def refresh_session_expiration
-    current_user if current_user
+    if user_signed_in?
+      current_user
+      cookies.permanent[:tutorials_end] = "true"
+      cookies.permanent[:terms_accepted] = "true"
+    end
   end
 end

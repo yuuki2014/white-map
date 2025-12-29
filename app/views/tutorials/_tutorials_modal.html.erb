@@ -1,0 +1,16 @@
+<%= turbo_stream.update "modal-container",
+      partial: "shared/modal",
+      locals: {
+        title: "",
+        close_button: false,
+        close_backdrop: false,
+        choice: true,
+        content_partial: "tutorials/map",
+        context: "tutorials",
+        content_locals: {
+          choices: {
+            skip:  { label: "スキップ", value: "end" },
+            yes: { label: "はじめる", value: "end" }
+          }
+        }
+      } %>

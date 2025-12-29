@@ -1,3 +1,8 @@
 <div class="relative h-screen w-full">
   <div data-controller="map" class="absolute inset-0 h-full w-full" data-maptiler-key="<%= Rails.application.credentials.dig(:maptiler, :api_key) %>"></div>
 </div>
+<% if cookies[:terms_accepted] != "true" && cookies[:tutorials_end] != "true" && !user_signed_in? %>
+  <%= render "tutorials/tutorials_modal" %>
+<% elsif cookies[:tutorials_end] == "true" && cookies[:terms_accepted] != "true" && !user_signed_in?  %>
+  <%= render "tutorials/terms_required_modal", formats: :turbo_stream %>
+<% end %>

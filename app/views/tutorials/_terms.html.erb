@@ -1,0 +1,27 @@
+<%# locals: (context: nil) %>
+
+<div class="flex flex-col gap-8">
+  <div class="mx-auto">
+    このアプリは、あなたの移動した軌跡を地図にするために、位置情報（GPS）を使用します。
+  </div>
+  <div class="mx-auto">
+    取得したデータはプライバシーポリシーに基づき厳重に管理されます。
+  </div>
+  <%= link_to "利用規約", "xxx", class: "underline text-blue-400 mx-auto", data: { turbo_stream: true } %>
+  <%= link_to "プライバシーポリシー", "xxx", class: "underline text-blue-400 mx-auto", data: { turbo_stream: true } %>
+  <%= form_with url: decisions_path, method: :post, data: { turbo: true }, class: "modal-footer shrink-0 mx-auto" do %>
+    <%= hidden_field_tag :context, context %>
+    <button type="submit" name="decision" value="accepted" class="btn" data-action="click->modal#close">
+      <div class="font-bold text-white bg-orange-500 mx-auto py-1 px-3 rounded-full">
+        同意して始める
+      </div>
+    </button>
+  <% end %>
+  <div class="text-gray-400 text-xs mx-auto">
+    ※ボタン押下をもって、利用規約およびプライバシーポリシーに同意したものとみなされます。
+  </div>
+  <div class="text-xs mx-auto">
+    すでにアカウントをお持ちの方はこちら
+  </div>
+  <%= link_to "ログイン", new_user_session_path, class: "text-xs underline text-blue-400 mx-auto", data: { turbo_stream: true } %>
+</div>

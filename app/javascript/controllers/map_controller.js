@@ -1,11 +1,16 @@
 import { Controller } from "@hotwired/stimulus"
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { get } from "@rails/request.js"
 
 // Connects to data-controller="map"
 export default class extends Controller {
   async connect() {
     console.log("stimulus map 接続確認")
+
+    // 定数
+    this.PERMISSION_DENIED = 1
+
     const apiKey = this.element.dataset.maptilerKey;
 
     // 地図のstyleを取得
@@ -15,29 +20,29 @@ export default class extends Controller {
     console.log(styleJson);
 
     // デフォルトの中央
-    let center = [ 139.745, 35.658 ]
+    this.center = [ 139.745, 35.658 ];
 
-    // 現在地を取得
-    try {
-      // getCurrentPosition関数で現在地を取得
-      const position = await this.getCurrentPosition();
-
-      // 取得できたら現在地で中央を書き換え
-      center = [ position.coords.longitude, position.coords.latitude ]
-    } catch (error) {
-      console.log("位置情報が取得できなかったのでデフォルトの中央を設定", error);
-    }
+    // 現在地を初期化
+    await this.geolocateInit()
 
     // 地図の初期化
     this.map = new maplibregl.Map({
       container: this.element,
       style: styleJson,
-      center: center,
+      center: this.center,
       zoom: 17
     });
 
+    const pulseEl = document.createElement('div');
+    pulseEl.className = 'my-pulse-marker';
+
+    this.pulseMarker = new maplibregl.Marker({
+      element: pulseEl,
+      offset: [ 0, 0 ]
+    }).setLngLat([0,0]).addTo(this.map);
+
     // 現在地追跡機能を作成
-    const geolocate = new maplibregl.GeolocateControl({
+    this.geolocate = new maplibregl.GeolocateControl({
       positionOptions: {
         // 高精度（GPS）モードを有効に
         enableHighAccuracy: true,
@@ -53,21 +58,24 @@ export default class extends Controller {
       }
     });
 
-    console.log(geolocate)
+    this._onGeolocate = this.startGeolocate.bind(this)
+    window.addEventListener("map:geolocate", this._onGeolocate);
+
+    console.log(this.geolocate)
 
     // 地図に現在地を追加。右上にボタン
-    this.map.addControl(geolocate);
+    this.map.addControl(this.geolocate);
 
     // 元々のtriggerを一時保存
-    const originalTrigger = geolocate.trigger.bind(geolocate);
+    const originalTrigger = this.geolocate.trigger.bind(this.geolocate);
 
     // triggerを上書き
-    geolocate.trigger = () => {
+    this.geolocate.trigger = () => {
       // 現在のズームレベルを取得
       const currentZoom = this.map.getZoom();
 
       // オプションを現在のズームレベルで書き換え
-      geolocate.options.fitBoundsOptions = {
+      this.geolocate.options.fitBoundsOptions = {
         maxZoom: currentZoom,
         linear: true,
         duration: 2000
@@ -79,7 +87,7 @@ export default class extends Controller {
     let num = 0;
 
     // 現在地を取得
-    geolocate.on('geolocate', (data) => {
+    this.geolocate.on('geolocate', (data) => {
 
       const lng = data.coords.longitude; // 経度
       const lat = data.coords.latitude;  // 緯度
@@ -90,6 +98,8 @@ export default class extends Controller {
       console.log("取得時刻:", recordTime);
       console.log("現在地取得:", lat, lng);
 
+      this.pulseMarker.setLngLat([lng, lat]);
+
       this.currentLng = lng;
       this.currentLat = lat;
       this.currentRecordTime = recordTime;
@@ -98,7 +108,9 @@ export default class extends Controller {
     // 地図の読み込みが終わった後に実行
     this.map.on('load', () => {
       // 地図上の現在地ボタンを起動
-      geolocate.trigger();
+      if(this.hasAccepted === "true"){
+        this.geolocate.trigger();
+      }
     })
 
     // アイコンが足りない時のダミー追加。後で正しいアイコンが表示されるように設定する
@@ -118,7 +130,7 @@ export default class extends Controller {
       // オプションを設定
       const options = {
         enableHighAccuracy: true,
-        timeout: 5000,
+        timeout: 20000,
         maximumAge: 0
       };
 
@@ -128,10 +140,67 @@ export default class extends Controller {
 
   disconnect() {
     console.log("disconnect:", this.map)
+    // 自作マーカーを削除
+    if (this.pulseMarker) {
+      this.pulseMarker.remove();
+    }
     if (this.map) {
       this.map.remove(); // 地図機能の停止、画面から削除
       this.map = null; // メモリの解放
       console.log("map 消去:", this.map)
     }
+    if (this._onGeolocate) {
+      window.removeEventListener("map:geolocate", this._onGeolocate)
+    }
+  }
+
+  getCookie(name) {
+    return document.cookie.split("; ").find(row => row.startsWith(`${name}=`))?.split("=")[1];
+  }
+
+  async startGeolocate(){
+    if (!this.geolocate) {
+      console.log("geolocateが準備できてません")
+      return
+    }
+    // 現在地を初期化
+    await this.geolocateInit()
+    this.geolocate.trigger();
+  }
+
+  async geolocateInit(){
+    this.hasAccepted = this.getCookie("terms_accepted");
+
+    if(this.hasAccepted === "true"){
+      // 現在地を取得
+      try {
+        // getCurrentPosition関数で現在地を取得
+        const position = await this.getCurrentPosition();
+
+        // 取得できたら現在地で中央を書き換え
+        this.center = [ position.coords.longitude, position.coords.latitude ];
+      } catch (error) {
+        console.log("位置情報が取得できなかったのでデフォルトの中央を設定", error);
+
+        // 現在地機能が許可されていない場合にモーダルを表示
+        if(error.code === this.PERMISSION_DENIED) {
+          this.showLocationDeniedModal()
+        }
+      }
+    }
+  }
+
+  clearModal(){
+    const container = document.getElementById("modal-container");
+    if (container) {
+      setTimeout(() => {
+        container.innerHTML = "";
+      },100)
+    }
+  }
+
+  // ターボストリームで位置情報が許可されていない時のモーダルを表示
+  showLocationDeniedModal() {
+    get("/location_denied", { responseKind: "turbo-stream" });
   }
 }

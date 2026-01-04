@@ -50,7 +50,8 @@ export default class extends Controller {
     this.statusValue = STATUS.RECORDING
     this.mapOutlet.setStatus(this.statusValue);
     this.mapOutlet.postFootprint();
-    this.mapOutlet.setFlashTimer();
+    this.mapOutlet.setFlushTimer();
+    this.mapOutlet.executeFogClearing();
   }
 
   resumeRecording(){
@@ -61,7 +62,7 @@ export default class extends Controller {
 
   pauseRecording(){
     console.log("一時停止");
-    this.mapOutlet.flashBuffer();
+    this.mapOutlet.flushBuffer();
     this.mapOutlet.postFootprint();
     this.statusValue = STATUS.PAUSED
     this.mapOutlet.setStatus(this.statusValue);
@@ -69,7 +70,7 @@ export default class extends Controller {
 
   endRecording(){
     console.log("記録を終えました");
-    this.mapOutlet.clearFlashTimer();
+    this.mapOutlet.clearFlushTimer();
     this.statusValue = STATUS.ENDED
     this.mapOutlet.setStatus(this.statusValue);
   }

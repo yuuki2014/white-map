@@ -5,10 +5,11 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { get } from "@rails/request.js"
 import ngeohash from 'ngeohash';
 import { getDistance } from 'geolib'
+import * as turf from "@turf/turf"
 
 // 定数定義
 const PERMISSION_DENIED   = 1;    // 位置情報不許可時のerror値
-const GEOHASH_PRECISION   = 12;   // 保存するgeohash精度
+const GEOHASH_PRECISION   = 9;   // 保存するgeohash精度
 const MIN_DISTANCE_METERS = 30;   // 30メートル
 const FORCE_RECORD_MS     = 5000; // 5000ミリ秒 (記録間隔の最大値)
 const FLUSH_INTERVAL_MS   = 1000; // 1000ミリ秒 (送信間隔)
@@ -20,7 +21,7 @@ export default class extends Controller {
                   }
 
   async connect() {
-    console.log("stimulus map 接続確認")
+    // console.log("stimulus map 接続確認")
 
     const apiKey = this.element.dataset.maptilerKey;
 
@@ -28,7 +29,7 @@ export default class extends Controller {
     const res = await fetch(`https://api.maptiler.com/maps/jp-mierune-streets/style.json?key=${apiKey}`);
     const styleJson = await res.json();
 
-    console.log(styleJson);
+    // console.log(styleJson);
 
     // ステータスを初期化
     this.status = null;
@@ -54,6 +55,10 @@ export default class extends Controller {
 
     // 現在地を初期化
     await this.geolocateInit()
+
+    // 地図の踏破済みの場所保存する配列を初期化
+    this.visitedFeatures = []
+    this.visitedGeohashes = new Set()
 
     // 地図の初期化
     this.map = new maplibregl.Map({
@@ -91,7 +96,7 @@ export default class extends Controller {
     this._onGeolocate = this.startGeolocate.bind(this)
     window.addEventListener("map:geolocate", this._onGeolocate);
 
-    console.log(this.geolocate)
+    // console.log(this.geolocate)
 
     // 地図に現在地を追加。右上にボタン
     this.map.addControl(this.geolocate);
@@ -129,10 +134,10 @@ export default class extends Controller {
       latInput.value = lat;
       num += 1;
 
-      console.log(num)
-      console.log("取得時刻:", recordTime);
-      console.log("現在地取得:", lat, lng);
-      console.log("geohash:", geohash)
+      // console.log(num)
+      // console.log("取得時刻:", recordTime);
+      // console.log("現在地取得:", lat, lng);
+      // console.log("geohash:", geohash)
 
       this.pulseMarker.setLngLat([lng, lat]);
 
@@ -145,6 +150,7 @@ export default class extends Controller {
       if(this.status === STATUS.RECORDING) {
 
         // 霧の更新
+        this.executeFogClearing();
 
         // 保存判定ロジック
         const now = Date.now(); // 現在の時刻
@@ -185,6 +191,9 @@ export default class extends Controller {
 
     // 地図の読み込みが終わった後に実行
     this.map.on('load', () => {
+      // 霧を初期化
+      this.fogInit()
+
       // 地図上の現在地ボタンを起動
       if(this.hasAccepted === "true"){
         this.geolocate.trigger();
@@ -230,9 +239,12 @@ export default class extends Controller {
     if (this._onGeolocate) {
       window.removeEventListener("map:geolocate", this._onGeolocate)
     }
-    if(this.flashTimer) {
-      clearInterval(this.flashTimer);
-      this.flashBuffer();
+    if(this.flushTimer) {
+      clearInterval(this.flushTimer);
+      this.flushBuffer();
+    }
+    if(this.status === STATUS.RECORDING){
+      this.postFootprint();
     }
   }
 
@@ -328,17 +340,15 @@ export default class extends Controller {
   }
 
   // 溜めたバッファを送信するためのフラッシュタイマー
-  setFlashTimer(){
+  setFlushTimer(){
     console.log("バッファ送信用タイマーをセット")
-    this.flashTimer = setInterval(() => {
-      if(this.status === STATUS.RECORDING){
-        this.flashBuffer();
-      }
+    this.flushTimer = setInterval(() => {
+      this.flushBuffer();
     }, FLUSH_INTERVAL_MS);
   }
 
   // 溜めたバッファを一気にポスト
-  async flashBuffer(){
+  async flushBuffer(){
     if(this.footprintBuffer.length === 0) return;
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content
@@ -372,15 +382,114 @@ export default class extends Controller {
     }
   }
 
-  clearFlashTimer(){
-    if(this.flashTimer) {
-      console.log("flashTimerを停止")
-      clearInterval(this.flashTimer);
+  clearFlushTimer(){
+    if(this.flushTimer) {
+      console.log("flushTimerを停止")
+      clearInterval(this.flushTimer);
     }
   }
 
   checkGeolocate(event){
     if(this.currentLng && this.currentLat) return;
     event.preventDefault();
+  }
+
+  fogInit(){
+    if (!this.map.getSource('polygon')) {
+      this.map.addSource('polygon', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+    }
+
+    if (!this.map.getLayer('polygon-fill')) {
+      this.map.addLayer({
+        id: `polygon-fill`,
+        type: "fill",
+        source: `polygon`,
+        layout: {},
+        paint: {
+          "fill-color": "#1c1c1c",
+          "fill-opacity": 0.5,
+        }
+      });
+    }
+
+    if (!this.map.getLayer('outline')) {
+      this.map.addLayer({
+        id: `outline`,
+        type: "line",
+        source: `polygon`,
+        layout: {},
+        paint: {
+          "line-color": "#1c1c1c",
+          "line-width": 2,
+        }
+      });
+    }
+  }
+
+  createPolygonFeatureFromGeohash(hash){
+    const [minLat, minLon, maxLat, maxLon] = ngeohash.decode_bbox(hash) // geohashをデコードしてbboxの形式に4点を取得
+    const bbox = [minLon, minLat, maxLon, maxLat]; // turfのbbox用に並び替える
+    const visitedPolygon = turf.bboxPolygon(bbox); // polygon用に
+
+    this.visitedFeatures.push(visitedPolygon) // 配列に格納
+  }
+
+  addGeohashesAndGetNew(){
+    const newGeohashes = []
+
+    // 現在地の周囲8方向のgeohashを取得
+    const neighbors = ngeohash.neighbors(this.currentGeohash);
+    const aroundGeohashes = [this.currentGeohash, ...neighbors];
+
+    // 保持していないものを追加
+    for (const hash of aroundGeohashes) {
+      if (this.visitedGeohashes.has(hash)) continue // すでに保持していた場合はスキップ
+      this.visitedGeohashes.add(hash);
+      newGeohashes.push(hash);
+    }
+
+    return newGeohashes
+  }
+
+  updateFog(){
+    if(!this.map.getSource('polygon')){
+      this.fogInit();
+    }
+
+    const source = this.map.getSource(`polygon`);
+
+    source.setData({ type: 'FeatureCollection', features: this.visitedFeatures })
+  }
+
+  resetFog() {
+    this.visitedFeatures = [];
+    this.visitedGeohashes.clear();
+
+    this.updateFog();
+  }
+
+  executeFogClearing(){
+    console.log("execute実行")
+    const newGeohashes = this.addGeohashesAndGetNew();
+    console.log(newGeohashes)
+
+    if(newGeohashes.length === 0){
+      console.log("新たに訪れた場所がないので何も実行しません")
+      return;
+    }
+
+    newGeohashes.forEach(hash => {
+      this.createPolygonFeatureFromGeohash(hash);
+    })
+
+    console.log(this.visitedFeatures)
+
+    this.updateFog();
   }
 }

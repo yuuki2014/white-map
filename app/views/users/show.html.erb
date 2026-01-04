@@ -12,9 +12,6 @@
         <div class="text-xl font-bold text-gray-800">
           <%= @user.nickname %>
         </div>
-        <div class="text-xl font-bold text-gray-800">
-          <%= @user.id %>
-        </div>
         <% if current_user&.general? %>
           <button class="p-2 rounded-full hover:bg-gray-200">
             <%= lucide_icon('square-pen', class: "text-gray-700")%>

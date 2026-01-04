@@ -7,8 +7,11 @@ import ngeohash from 'ngeohash';
 import { getDistance } from 'geolib'
 
 // 定数定義
-const PERMISSION_DENIED = 1; // 位置情報不許可時のerror値
-const GEOHASH_PRECISION = 12; // 保存するgeohash精度
+const PERMISSION_DENIED   = 1;    // 位置情報不許可時のerror値
+const GEOHASH_PRECISION   = 12;   // 保存するgeohash精度
+const MIN_DISTANCE_METERS = 30;   // 30メートル
+const FORCE_RECORD_MS     = 5000; // 5000ミリ秒 (記録間隔の最大値)
+const FLUSH_INTERVAL_MS   = 1000; // 1000ミリ秒 (送信間隔)
 
 // Connects to data-controller="map"
 export default class extends Controller {
@@ -152,8 +155,8 @@ export default class extends Controller {
 
         // 保存条件
         const isNewTile = this.lastSentGeohash !== this.currentGeohash; // geohashが前回から更新されている場合
-        const isMoveEnough = distanceMoved > 30; // 前回より一定の距離以上移動している場合
-        const isTimeOut = timeElapsed > 5000;   // 移動していなくても一定時間が経過
+        const isMoveEnough = distanceMoved > MIN_DISTANCE_METERS;       // 前回より一定の距離以上移動している場合
+        const isTimeOut = timeElapsed > FORCE_RECORD_MS;                // 移動していなくても一定時間が経過
 
         // どれか一つの条件にでも当てはまった場合は保存
         if( isNewTile || isMoveEnough || isTimeOut ) {
@@ -331,7 +334,7 @@ export default class extends Controller {
       if(this.status === STATUS.RECORDING){
         this.flashBuffer();
       }
-    }, 1000);
+    }, FLUSH_INTERVAL_MS);
   }
 
   // 溜めたバッファを一気にポスト
@@ -366,6 +369,13 @@ export default class extends Controller {
       console.log("送信成功。現在のバッファ:", this.footprintBuffer);
     } catch(error) {
       console.warn("送信失敗。データを保持して次回リトライします", error);
+    }
+  }
+
+  clearFlashTimer(){
+    if(this.flashTimer) {
+      console.log("flashTimerを停止")
+      clearInterval(this.flashTimer);
     }
   }
 

@@ -1,5 +1,7 @@
-<%= link_to end_check_api_v1_trip_path(trip),
-  class: "btn btn-primary bg-gray-300 text-black p-3 rounded-full shadow-lg ring-1 ring-black/20 hover:bg-gray-400 active:scale-95 transition",
-  data: { turbo_stream: true } do %>
+<%= button_to end_check_api_v1_trip_path(trip),
+      method: :get,
+      params: { format: :turbo_stream },
+      form: { class: "contents" },
+      class: "flex items-center justify-center btn btn-primary bg-gray-300 text-black p-3 rounded-full shadow-lg ring-1 ring-black/20 hover:bg-gray-400 active:scale-95 transition" do %>
   <%= lucide_icon('square') %>
 <% end %>

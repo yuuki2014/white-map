@@ -32,7 +32,7 @@ export default class extends Controller {
     // console.log(styleJson);
 
     // ステータスを初期化
-    this.status = null;
+    this.status = STATUS.STOPPED;
 
     // 現在の緯度経度を初期化
     this.currentLng = null;
@@ -56,18 +56,18 @@ export default class extends Controller {
     // 現在地を初期化
     await this.geolocateInit()
 
-    // 地図の踏破済みの場所保存する配列を初期化
-    this.visitedCoordinates = []
+    // TurfのFeatureオブジェクトとして管理
+    this.visitedFeature = null;
     this.visitedGeohashes = new Set()
 
     // 世界を覆う霧のマスク
-    this.worldMask = [
+    this.worldFeature = turf.polygon([[
       [-180, 90],
       [-180, -90],
       [180, -90],
       [180, 90],
       [-180, 90]
-    ];
+    ]]);
 
     // 地図の初期化
     this.map = new maplibregl.Map({
@@ -157,11 +157,14 @@ export default class extends Controller {
       this.currentGeohash = geohash;
       this.currentRecordTime = recordTime;
 
+
+      // 霧の更新
+      if(this.status !== STATUS.PAUSED){
+        this.executeFogClearing();
+      }
+
       // status が RECORDING になっている場合に保存
       if(this.status === STATUS.RECORDING) {
-
-        // 霧の更新
-        this.executeFogClearing();
 
         // 保存判定ロジック
         const now = Date.now(); // 現在の時刻
@@ -210,21 +213,18 @@ export default class extends Controller {
         this.geolocate.trigger();
       }
 
+      // // ▼▼▼ デバッグ用：クリックで霧を晴らす ▼▼▼
+      // this.map.on('click', (e) => {
+      //   const { lng, lat } = e.lngLat;
 
+      //   // クリックした場所をGeohash（精度9）に変換
+      //   const clickHash = ngeohash.encode(lat, lng, 9);
 
-      // ▼▼▼ デバッグ用：クリックで霧を晴らす ▼▼▼
-      this.map.on('click', (e) => {
-        const { lng, lat } = e.lngLat;
-        
-        // 1. クリックした場所をGeohash（精度9）に変換
-        // ※ ngeohashライブラリが使える前提です
-        const clickHash = ngeohash.encode(lat, lng, 9);
-        
-        console.log(`クリック地点: ${lat}, ${lng} -> ${clickHash}`);
+      //   console.log(`クリック地点: ${lat}, ${lng} -> ${clickHash}`);
 
-        // 2. その場所を中心に霧を晴らす処理を実行
-        this.debugClearFogAt(clickHash);
-      });
+      //   // その場所を中心に霧を晴らす処理を実行
+      //   this.debugClearFogAt(clickHash);
+      // });
     })
 
     // アイコンが足りない時のダミー追加。後で正しいアイコンが表示されるように設定する
@@ -287,6 +287,7 @@ export default class extends Controller {
     // 現在地を初期化
     await this.geolocateInit()
     this.geolocate.trigger();
+    this.fog
   }
 
   async geolocateInit(){
@@ -429,7 +430,7 @@ export default class extends Controller {
           type: 'Feature',
           geometry: {
             type: 'Polygon',
-            coordinates: [this.worldMask]
+            coordinates: [this.worldFeature]
           }
         }
       });
@@ -449,11 +450,11 @@ export default class extends Controller {
     }
   }
 
-  createCoordinateFromGeohash(hash){
+  createPolygonFromGeohash(hash){
     const [minLat, minLon, maxLat, maxLon] = ngeohash.decode_bbox(hash); // geohashをデコードしてbboxの形式に4点を取得
     const bbox = [minLon, minLat, maxLon, maxLat]; // turfのbbox用に並び替える
 
-    return turf.bboxPolygon(bbox).geometry.coordinates[0];
+    return turf.bboxPolygon(bbox);
   }
 
   addGeohashesAndGetNew(){
@@ -473,32 +474,43 @@ export default class extends Controller {
     return newGeohashes
   }
 
-  updateFog(){
+  updateFog(geojsonData){
     if(!this.map.getSource('fog')){
       this.fogInit();
     }
 
     const source = this.map.getSource(`fog`);
-
-    const holePolygon = {
-      type: 'Feature',
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          this.worldMask,
-          ...this.visitedCoordinates
-        ]
-      }
-    };
-
-    source.setData(holePolygon)
+    source.setData(geojsonData);
   }
 
   resetFog() {
-    this.visitedCoordinates = [];
+    this.visitedFeature = null;
     this.visitedGeohashes.clear();
 
-    this.updateFog();
+    const targetHash = this.currentGeohash;
+    const neighbors = ngeohash.neighbors(targetHash);
+    const hashesToClear = [targetHash, ...neighbors];
+
+    const polygonsToMerge = hashesToClear.map(hash => this.createPolygonFromGeohash(hash));
+
+    let feature = null;
+
+    if (polygonsToMerge.length > 1) {
+      // 配列をFeatureCollectionに変換してから、unionに渡す
+      const featureCollection = turf.featureCollection(polygonsToMerge);
+      feature = turf.union(featureCollection);
+    } else {
+      feature = polygonsToMerge[0];
+    }
+
+    const fogPolygon = turf.difference(turf.featureCollection([this.worldFeature, feature]));
+
+    this.updateFog(fogPolygon);
+  }
+
+  resetFogData() {
+    this.visitedFeature = null;
+    this.visitedGeohashes.clear();
   }
 
   executeFogClearing(){
@@ -511,15 +523,35 @@ export default class extends Controller {
       return;
     }
 
-    newGeohashes.forEach(hash => {
-      const coords = this.createCoordinateFromGeohash(hash);
-      this.visitedCoordinates.push(coords);
-    })
+    // 今回追加するポリゴンを全て配列にする
+    const polygonsToMerge = newGeohashes.map(hash => this.createPolygonFromGeohash(hash));
 
-    console.log(this.visitedCoordinates)
-    console.log("現在の穴の数:", this.visitedCoordinates.length)
+    // 過去のvisitedFeatureがあれば、それも配列に加える
+    if (this.visitedFeature) {
+      polygonsToMerge.push(this.visitedFeature);
+    }
 
-    this.updateFog();
+    if (polygonsToMerge.length > 1) {
+      // 配列をFeatureCollectionに変換してから、unionに渡す
+      const featureCollection = turf.featureCollection(polygonsToMerge);
+      this.visitedFeature = turf.union(featureCollection);
+    } else {
+      this.visitedFeature = polygonsToMerge[0];
+    }
+
+    // 世界全体からvisitedを引いて霧を作る
+    const fogPolygon = turf.difference(turf.featureCollection([this.worldFeature, this.visitedFeature]));
+
+    if (fogPolygon) {
+      this.updateFog(fogPolygon);
+    } else {
+      console.log("fogPolygonが見つかりません");
+    }
+
+    if(this.status === STATUS.STOPPED){
+      console.log("リセット")
+      this.resetFogData();
+    }
   }
 
   // 指定されたGeohashの周辺を晴らす（デバッグ・テスト用）
@@ -528,26 +560,33 @@ export default class extends Controller {
     const neighbors = ngeohash.neighbors(targetHash);
     const hashesToClear = [targetHash, ...neighbors];
 
-    let addedCount = 0;
+    const polygonsToMerge = hashesToClear.map(hash => this.createPolygonFromGeohash(hash));
 
-    hashesToClear.forEach(hash => {
-      // 重複チェック
-      if (this.visitedGeohashes.has(hash)) return;
-      
-      this.visitedGeohashes.add(hash);
+     // 過去のvisitedFeatureがあれば、それも配列に加える
+    if (this.visitedFeature) {
+      polygonsToMerge.push(this.visitedFeature);
+    }
 
-      // 座標を作って保存（既存メソッドを再利用）
-      const coords = this.createCoordinateFromGeohash(hash);
-      this.visitedCoordinates.push(coords);
-      
-      addedCount++;
-    });
-
-    if (addedCount > 0) {
-      console.log(`✨ 新たに ${addedCount} 箇所を開放！ (現在の穴の総数: ${this.visitedCoordinates.length})`);
-      this.updateFog();
+    if (polygonsToMerge.length > 1) {
+      // 配列をFeatureCollectionに変換してから、unionに渡す
+      const featureCollection = turf.featureCollection(polygonsToMerge);
+      this.visitedFeature = turf.union(featureCollection);
     } else {
-      console.log("すでに開放済みです");
+      this.visitedFeature = polygonsToMerge[0];
+    }
+
+    // 世界全体からvisitedを引いて霧を作る
+    const fogPolygon = turf.difference(turf.featureCollection([this.worldFeature, this.visitedFeature]));
+
+    if (fogPolygon) {
+      this.updateFog(fogPolygon);
+    } else {
+      console.log("fogPolygonが見つかりません");
+    }
+
+    if(this.status === STATUS.STOPPED){
+      console.log("リセット")
+      this.resetFogData();
     }
   }
 }

@@ -73,6 +73,7 @@ export default class extends Controller {
     this.mapOutlet.clearFlushTimer();
     this.statusValue = STATUS.ENDED
     this.mapOutlet.setStatus(this.statusValue);
+    this.mapOutlet.resetFog();
   }
 
   // status 変化時に自動で呼ばれるメソッド

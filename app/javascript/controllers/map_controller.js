@@ -57,8 +57,17 @@ export default class extends Controller {
     await this.geolocateInit()
 
     // 地図の踏破済みの場所保存する配列を初期化
-    this.visitedFeatures = []
+    this.visitedCoordinates = []
     this.visitedGeohashes = new Set()
+
+    // 世界を覆う霧のマスク
+    this.worldMask = [
+      [-180, 90],
+      [-180, -90],
+      [180, -90],
+      [180, 90],
+      [-180, 90]
+    ];
 
     // 地図の初期化
     this.map = new maplibregl.Map({
@@ -88,6 +97,8 @@ export default class extends Controller {
       trackUserLocation: true,
       // スマホの向いている方角を表示
       showUserHeading: true,
+      // GPSの誤差の範囲を表示
+      showAccuracyCircle: false,
       // ズームカメラの設定
       fitBoundsOptions: {
       }
@@ -198,6 +209,22 @@ export default class extends Controller {
       if(this.hasAccepted === "true"){
         this.geolocate.trigger();
       }
+
+
+
+      // ▼▼▼ デバッグ用：クリックで霧を晴らす ▼▼▼
+      this.map.on('click', (e) => {
+        const { lng, lat } = e.lngLat;
+        
+        // 1. クリックした場所をGeohash（精度9）に変換
+        // ※ ngeohashライブラリが使える前提です
+        const clickHash = ngeohash.encode(lat, lng, 9);
+        
+        console.log(`クリック地点: ${lat}, ${lng} -> ${clickHash}`);
+
+        // 2. その場所を中心に霧を晴らす処理を実行
+        this.debugClearFogAt(clickHash);
+      });
     })
 
     // アイコンが足りない時のダミー追加。後で正しいアイコンが表示されるように設定する
@@ -395,49 +422,38 @@ export default class extends Controller {
   }
 
   fogInit(){
-    if (!this.map.getSource('polygon')) {
-      this.map.addSource('polygon', {
+    if (!this.map.getSource('fog')) {
+      this.map.addSource('fog', {
         type: 'geojson',
         data: {
-          type: 'FeatureCollection',
-          features: []
+          type: 'Feature',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [this.worldMask]
+          }
         }
       });
     }
 
-    if (!this.map.getLayer('polygon-fill')) {
+    if (!this.map.getLayer('fog-layer')) {
       this.map.addLayer({
-        id: `polygon-fill`,
+        id: 'fog-layer',
         type: "fill",
-        source: `polygon`,
-        layout: {},
+        source: 'fog',
         paint: {
-          "fill-color": "#1c1c1c",
-          "fill-opacity": 0.5,
-        }
-      });
-    }
-
-    if (!this.map.getLayer('outline')) {
-      this.map.addLayer({
-        id: `outline`,
-        type: "line",
-        source: `polygon`,
-        layout: {},
-        paint: {
-          "line-color": "#1c1c1c",
-          "line-width": 2,
+          "fill-color": "#ffffff",
+          "fill-opacity": 0.9,
+          'fill-antialias': false,
         }
       });
     }
   }
 
-  createPolygonFeatureFromGeohash(hash){
-    const [minLat, minLon, maxLat, maxLon] = ngeohash.decode_bbox(hash) // geohashをデコードしてbboxの形式に4点を取得
+  createCoordinateFromGeohash(hash){
+    const [minLat, minLon, maxLat, maxLon] = ngeohash.decode_bbox(hash); // geohashをデコードしてbboxの形式に4点を取得
     const bbox = [minLon, minLat, maxLon, maxLat]; // turfのbbox用に並び替える
-    const visitedPolygon = turf.bboxPolygon(bbox); // polygon用に
 
-    this.visitedFeatures.push(visitedPolygon) // 配列に格納
+    return turf.bboxPolygon(bbox).geometry.coordinates[0];
   }
 
   addGeohashesAndGetNew(){
@@ -458,17 +474,28 @@ export default class extends Controller {
   }
 
   updateFog(){
-    if(!this.map.getSource('polygon')){
+    if(!this.map.getSource('fog')){
       this.fogInit();
     }
 
-    const source = this.map.getSource(`polygon`);
+    const source = this.map.getSource(`fog`);
 
-    source.setData({ type: 'FeatureCollection', features: this.visitedFeatures })
+    const holePolygon = {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          this.worldMask,
+          ...this.visitedCoordinates
+        ]
+      }
+    };
+
+    source.setData(holePolygon)
   }
 
   resetFog() {
-    this.visitedFeatures = [];
+    this.visitedCoordinates = [];
     this.visitedGeohashes.clear();
 
     this.updateFog();
@@ -485,11 +512,42 @@ export default class extends Controller {
     }
 
     newGeohashes.forEach(hash => {
-      this.createPolygonFeatureFromGeohash(hash);
+      const coords = this.createCoordinateFromGeohash(hash);
+      this.visitedCoordinates.push(coords);
     })
 
-    console.log(this.visitedFeatures)
+    console.log(this.visitedCoordinates)
+    console.log("現在の穴の数:", this.visitedCoordinates.length)
 
     this.updateFog();
+  }
+
+  // 指定されたGeohashの周辺を晴らす（デバッグ・テスト用）
+  debugClearFogAt(targetHash) {
+    // 周囲8方向のgeohashを取得
+    const neighbors = ngeohash.neighbors(targetHash);
+    const hashesToClear = [targetHash, ...neighbors];
+
+    let addedCount = 0;
+
+    hashesToClear.forEach(hash => {
+      // 重複チェック
+      if (this.visitedGeohashes.has(hash)) return;
+      
+      this.visitedGeohashes.add(hash);
+
+      // 座標を作って保存（既存メソッドを再利用）
+      const coords = this.createCoordinateFromGeohash(hash);
+      this.visitedCoordinates.push(coords);
+      
+      addedCount++;
+    });
+
+    if (addedCount > 0) {
+      console.log(`✨ 新たに ${addedCount} 箇所を開放！ (現在の穴の総数: ${this.visitedCoordinates.length})`);
+      this.updateFog();
+    } else {
+      console.log("すでに開放済みです");
+    }
   }
 }

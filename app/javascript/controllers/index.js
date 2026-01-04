@@ -7,8 +7,8 @@ import { application } from "./application"
 import DispatchController from "./dispatch_controller"
 application.register("dispatch", DispatchController)
 
-import FlashController from "./flash_controller"
-application.register("flash", FlashController)
+import FlushController from "./flush_controller"
+application.register("flush", FlushController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)

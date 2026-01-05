@@ -8,7 +8,6 @@ class Footprint < ApplicationRecord
   # 定数定義
   GEOHASH_PRECISION = 9
 
-
   # バリデーション定義
   validates :trip_id, :latitude, :longitude, :geohash, :recorded_at, presence: true
 

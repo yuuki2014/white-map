@@ -11,8 +11,8 @@ import * as turf from "@turf/turf"
 const PERMISSION_DENIED   = 1;    // 位置情報不許可時のerror値
 const GEOHASH_PRECISION   = 9;   // 保存するgeohash精度
 const MIN_DISTANCE_METERS = 30;   // 30メートル
-const FORCE_RECORD_MS     = 5000; // 5000ミリ秒 (記録間隔の最大値)
-const FLUSH_INTERVAL_MS   = 1000; // 1000ミリ秒 (送信間隔)
+const FORCE_RECORD_MS     = 3000; // 3000ミリ秒 (記録間隔の最大値)
+const FLUSH_INTERVAL_MS   = 6000; // 6000ミリ秒 (送信間隔)
 
 // Connects to data-controller="map"
 export default class extends Controller {

@@ -13,10 +13,10 @@ const GEOHASH_PRECISION   = 9;   // 保存するgeohash精度
 const MIN_DISTANCE_METERS = 30;   // 30メートル
 const FORCE_RECORD_MS     = 3000; // 3000ミリ秒 (記録間隔の最大値)
 const FLUSH_INTERVAL_MS   = 6000; // 6000ミリ秒 (送信間隔)
-const FOG_UPDATE_MIN_MS = 1000;
 
 // Connects to data-controller="map"
 export default class extends Controller {
+  static targets = [ "mapOverlay" ]
   static values = { longitude: String,
                     latitude : String
                   }
@@ -24,12 +24,10 @@ export default class extends Controller {
   async connect() {
     // console.log("stimulus map 接続確認")
 
-    this.lastFogUpdatedAt = 0;
-
     const apiKey = this.element.dataset.maptilerKey;
 
     // 地図のstyleを取得
-    const res = await fetch(`https://api.maptiler.com/maps/jp-mierune-streets/style.json?key=${apiKey}`);
+    const res = await fetch(`https://api.maptiler.com/maps/jp-mierune-dark/style.json?key=${apiKey}`);
     const styleJson = await res.json();
 
     // console.log(styleJson);
@@ -77,8 +75,11 @@ export default class extends Controller {
       container: this.element,
       style: styleJson,
       center: this.center,
-      zoom: 17
+      zoom: 17,
+      attributionControl: false,
     });
+
+    this.map.addControl(new maplibregl.AttributionControl({ compact: true }), "top-right");
 
     const pulseEl = document.createElement('div');
     pulseEl.className = 'my-pulse-marker';
@@ -153,7 +154,7 @@ export default class extends Controller {
       // console.log("現在地取得:", lat, lng);
       // console.log("geohash:", geohash)
 
-      console.log("accuracy(m):", data.coords.accuracy)
+      // console.log("accuracy(m):", data.coords.accuracy)
 
       this.pulseMarker.setLngLat([lng, lat]);
 
@@ -162,11 +163,8 @@ export default class extends Controller {
       this.currentGeohash = geohash;
       this.currentRecordTime = recordTime;
 
-
       // 霧の更新
-      const now = Date.now()
-      if (this.status !== STATUS.PAUSED && now - this.lastFogUpdatedAt > FOG_UPDATE_MIN_MS) {
-        this.lastFogUpdatedAt = now
+      if (this.status !== STATUS.PAUSED) {
         this.executeFogClearing()
       }
 
@@ -210,6 +208,21 @@ export default class extends Controller {
       }
     })
 
+    // 非表示にする地図上の情報
+    const toHide = [
+      "Restaurant and shop",
+      "Store and mall",
+      "Pub",
+      "Hotel",
+      "Generic POI",
+      "Generic POI 11",
+      "Major POI",
+      "Doctor",
+      "Parking",
+      "Government",
+      "Golf pitch",
+    ];
+
     // 地図の読み込みが終わった後に実行
     this.map.on('load', () => {
       // 霧を初期化
@@ -219,6 +232,15 @@ export default class extends Controller {
       if(this.hasAccepted === "true"){
         this.geolocate.trigger();
       }
+
+      toHide.forEach(id => {
+        if (this.map.getLayer(id)) {
+          this.map.setLayoutProperty(id, "visibility", "none");
+        }
+      });
+
+      this.clearMapOverlay();
+
 
       // // ▼▼▼ デバッグ用：クリックで霧を晴らす ▼▼▼
       // this.map.on('click', (e) => {
@@ -515,9 +537,9 @@ export default class extends Controller {
   }
 
   executeFogClearing(){
-    console.log("execute実行")
+    // console.log("execute実行")
     const newGeohashes = this.addGeohashesAndGetNew();
-    console.log(newGeohashes)
+    // console.log(newGeohashes)
 
     if(newGeohashes.length === 0){
       console.log("新たに訪れた場所がないので何も実行しません")
@@ -550,7 +572,7 @@ export default class extends Controller {
     }
 
     if(this.status === STATUS.STOPPED){
-      console.log("リセット")
+      // console.log("リセット")
       this.resetFogData();
     }
   }
@@ -586,8 +608,17 @@ export default class extends Controller {
     }
 
     if(this.status === STATUS.STOPPED){
-      console.log("リセット")
+      // console.log("リセット")
       this.resetFogData();
     }
+  }
+
+  clearMapOverlay(){
+    const el = this.mapOverlayTarget
+    el.classList.remove("opacity-100")
+    el.classList.add("opacity-0")
+    el.addEventListener("transitionend", () => {
+      el.remove();
+    }, { once: true })
   }
 }

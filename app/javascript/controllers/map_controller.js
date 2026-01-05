@@ -13,6 +13,7 @@ const GEOHASH_PRECISION   = 9;   // 保存するgeohash精度
 const MIN_DISTANCE_METERS = 30;   // 30メートル
 const FORCE_RECORD_MS     = 3000; // 3000ミリ秒 (記録間隔の最大値)
 const FLUSH_INTERVAL_MS   = 6000; // 6000ミリ秒 (送信間隔)
+const FOG_UPDATE_MIN_MS = 1000;
 
 // Connects to data-controller="map"
 export default class extends Controller {
@@ -22,6 +23,8 @@ export default class extends Controller {
 
   async connect() {
     // console.log("stimulus map 接続確認")
+
+    this.lastFogUpdatedAt = 0;
 
     const apiKey = this.element.dataset.maptilerKey;
 
@@ -150,6 +153,8 @@ export default class extends Controller {
       // console.log("現在地取得:", lat, lng);
       // console.log("geohash:", geohash)
 
+      console.log("accuracy(m):", data.coords.accuracy)
+
       this.pulseMarker.setLngLat([lng, lat]);
 
       this.currentLng = lng;
@@ -159,8 +164,10 @@ export default class extends Controller {
 
 
       // 霧の更新
-      if(this.status !== STATUS.PAUSED){
-        this.executeFogClearing();
+      const now = Date.now()
+      if (this.status !== STATUS.PAUSED && now - this.lastFogUpdatedAt > FOG_UPDATE_MIN_MS) {
+        this.lastFogUpdatedAt = now
+        this.executeFogClearing()
       }
 
       // status が RECORDING になっている場合に保存
@@ -360,11 +367,11 @@ export default class extends Controller {
     if(!response.ok) {
       const errorData = await response.json();
 
-      console.error("位置情報の保存に失敗しました", errorData.errors)
+      console.error("postFootprint:位置情報の保存に失敗しました", errorData.errors)
       return;
     }
 
-    console.log("位置情報の保存に成功しました");
+    console.log("postFootprint:位置情報の保存に成功しました");
   }
 
   // 溜めたバッファを送信するためのフラッシュタイマー
@@ -426,13 +433,7 @@ export default class extends Controller {
     if (!this.map.getSource('fog')) {
       this.map.addSource('fog', {
         type: 'geojson',
-        data: {
-          type: 'Feature',
-          geometry: {
-            type: 'Polygon',
-            coordinates: [this.worldFeature]
-          }
-        }
+        data: this.worldFeature
       });
     }
 

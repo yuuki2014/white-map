@@ -446,9 +446,10 @@ export default class extends Controller {
     }
   }
 
+  // 現在地を取得できているのかチェック
   checkGeolocate(event){
-    if(this.currentLng && this.currentLat) return;
-    event.preventDefault();
+    if(this.currentLng && this.currentLat) return; // 現在地が取得できているのであれば何もしない
+    event.preventDefault();                        // 現在地が取得できていない場合はeventを行わないようにする
   }
 
   fogInit(){

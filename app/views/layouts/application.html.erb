@@ -27,6 +27,7 @@
   </head>
 
   <body class="" data-controller="ui" data-ui-map-outlet="#main-map">
+    <div class="fixed inset-0 z-50 hidden" data-ui-target="uiOverlay" data-action="click->ui#clearUiOverlay"></div>
     <%= yield :header %>
     <main class="font-sans">
       <%= yield %>

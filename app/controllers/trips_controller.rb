@@ -3,7 +3,8 @@ class TripsController < ApplicationController
   end
 
   def index
-    flash[:notice] = "フラッシュテスト"
+    @trips = current_user.trips
+    @geohash_counts = Footprint.where(trip_id: @trips.select(:id)).group(:trip_id).distinct.count(:geohash)
   end
 
   def status

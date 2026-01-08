@@ -12,6 +12,7 @@
     "maplibregl",
     "maptiler",
     "ngeohash",
+    "strftime",
     "styleimagemissing",
     "stylesheet"
   ]

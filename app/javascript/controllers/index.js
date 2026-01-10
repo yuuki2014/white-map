@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import BottomSheetController from "./bottom_sheet_controller"
+application.register("bottom-sheet", BottomSheetController)
+
 import CopyController from "./copy_controller"
 application.register("copy", CopyController)
 

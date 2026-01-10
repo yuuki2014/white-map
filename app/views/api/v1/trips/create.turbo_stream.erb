@@ -3,5 +3,5 @@
     <div id="trip-id-receiver" data-ui-target="tripIdReceiver" data-trip-id="<%= @trip.id %>"></div>
   <% end %>
 <% end %>
-<%= turbo_stream.replace "end-trip-button-container", partial: "shared/end_trip_button", locals: { trip: @trip } %>
+<%= turbo_stream.update "end-trip-button-container", partial: "shared/end_trip_button", locals: { trip: @trip } %>
 <%= turbo_stream.replace "flash", partial: "shared/flash_message" %>

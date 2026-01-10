@@ -10,7 +10,7 @@ class TripsController < ApplicationController
         @first_footprint = @trip.footprints.first
 
         @visited_geohashes =  @trip.footprints.flat_map do |footprint|
-                        [footprint.geohash] + GeoHash.neighbors(footprint.geohash)
+                        [ footprint.geohash ] + GeoHash.neighbors(footprint.geohash)
                       end.uniq
 
         render

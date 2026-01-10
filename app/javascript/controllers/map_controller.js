@@ -1,5 +1,5 @@
-import { STATUS } from "../constants/status"
 import { Controller } from "@hotwired/stimulus"
+import { STATUS } from "../constants/status"
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { get } from "@rails/request.js"
@@ -616,8 +616,12 @@ export default class extends Controller {
 
   clearMapOverlay(){
     const el = this.mapOverlayTarget
+
+    if (!el) return;
+
     el.classList.remove("opacity-100")
     el.classList.add("opacity-0")
+
     el.addEventListener("transitionend", () => {
       el.remove();
     }, { once: true })

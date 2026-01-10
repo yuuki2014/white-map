@@ -16,6 +16,9 @@ application.register("flash", FlashController)
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
+import HistoryMapController from "./history_map_controller"
+application.register("history-map", HistoryMapController)
+
 import MapController from "./map_controller"
 application.register("map", MapController)
 

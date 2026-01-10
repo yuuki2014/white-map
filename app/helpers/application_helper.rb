@@ -5,9 +5,11 @@ module ApplicationHelper
     is_active = current_page?(path)
 
     # mypageからリダイレクトされて開いているユーザー詳細ページもアクティブに
-    if path == user_path(current_user)
-      if controller_name == "users" && action_name == "show"
-        is_active = true
+    if user_signed_in?
+      if path == user_path(current_user)
+        if controller_name == "users" && action_name == "show"
+          is_active = true
+        end
       end
     end
 

@@ -1,0 +1,38 @@
+<%# 全体の背景コンテナ（クリーム色） %>
+<div class="h-screen bg-[#FFFBE6] flex flex-col">
+
+  <%# --- ヘッダー部分 --- %>
+  <header class="sticky top-0 z-10 flex items-center justify-center bg-gray-300 py-2 px-4 shadow-sm">
+
+    <%# 左端の戻るボタン %>
+    <%= link_to @back_url, class: "absolute left-1 px-4 py-1.5" do %>
+      <%= lucide_icon("arrow-left", class: "transition text-gray-900 hover:text-gray-700 active:scale-95")%>
+    <% end %>
+
+    <%# タイトル %>
+    <div class="text-xl font-bold text-gray-800">
+      <%= @trip.name %>
+    </div>
+
+    <%# 右側の「…」ボタン %>
+    <%= link_to "#", class: "absolute right-1 px-4 py-1.5" do %>
+      <%= lucide_icon("ellipsis-vertical", class: "transition text-gray-900 hover:text-gray-700 active:scale-95")%>
+    <% end %>
+  </header>
+
+  <%# --- マップ部分 --- %>
+  <div class="relative flex-1 min-h-0 w-full">
+    <div id="history-map"
+      data-controller="history-map"
+      class="absolute inset-0 h-full w-full"
+      data-maptiler-key="<%= Rails.application.credentials.dig(:maptiler, :api_key) %>"
+      data-history-map-longitude-value="<%= @first_footprint.longitude %>"
+      data-history-map-latitude-value="<%= @first_footprint.latitude %>"
+      data-history-map-visited-geohashes-value="<%= @visited_geohashes.to_json %>"
+    >
+      <div class="fixed bg-white w-full h-[130%] -bottom-[30%] inset-0 z-20 transition-transform duration-[2000ms] opacity-100 pointer-events-none ease-in-out
+                  [mask-image:linear-gradient(to_bottom,black_80%,transparent)]"
+                  data-history-map-target="mapOverlay"></div>
+    </div>
+  </div>
+</div>

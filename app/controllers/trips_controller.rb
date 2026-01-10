@@ -2,9 +2,34 @@ class TripsController < ApplicationController
   def new
   end
 
+  def show
+    if user_signed_in?
+      @trip = current_user.trips.includes(:footprints).find_by(id: params[:id])
+
+      if @trip.present?
+        @first_footprint = @trip.footprints.first
+
+        @visited_geohashes =  @trip.footprints.flat_map do |footprint|
+                        [footprint.geohash] + GeoHash.neighbors(footprint.geohash)
+                      end.uniq
+
+        render
+      else
+        flash[:alert] = "その地図にはアクセス出来ません"
+        redirect_to trips_path
+      end
+    else
+      redirect_to root_path
+    end
+  end
+
   def index
-    @trips = current_user.trips
-    @geohash_counts = Footprint.where(trip_id: @trips.select(:id)).group(:trip_id).distinct.count(:geohash)
+    if user_signed_in?
+      @trips = current_user.trips
+      @geohash_counts = Footprint.where(trip_id: @trips.select(:id)).group(:trip_id).distinct.count(:geohash)
+    else
+      redirect_to root_path
+    end
   end
 
   def status

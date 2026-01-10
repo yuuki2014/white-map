@@ -154,12 +154,14 @@ export default class extends Controller {
   }
 
   hiddenIcon(){
+    this.transitionEvents = new AbortController();
+
     if(!this.maplibreTopContainer){
       this.maplibreTopContainer = document.querySelector(".maplibregl-ctrl-group")
     }
 
     this.maplibreTopContainer.classList.add("transition-opacity", "duration-500", "opacity-0")
-    this.maplibreTopContainer.addEventListener("transitionend", this._handleTransitionEnd, { once: true });
+    this.maplibreTopContainer.addEventListener("transitionend", this._handleTransitionEnd, { signal: this.transitionEvents.signal, once: true });
 
     this.leftButtonContainerTarget.classList.add("-translate-x-full")
     this.rightRecordingButtonContainerTarget.classList.add("translate-x-full")
@@ -173,7 +175,9 @@ export default class extends Controller {
       this.maplibreTopContainer = document.querySelector(".maplibregl-ctrl-group")
     }
     this.maplibreTopContainer.classList.remove("hidden");
-    this.maplibreTopContainer.removeEventListener("transitionend", this._handleTransitionEnd);
+    // this.maplibreTopContainer.removeEventListener("transitionend", this._handleTransitionEnd);
+    this.transitionEvents?.abort();
+    this.transitionEvents = null;
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -184,15 +188,18 @@ export default class extends Controller {
 
   // document の各イベントハンドラに _debounceEvent をセット
   documentSetHiddenTimer(){
+    this.debounceEvents = new AbortController();
     EVENTS.forEach((e) => {
-      document.addEventListener(e, this._debounceEvent);
+      document.addEventListener(e, this._debounceEvent, { signal: this.debounceEvents.signal });
     });
   }
 
   documentRemoveHiddenTimer(){
-    EVENTS.forEach((e) => {
-      document.removeEventListener(e, this._debounceEvent);
-    })
+    this.debounceEvents?.abort();
+    this.debounceEvents = null;
+    // EVENTS.forEach((e) => {
+    //   document.removeEventListener(e, this._debounceEvent);
+    // })
   }
 
   // 一定時間後アイコンを隠す
@@ -214,7 +221,8 @@ export default class extends Controller {
     clearTimeout(this.hiddenTimerId)
     this.hiddenTimerId = null
 
-    this.maplibreTopContainer.removeEventListener("transitionend", this._handleTransitionEnd);
+    // this.maplibreTopContainer.removeEventListener("transitionend", this._handleTransitionEnd);
+    this.transitionEvents?.abort();
     this.documentRemoveHiddenTimer();
   }
 }

@@ -2,7 +2,7 @@
 <div class="min-h-screen bg-[#FFFBE6] flex flex-col">
 
   <%# --- ヘッダー部分 --- %>
-  <header class="sticky top-0 z-10 flex items-center justify-center bg-gray-200 py-2 px-4 shadow-sm">
+  <header class="sticky top-0 z-10 flex items-center justify-center bg-gray-300 py-2 px-4 shadow-sm">
     <%# タイトル %>
     <div class="text-xl font-bold text-gray-800">
       今までの地図
@@ -17,39 +17,49 @@
   <div class="flex-1 overflow-y-auto pb-24">
 
     <%# 各データをループ表示 %>
-    <% @trips.each do |trip| %>
-      <% geohash_count = @geohash_counts[trip.id] || 0 %>
+    <% if @trips.present? %>
+      <% @trips&.each do |trip| %>
+        <% geohash_count = @geohash_counts[trip.id] || 0 %>
 
+        <div class="flex flex-col items-center border-b border-gray-300 py-8 last:border-none">
+
+          <%# タイトル %>
+          <div class="mb-2 text-lg font-bold text-black">
+            <%= trip.name %>
+          </div>
+
+          <%# 開始日時 %>
+          <div class="mb-5 text-sm text-gray-800">
+            <%= trip.started_at.strftime("%Y/%m/%d %H:%M") %>
+          </div>
+
+          <%# 地図画像コンテナ %>
+          <%= link_to trip_path(trip.id) do %>
+            <div class="mb-4 h-64 w-64 overflow-hidden rounded-2xl border border-gray-400 bg-white shadow-sm">
+              <%# <%= image_tag trip.image_url, class: "h-full w-full object-cover" %>
+              <div class="flex h-full w-full items-center justify-center bg-gray-50 text-gray-400">
+                Map Image
+              </div>
+            </div>
+          <% end %>
+
+          <%# 詳細データ %>
+          <div class="flex flex-col items-center gap-1 text-sm font-medium text-black">
+            <div>
+              距離: <%= trip.total_distance %> m / <%= geohash_count %> マス
+            </div>
+            <div>
+              探索時間: <%= format_duration(trip.activity_time) %>
+            </div>
+          </div>
+
+        </div>
+      <% end %>
+    <% else %>
       <div class="flex flex-col items-center border-b border-gray-300 py-8 last:border-none">
-
-        <%# タイトル %>
-        <h2 class="mb-2 text-lg font-bold text-black">
-          <%= trip.name %>
-        </h2>
-
-        <%# 開始日時 %>
-        <div class="mb-5 text-sm text-gray-800">
-          <%= trip.started_at.strftime("%Y/%m/%d %H:%M") %>
+        <div>
+          履歴が存在しません。
         </div>
-
-        <%# 地図画像コンテナ %>
-        <div class="mb-4 h-64 w-64 overflow-hidden rounded-2xl border border-gray-400 bg-white shadow-sm">
-          <%# <%= image_tag trip.image_url, class: "h-full w-full object-cover" %>
-          <div class="flex h-full w-full items-center justify-center bg-gray-50 text-gray-400">
-            Map Image
-          </div>
-        </div>
-
-        <%# 詳細データ %>
-        <div class="flex flex-col items-center gap-1 text-sm font-medium text-black">
-          <div>
-            距離: <%= trip.total_distance %> m / <%= geohash_count %> マス
-          </div>
-          <div>
-            探索時間: <%= format_duration(trip.activity_time) %>
-          </div>
-        </div>
-
       </div>
     <% end %>
 

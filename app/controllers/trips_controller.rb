@@ -89,7 +89,7 @@ class TripsController < ApplicationController
       end
     end
 
-    if @trip
+    if @trip.destroy
       redirect_to trips_path, notice: "地図を削除しました"
     else
       flash.now[:alert] = "地図の削除に失敗しました"

@@ -1,6 +1,14 @@
 class Api::V1::TripsController < ApplicationController
   def create
-    @trip = current_user.trips.build
+    @trip = current_user&.trips&.build
+
+    unless @trip
+      flash.now[:alert] = "この機能はゲストか会員しか使えません"
+      return respond_to do |format|
+        format.html { redirect_to root_path }
+        format.turbo_stream { render "shared/flash_message" }
+      end
+    end
 
     if @trip.save
       flash.now[:notice] = "探索を開始しました"

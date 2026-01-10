@@ -4,6 +4,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static values = { text: String,
                   }
+
   connect() {
   }
 
@@ -16,7 +17,7 @@ export default class extends Controller {
   }
 
   async copy(){
-    const text = this.textValue || this.element.textContent.trim()
+    const text = this.textValue;
 
     try {
       await navigator.clipboard.writeText(text)

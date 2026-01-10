@@ -24,10 +24,16 @@ export default class extends Controller {
   async connect() {
     // console.log("stimulus map 接続確認")
 
+    this.mapInitEnd         = false;
+    this.clearMapOverlayEnd = false;
+
     const apiKey = this.element.dataset.maptilerKey;
 
     // 地図のstyleを取得
     const res = await fetch(`https://api.maptiler.com/maps/jp-mierune-dark/style.json?key=${apiKey}`);
+
+    if (!this.element.isConnected) return;
+
     const styleJson = await res.json();
 
     // console.log(styleJson);
@@ -128,7 +134,7 @@ export default class extends Controller {
       this.geolocate.options.fitBoundsOptions = {
         maxZoom: currentZoom,
         linear: true,
-        duration: 2000
+        // duration: 2000
       }
 
       return originalTrigger();
@@ -239,8 +245,8 @@ export default class extends Controller {
         }
       });
 
-      this.clearMapOverlay();
-
+      this.mapInitEnd = true;
+      this.maybeClearOverlay();
 
       // // ▼▼▼ デバッグ用：クリックで霧を晴らす ▼▼▼
       // this.map.on('click', (e) => {
@@ -273,7 +279,7 @@ export default class extends Controller {
       // オプションを設定
       const options = {
         enableHighAccuracy: true,
-        timeout: 20000,
+        timeout: 5000,
         maximumAge: 0
       };
 
@@ -283,18 +289,27 @@ export default class extends Controller {
 
   disconnect() {
     console.log("disconnect:", this.map)
+
     // 自作マーカーを削除
     if (this.pulseMarker) {
       this.pulseMarker.remove();
+      this.pulseMarker = null;
     }
+
     if (this.map) {
+      if (this.geolocate) {
+        this.geolocate.off('geolocate', this._onGeolocate);
+      }
+
       this.map.remove(); // 地図機能の停止、画面から削除
-      this.map = null; // メモリの解放
+      this.map = null; // 参照も切る
       console.log("map 消去:", this.map)
     }
+
     if (this._onGeolocate) {
       window.removeEventListener("map:geolocate", this._onGeolocate)
     }
+
     if(this.flushTimer) {
       clearInterval(this.flushTimer);
       this.flushBuffer();
@@ -625,5 +640,19 @@ export default class extends Controller {
     el.addEventListener("transitionend", () => {
       el.remove();
     }, { once: true })
+  }
+
+  maybeClearOverlay(){
+    if (!this.mapInitEnd)          return; // まだ地図が初期化されてない
+    if (!this.hasMapOverlayTarget) return; // まだ overlay target がない
+    if (this.clearMapOverlayEnd)   return; // すでにoverlay削除済み
+
+    this.clearMapOverlay();
+    this.clearMapOverlayEnd = true;
+  }
+
+  // mapOverlayが接続された時に自動実行
+  mapOverlayTargetConnected(_element) {
+    this.maybeClearOverlay();
   }
 }

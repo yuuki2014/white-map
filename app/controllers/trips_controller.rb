@@ -3,22 +3,22 @@ class TripsController < ApplicationController
   end
 
   def show
-    if user_signed_in?
-      @trip = current_user.trips.includes(:footprints).find_by(id: params[:id])
+    @trip = Trip.includes(:footprints).find_by(id: params[:id])
 
-      if @trip.present?
+    if @trip.present?
+      if @trip.user_id == current_user&.id || @trip.visibility_unlisted? || @trip.visibility_public?
         @first_footprint = @trip.footprints.first
-
         @visited_geohashes =  @trip.footprints.flat_map do |footprint|
                         [ footprint.geohash ] + GeoHash.neighbors(footprint.geohash)
                       end.uniq
 
         render
       else
-        flash[:alert] = "その地図にはアクセス出来ません"
+        flash[:alert] = "地図が見つかりませんでした"
         redirect_to trips_path
       end
     else
+      flash[:alert] = "地図が見つかりませんでした"
       redirect_to root_path
     end
   end
@@ -28,6 +28,7 @@ class TripsController < ApplicationController
       @trips = current_user.trips
       @geohash_counts = Footprint.where(trip_id: @trips.select(:id)).group(:trip_id).distinct.count(:geohash)
     else
+      flash[:alert] = "この機能はゲストか会員しか使えません"
       redirect_to root_path
     end
   end
@@ -70,7 +71,15 @@ class TripsController < ApplicationController
   end
 
   def confirm_destroy
-    @trip = current_user.trips.find_by(id: params[:id])
+    @trip = current_user&.trips&.find_by(id: params[:id])
+
+    unless @trip
+      flash.now[:alert] = "削除できません"
+      respond_to do |format|
+        format.html { redirect_to root_path }
+        format.turbo_stream { render "shared/flash_message" }
+      end
+    end
 
     respond_to do |format|
       format.html { redirect_to root_path }

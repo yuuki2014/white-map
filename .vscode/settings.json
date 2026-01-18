@@ -11,10 +11,12 @@
     "maplibre",
     "maplibregl",
     "maptiler",
+    "moveend",
     "ngeohash",
     "referer",
     "strftime",
     "styleimagemissing",
-    "stylesheet"
+    "stylesheet",
+    "zoomend"
   ]
 }

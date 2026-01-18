@@ -15,6 +15,8 @@ const FORCE_RECORD_MS     = 3000; // 3000ミリ秒 (記録間隔の最大値)
 const FLUSH_INTERVAL_MS   = 6000; // 6000ミリ秒 (送信間隔)
 const GEOLOCATE_TIMEOUT = 10000;  // 10秒（現在地取得タイムアウト）
 const INITIAL_ZOOM_LEVEL = 17;    // 初期のズームレベル
+const MAP_OVERLAY_TIMEOUT = 5000; // マップオーバーレイを消すまでタイムアウト時間
+const MAP_OVERLAY_DISTANCE = 100; // マップオーバーレイを消すまで距離
 
 // Connects to data-controller="map"
 export default class extends Controller {
@@ -51,7 +53,7 @@ export default class extends Controller {
       if (abortController.signal.aborted || !this.element.isConnected) return; // もし connect 中に遷移してたらreturn
     } catch (e) {
       if (e.name == "AbortError") {
-        console.error("ページ遷移によるエラー", e);
+        console.debug("ページ遷移によるエラー", e);
         return;
       }
       console.error(e);
@@ -76,9 +78,6 @@ export default class extends Controller {
 
     // データを溜めておくための配列
     this.footprintBuffer = []
-
-    // デフォルトの中央
-    this.center = [ 139.745, 35.658 ];
 
     // 現在地を初期化
     await this.geolocateInit()
@@ -152,12 +151,24 @@ export default class extends Controller {
       // オプションを現在のズームレベルで書き換え
       this.geolocate.options.fitBoundsOptions = {
         maxZoom: currentZoom,
+        minZoom: currentZoom,
         linear: true,
-        // duration: 2000
+        // duration: 5000
       }
 
       return originalTrigger();
     }
+
+    this.map.on('zoomend', () => {
+      // 現在地追従機能が存在しない場合は無視
+      if (!this.geolocate) return;
+
+      const currentZoom = this.map.getZoom();
+
+      // maxとminのズームを現在のズームに固定
+      this.geolocate.options.fitBoundsOptions.maxZoom = currentZoom;
+      this.geolocate.options.fitBoundsOptions.minZoom = currentZoom;
+    });
 
     // on.geolocate用ハンドラ
     this._onGeolocate = (data) => {
@@ -182,6 +193,9 @@ export default class extends Controller {
       if (this.status !== STATUS.PAUSED) {
         this.executeFogClearing()
       }
+
+      this.mapInitEnd = true;
+      this.maybeClearOverlay();
 
       // status が RECORDING になっている場合に保存
       if(this.status === STATUS.RECORDING) {
@@ -246,19 +260,20 @@ export default class extends Controller {
       // 霧を初期化
       this.fogInit()
 
-      // 地図上の現在地ボタンを起動
-      if(this.hasAccepted === "true"){
-        this.geolocate.trigger();
-      }
-
       toHide.forEach(id => {
         if (this.map.getLayer(id)) {
           this.map.setLayoutProperty(id, "visibility", "none");
         }
       });
 
-      this.mapInitEnd = true;
-      this.maybeClearOverlay();
+      // 地図上の現在地ボタンを起動
+      if(this.hasAccepted === "true"){
+        this.geolocate.trigger();
+      } else {
+        this.mapInitEnd = true;
+        this.maybeClearOverlay();
+      }
+
 
       // // ▼▼▼ デバッグ用：クリックで霧を晴らす ▼▼▼
       // this.map.on('click', (e) => {
@@ -361,6 +376,8 @@ export default class extends Controller {
         this.center = [ position.coords.longitude, position.coords.latitude ];
       } catch (error) {
         console.log("位置情報が取得できなかったのでデフォルトの中央を設定", error);
+        // デフォルトの中央
+        this.center = [ 139.745, 35.658 ];
 
         // 現在地機能が許可されていない場合にモーダルを表示
         if(error.code === PERMISSION_DENIED) {
@@ -643,17 +660,55 @@ export default class extends Controller {
     }
   }
 
+  // 地図表示前にマップを覆っているオーバーレイを消去
   clearMapOverlay(){
-    const el = this.mapOverlayTarget
+    if (this.clearMapOverlayEnd) return;
 
+    const el = this.mapOverlayTarget
     if (!el) return;
 
-    el.classList.remove("opacity-100")
-    el.classList.add("opacity-0")
+    const fadeOut = () => {
+      if (this.clearMapOverlayEnd) return;
+      if (el.classList.contains("opacity-0")) return; // すでにopacity-0が含まれていたら何もしない
 
-    el.addEventListener("transitionend", () => {
-      el.remove();
-    }, { once: true })
+      this.clearMapOverlayEnd = true;
+
+      el.classList.remove("opacity-100")
+      el.classList.add("opacity-0")
+      el.addEventListener("transitionend", () => {
+        el.remove();
+      }, { once: true })
+    }
+
+    // 移動が終了しているかチェック
+    const checkArrival = () => {
+      const center = this.map.getCenter(); // 現在の地図の中央を取得
+
+      // 地図の中央とGPSから取得した現在地の距離を算出
+      const distance = getDistance(
+        { latitude: center.lat, longitude: center.lng },
+        { latitude: this.currentLat, longitude: this.currentLng }
+      );
+
+      // 差が一定以下ならオーバーレイを消去
+      if (distance < MAP_OVERLAY_DISTANCE) {
+        fadeOut();
+      } else {
+        this.map.once("moveend", checkArrival); // まだ距離があるようなら再びセット
+      }
+    }
+
+    // isMoving()で移動中か検知
+    if (this.map.isMoving()) {
+      this.map.once("moveend", checkArrival);
+
+      // moveendがうまく機能しなかった時用にsetTimeoutをセット
+      setTimeout(() => {
+        fadeOut();
+      }, MAP_OVERLAY_TIMEOUT);
+    } else {
+      fadeOut();
+    }
   }
 
   maybeClearOverlay(){
@@ -662,7 +717,6 @@ export default class extends Controller {
     if (this.clearMapOverlayEnd)   return; // すでにoverlay削除済み
 
     this.clearMapOverlay();
-    this.clearMapOverlayEnd = true;
   }
 
   // mapOverlayが接続された時に自動実行

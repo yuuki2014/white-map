@@ -9,10 +9,12 @@ import * as turf from "@turf/turf"
 
 // 定数定義
 const PERMISSION_DENIED   = 1;    // 位置情報不許可時のerror値
-const GEOHASH_PRECISION   = 9;   // 保存するgeohash精度
+const GEOHASH_PRECISION   = 9;    // 保存するgeohash精度
 const MIN_DISTANCE_METERS = 30;   // 30メートル
 const FORCE_RECORD_MS     = 3000; // 3000ミリ秒 (記録間隔の最大値)
 const FLUSH_INTERVAL_MS   = 6000; // 6000ミリ秒 (送信間隔)
+const GEOLOCATE_TIMEOUT = 10000;  // 10秒（現在地取得タイムアウト）
+const INITIAL_ZOOM_LEVEL = 17;    // 初期のズームレベル
 
 // Connects to data-controller="map"
 export default class extends Controller {
@@ -22,21 +24,39 @@ export default class extends Controller {
                   }
 
   async connect() {
-    // console.log("stimulus map 接続確認")
+    console.log("stimulus map 接続確認")
 
-    this.mapInitEnd         = false;
-    this.clearMapOverlayEnd = false;
+    // 前のが残っていた時に備えて最初に消してからアボートコントローラーをセット
+    this.ac?.abort();
+    const abortController = new AbortController();
+    this.ac = abortController;
+
+    // 自作イベント発火用
+    // 規約同意時にmap:geolocateが発火して位置情報を取得
+    // startGeolocateをwindowにセットする様にthisを固定してセット
+    this._onWindowGeolocate ??= this.startGeolocate.bind(this)
+    window.addEventListener("map:geolocate", this._onWindowGeolocate, { signal: abortController.signal });
+
+    if (abortController.signal.aborted || !this.element.isConnected) return; // もし connect 中に遷移してたらreturn
+
+    this.mapInitEnd         = false; // 地図の初期化フラグ
+    this.clearMapOverlayEnd = false; // 初期表示されているオーバレイ要素のクリアフラグ
 
     const apiKey = this.element.dataset.maptilerKey;
 
-    // 地図のstyleを取得
-    const res = await fetch(`https://api.maptiler.com/maps/jp-mierune-dark/style.json?key=${apiKey}`);
+    try {
+      // 地図のstyleを取得
+      const res = await fetch(`https://api.maptiler.com/maps/jp-mierune-dark/style.json?key=${apiKey}`, { signal: abortController.signal })
+      this.styleJson = await res.json();
+      if (abortController.signal.aborted || !this.element.isConnected) return; // もし connect 中に遷移してたらreturn
+    } catch (e) {
+      if (e.name == "AbortError") {
+        console.error("ページ遷移によるエラー", e);
+        return;
+      }
+      console.error(e);
+    }
 
-    if (!this.element.isConnected) return;
-
-    const styleJson = await res.json();
-
-    // console.log(styleJson);
 
     // ステータスを初期化
     this.status = STATUS.STOPPED;
@@ -63,6 +83,8 @@ export default class extends Controller {
     // 現在地を初期化
     await this.geolocateInit()
 
+    if (abortController.signal.aborted || !this.element.isConnected) return; // もし connect 中に遷移してたらreturn
+
     // TurfのFeatureオブジェクトとして管理
     this.visitedFeature = null;
     this.visitedGeohashes = new Set()
@@ -79,14 +101,16 @@ export default class extends Controller {
     // 地図の初期化
     this.map = new maplibregl.Map({
       container: this.element,
-      style: styleJson,
+      style: this.styleJson,
       center: this.center,
-      zoom: 17,
+      zoom: INITIAL_ZOOM_LEVEL,
       attributionControl: false,
     });
 
+    // maplibreglのアトリビューションを画面右上に表示
     this.map.addControl(new maplibregl.AttributionControl({ compact: true }), "top-right");
 
+    // 自作パルスを作成して位置を0,0で表示
     const pulseEl = document.createElement('div');
     pulseEl.className = 'my-pulse-marker';
 
@@ -95,7 +119,7 @@ export default class extends Controller {
       offset: [ 0, 0 ]
     }).setLngLat([0,0]).addTo(this.map);
 
-    // 現在地追跡機能を作成
+    // 現在地追跡機能をセット
     this.geolocate = new maplibregl.GeolocateControl({
       positionOptions: {
         // 高精度（GPS）モードを有効に
@@ -114,15 +138,10 @@ export default class extends Controller {
       }
     });
 
-    this._onGeolocate = this.startGeolocate.bind(this)
-    window.addEventListener("map:geolocate", this._onGeolocate);
-
-    // console.log(this.geolocate)
-
     // 地図に現在地を追加。右上にボタン
     this.map.addControl(this.geolocate);
 
-    // 元々のtriggerを一時保存
+    // 元々のtriggerを保存
     const originalTrigger = this.geolocate.trigger.bind(this.geolocate);
 
     // triggerを上書き
@@ -140,11 +159,8 @@ export default class extends Controller {
       return originalTrigger();
     }
 
-    let num = 0;
-
-    // 現在地を取得
-    this.geolocate.on('geolocate', (data) => {
-
+    // on.geolocate用ハンドラ
+    this._onGeolocate = (data) => {
       const lng = data.coords.longitude; // 経度
       const lat = data.coords.latitude;  // 緯度
       const recordTime = new Date(data.timestamp).toISOString(); // 取得時間
@@ -153,15 +169,8 @@ export default class extends Controller {
       const geohash = ngeohash.encode(lat, lng, GEOHASH_PRECISION); // geohashを計算
       lngInput.value = lng;
       latInput.value = lat;
-      num += 1;
 
-      // console.log(num)
-      // console.log("取得時刻:", recordTime);
-      // console.log("現在地取得:", lat, lng);
-      // console.log("geohash:", geohash)
-
-      // console.log("accuracy(m):", data.coords.accuracy)
-
+      // 自作パルスの現在地を更新
       this.pulseMarker.setLngLat([lng, lat]);
 
       this.currentLng = lng;
@@ -212,7 +221,10 @@ export default class extends Controller {
           this.lastSavedCoords = { latitude: data.latitude, longitude: data.longitude }
         }
       }
-    })
+    };
+
+    // 現在地を取得
+    this.geolocate.on('geolocate', this._onGeolocate);
 
     // 非表示にする地図上の情報
     const toHide = [
@@ -263,8 +275,8 @@ export default class extends Controller {
     })
 
     // アイコンが足りない時のダミー追加。後で正しいアイコンが表示されるように設定する
-    this.map.on('styleimagemissing', (e) => {
-      const id = e.id;
+    this.map.on('styleimagemissing', (event) => {
+      const id = event.id;
       // すでに追加済みなら何もしない
       if (this.map.hasImage(id)) return;
 
@@ -279,7 +291,7 @@ export default class extends Controller {
       // オプションを設定
       const options = {
         enableHighAccuracy: true,
-        timeout: 5000,
+        timeout: GEOLOCATE_TIMEOUT,
         maximumAge: 0
       };
 
@@ -289,6 +301,10 @@ export default class extends Controller {
 
   disconnect() {
     console.log("disconnect:", this.map)
+
+    // アボートでフェッチやイベントリスナーを止める
+    this.ac?.abort();
+    this.ac = null;
 
     // 自作マーカーを削除
     if (this.pulseMarker) {
@@ -304,10 +320,6 @@ export default class extends Controller {
       this.map.remove(); // 地図機能の停止、画面から削除
       this.map = null; // 参照も切る
       console.log("map 消去:", this.map)
-    }
-
-    if (this._onGeolocate) {
-      window.removeEventListener("map:geolocate", this._onGeolocate)
     }
 
     if(this.flushTimer) {
@@ -342,6 +354,8 @@ export default class extends Controller {
       try {
         // getCurrentPosition関数で現在地を取得
         const position = await this.getCurrentPosition();
+
+        if (this.ac?.signal.aborted || !this.element.isConnected) return; // 途中で終了していた場合はreturn
 
         // 取得できたら現在地で中央を書き換え
         this.center = [ position.coords.longitude, position.coords.latitude ];
@@ -404,7 +418,7 @@ export default class extends Controller {
     if(!response.ok) {
       const errorData = await response.json();
 
-      console.error("postFootprint:位置情報の保存に失敗しました", errorData.errors)
+      console.debug("postFootprint:位置情報の保存に失敗しました", errorData.errors)
       return;
     }
 

@@ -1,0 +1,9 @@
+<div id="<%= "map-title-" + @trip&.public_uid %>" class="flex-1 text-center text-xl font-bold text-gray-800 px-2">
+  <%= form_with url: update_title_trip_path(@trip), class: "flex items-center gap-3",method: :patch, scope: :trip do |form| %>
+    <div class="flex-1 min-w-0">
+      <%= form.text_field :name, maxlength: Trip::TITLE_MAX_LENGTH, class: "w-full text-center py-1 min-w-0" %>
+    </div>
+
+    <%= form.submit "確定", class: "shrink-0 cursor-pointer rounded-full bg-orange-400 px-4 py-1.5 text-sm font-bold text-white shadow transition hover:bg-orange-500 active:scale-95" %>
+  <% end %>
+</div>

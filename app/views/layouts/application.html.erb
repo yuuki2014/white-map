@@ -38,5 +38,10 @@
     <%= render "bottom_sheets/bottom_sheets_shell" %>
     <%= render "shared/modal_shell" %>
     <%= render "shared/flash_message" %>
+    <div id="error-root" class="fixed inset-0 z-50 pointer-events-none">
+      <div id="error-container" class="pointer-events-auto fixed top-6 left-1/2 -translate-x-1/2">
+        <%= render "shared/error_messages" %>
+      </div>
+    </div>
   </body>
 </html>

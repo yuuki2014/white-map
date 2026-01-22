@@ -2,24 +2,28 @@
 <div class="h-screen bg-[#FFFBE6] flex flex-col">
 
   <%# --- ヘッダー部分 --- %>
-  <header class="sticky top-0 z-10 flex items-center justify-center bg-gray-300 py-2 px-4 shadow-sm">
+  <header class="sticky top-0 z-10 flex items-center justify-between bg-gray-300 py-2 px-4 shadow-sm gap-2">
 
     <%# 左端の戻るボタン %>
-    <%= link_to @back_url, class: "absolute left-1 px-4 py-1.5" do %>
-      <%= lucide_icon("arrow-left", class: "transition text-gray-900 hover:text-gray-700 active:scale-95")%>
-    <% end %>
-
-    <%# タイトル %>
-    <div class="text-xl font-bold text-gray-800">
-      <%= @trip&.name %>
+    <div class="flex-none">
+      <%= link_to @back_url, class: "block py-1.5" do %>
+        <%= lucide_icon("arrow-left", class: "transition text-gray-900 hover:text-gray-700 active:scale-95 stroke-[2.5]")%>
+      <% end %>
     </div>
 
+    <%# タイトル %>
+    <%= render "trips/title" %>
+
     <%# 右側の「…」ボタン %>
-    <% if @trip %>
-      <%= link_to trip_bottom_sheets_path(@trip), class: "absolute right-1 px-4 py-1.5", data: { turbo_stream: true } do %>
-        <%= lucide_icon("ellipsis-vertical", class: "transition text-gray-900 hover:text-gray-700 active:scale-95")%>
+    <div class="flex-none">
+      <% if @trip %>
+        <%= link_to trip_bottom_sheets_path(@trip), class: "block py-1.5", data: { turbo_stream: true } do %>
+          <%= lucide_icon("ellipsis-vertical", class: "transition text-gray-900 hover:text-gray-700 active:scale-95")%>
+        <% end %>
+      <% else %>
+        <div class="w-8"></div>
       <% end %>
-    <% end %>
+    </div>
   </header>
 
   <%# --- マップ部分 --- %>

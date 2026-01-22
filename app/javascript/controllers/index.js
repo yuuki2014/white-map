@@ -13,6 +13,9 @@ application.register("copy", CopyController)
 import DispatchController from "./dispatch_controller"
 application.register("dispatch", DispatchController)
 
+import ErrorController from "./error_controller"
+application.register("error", ErrorController)
+
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 

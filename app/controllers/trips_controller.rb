@@ -33,6 +33,53 @@ class TripsController < ApplicationController
     end
   end
 
+  def edit_title
+    @trip = current_user&.trips&.find_by(id: params[:id])
+
+    if @trip.nil?
+      flash.now[:alert] = "権限がありません"
+      return respond_to do |format|
+        format.html { redirect_to root_path }
+        format.turbo_stream { render "shared/flash_message" }
+      end
+    end
+
+    respond_to do |format|
+      format.html { redirect_to root_path }
+      format.turbo_stream
+    end
+  end
+
+  def update_title
+    @trip = current_user&.trips&.find_by(id: params[:id])
+
+    if @trip.nil?
+      flash.now[:alert] = "権限がありません"
+      return respond_to do |format|
+        format.html { head :not_acceptable }
+        format.turbo_stream { render "shared/flash_message" }
+      end
+    end
+
+    if @trip.update(name: trip_param_title[:name])
+      respond_to do |format|
+        format.html { head :not_acceptable }
+        format.turbo_stream do
+          flash.now[:notice] = "タイトルを更新しました"
+          render
+        end
+      end
+    else
+      respond_to do |format|
+        format.html { head :not_acceptable }
+        format.turbo_stream do
+          flash.now[:alert] = "タイトルの更新に失敗しました"
+          render "shared/flash_and_error"
+        end
+      end
+    end
+  end
+
   def edit_status
     @trip = current_user&.trips&.find_by(id: params[:id])
 
@@ -130,5 +177,9 @@ class TripsController < ApplicationController
 
   def trip_param_status
     params.require(:trip).permit(:status)
+  end
+
+  def trip_param_title
+    params.require(:trip).permit(:name)
   end
 end

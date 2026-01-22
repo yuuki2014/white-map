@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "stimulus/error"
   namespace :guest do
     post "sessions/create"
   end
@@ -30,6 +31,8 @@ Rails.application.routes.draw do
       get "confirm_destroy", to: "trips#confirm_destroy"
       patch :status
       get :edit_status
+      get :edit_title
+      patch :update_title
     end
     resource :bottom_sheets, only: %i[ show ]
   end

@@ -1,0 +1,4 @@
+<% target_id = "map-title-" + @trip.public_uid %>
+<%= turbo_stream.replace target_id, partial: "trips/edit_title" %>
+<%= turbo_stream.replace "flash", partial: "shared/flash_message" %>
+<%= turbo_stream.append "error-container", partial: "shared/error_messages", locals: { object: @trip } %>

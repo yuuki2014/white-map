@@ -58,15 +58,15 @@
     <%# 各種リンクカード %>
     <% if current_user.guest? %>
       <% account_links = [
-        link_to("・利用規約", "#", class: "hover:text-gray-900"),
-        link_to("・プライバシーポリシー", "#", class: "hover:text-gray-900"),
+        link_to("・利用規約", terms_path, class: "hover:text-gray-900", data: { turbo_stream: true }),
+        link_to("・プライバシーポリシー", privacy_policy_path, class: "hover:text-gray-900", data: { turbo_stream: true }),
       ] %>
       <%= mypage_card(account_links) %>
     <% elsif current_user.general? %>
       <% account_links = [
         link_to("・アカウント設定", "#", class: "hover:text-gray-900"),
-        link_to("・利用規約", "#", class: "hover:text-gray-900"),
-        link_to("・プライバシーポリシー", "#", class: "hover:text-gray-900"),
+        link_to("・利用規約", terms_path, class: "hover:text-gray-900", data: { turbo_stream: true }),
+        link_to("・プライバシーポリシー", privacy_policy_path, class: "hover:text-gray-900", data: { turbo_stream: true }),
         button_to("・ログアウト", destroy_user_session_path, method: :delete, class: "text-red-500 hover:text-red-700"),
       ] %>
       <%= mypage_card(account_links) %>

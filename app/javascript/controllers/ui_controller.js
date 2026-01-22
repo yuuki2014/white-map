@@ -1,21 +1,45 @@
 import { STATUS } from "../constants/status"
 import { Controller } from "@hotwired/stimulus"
 
+const HIDDEN_TIMEOUT = 3000;
+const EVENTS = [ "click", "touchstart", "pointerdown" ]
+
 // Connects to data-controller="ui"
 export default class extends Controller {
   static outlets = [ "map" ]
-  static targets = [ "footer", "leftButtonContainer", "rightNormalButtonContainer", "rightRecordingButtonContainer", "pauseButtonContainer", "bottomSheet", "playButton", "pauseButton", "tripIdReceiver" ]
+  static targets = [ "footer", "leftButtonContainer", "rightNormalButtonContainer", "rightRecordingButtonContainer", "pauseButtonContainer", "bottomSheet", "playButton", "pauseButton", "tripIdReceiver", "uiOverlay" ]
   static values = { status: String,
                     tripId: String
                   }
 
   connect() {
+    console.log(EVENTS)
     console.log("接続テスト");
     // this.mapOutlet.showLocationDeniedModal()
     // 初期化
     // status の初期値をセット
     if(!this.hasStatusValue) {
       this.statusValue = STATUS.STOPPED;
+    }
+
+    // UIを隠すタイマーIDを保持
+    this.hiddenTimerId = null;
+
+    // transitionend イベント内で実行するイベントを定義
+    this._handleTransitionEnd = () => {
+      if (this.maplibreTopContainer.classList.contains("opacity-0")) {
+        this.maplibreTopContainer.classList.add("hidden")
+      }
+    }
+
+    // デバウンスでUIを隠すタイマーをセット
+    this._debounceEvent = () => {
+      clearTimeout(this.hiddenTimerId);
+      this.hiddenTimerId = null;
+      if(this.statusValue === STATUS.RECORDING){
+        this.visibleUi();
+        this.setHiddenTimer();
+      }
     }
   }
 
@@ -50,7 +74,12 @@ export default class extends Controller {
     this.statusValue = STATUS.RECORDING
     this.mapOutlet.setStatus(this.statusValue);
     this.mapOutlet.postFootprint();
-    this.mapOutlet.setFlashTimer();
+    this.mapOutlet.setFlushTimer();
+    this.mapOutlet.executeFogClearing();
+
+    // デバウンスイベントをセット
+    this.documentSetHiddenTimer();
+    this.setHiddenTimer();
   }
 
   resumeRecording(){
@@ -61,7 +90,7 @@ export default class extends Controller {
 
   pauseRecording(){
     console.log("一時停止");
-    this.mapOutlet.flashBuffer();
+    this.mapOutlet.flushBuffer();
     this.mapOutlet.postFootprint();
     this.statusValue = STATUS.PAUSED
     this.mapOutlet.setStatus(this.statusValue);
@@ -69,9 +98,12 @@ export default class extends Controller {
 
   endRecording(){
     console.log("記録を終えました");
-    this.mapOutlet.clearFlashTimer();
+    this.mapOutlet.clearFlushTimer();
     this.statusValue = STATUS.ENDED
     this.mapOutlet.setStatus(this.statusValue);
+    this.mapOutlet.resetFog();
+
+    this.documentRemoveHiddenTimer();
   }
 
   // status 変化時に自動で呼ばれるメソッド
@@ -116,8 +148,81 @@ export default class extends Controller {
     }
   }
 
+  // 現在地が取得できているのかチェック
   checkGeolocate(event){
-    console.log("現在地情報チェック")
     this.mapOutlet.checkGeolocate(event);
+  }
+
+  hiddenIcon(){
+    this.transitionEvents = new AbortController();
+
+    if(!this.maplibreTopContainer){
+      this.maplibreTopContainer = document.querySelector(".maplibregl-ctrl-group")
+    }
+
+    this.maplibreTopContainer.classList.add("transition-opacity", "duration-500", "opacity-0")
+    this.maplibreTopContainer.addEventListener("transitionend", this._handleTransitionEnd, { signal: this.transitionEvents.signal, once: true });
+
+    this.leftButtonContainerTarget.classList.add("-translate-x-full")
+    this.rightRecordingButtonContainerTarget.classList.add("translate-x-full")
+  }
+
+  visibleUi(){
+    this.leftButtonContainerTarget.classList.remove("-translate-x-full")
+    this.rightRecordingButtonContainerTarget.classList.remove("translate-x-full")
+
+    if(this.maplibreTopContainer){
+      this.maplibreTopContainer = document.querySelector(".maplibregl-ctrl-group")
+    }
+    this.maplibreTopContainer.classList.remove("hidden");
+    // this.maplibreTopContainer.removeEventListener("transitionend", this._handleTransitionEnd);
+    this.transitionEvents?.abort();
+    this.transitionEvents = null;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        this.maplibreTopContainer.classList.remove("opacity-0")
+      });
+    });
+  }
+
+  // document の各イベントハンドラに _debounceEvent をセット
+  documentSetHiddenTimer(){
+    this.debounceEvents = new AbortController();
+    EVENTS.forEach((e) => {
+      document.addEventListener(e, this._debounceEvent, { signal: this.debounceEvents.signal });
+    });
+  }
+
+  documentRemoveHiddenTimer(){
+    this.debounceEvents?.abort();
+    this.debounceEvents = null;
+    // EVENTS.forEach((e) => {
+    //   document.removeEventListener(e, this._debounceEvent);
+    // })
+  }
+
+  // 一定時間後アイコンを隠す
+  setHiddenTimer(){
+    if(!this.maplibreTopContainer){
+      this.maplibreTopContainer = document.querySelector(".maplibregl-ctrl-group");
+    }
+
+    clearTimeout(this.hiddenTimerId);
+
+    this.hiddenTimerId = setTimeout(() => {
+      if(this.statusValue === STATUS.RECORDING){
+        this.hiddenIcon();
+      }
+    }, HIDDEN_TIMEOUT);
+  }
+
+  disconnect(){
+    clearTimeout(this.hiddenTimerId)
+    this.hiddenTimerId = null
+
+    // this.maplibreTopContainer.removeEventListener("transitionend", this._handleTransitionEnd);
+    this.transitionEvents?.abort();
+    this.documentRemoveHiddenTimer();
   }
 }

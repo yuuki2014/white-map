@@ -1,5 +1,7 @@
 <div class="relative h-screen w-full">
-  <div id="main-map" data-controller="map" class="absolute inset-0 h-full w-full" data-maptiler-key="<%= Rails.application.credentials.dig(:maptiler, :api_key) %>"></div>
+  <div id="main-map" data-controller="map" class="absolute inset-0 h-full w-full" data-maptiler-key="<%= Rails.application.credentials.dig(:maptiler, :api_key) %>">
+    <div class="fixed bg-white inset-0 z-20 transition-opacity duration-1000 opacity-100" data-map-target="mapOverlay"></div>
+  </div>
 </div>
 <% if cookies[:terms_accepted] != "true" && cookies[:tutorials_end] != "true" && !user_signed_in? %>
   <%= render "tutorials/tutorials_modal" %>

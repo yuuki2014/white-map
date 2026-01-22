@@ -10,6 +10,9 @@ class Trip < ApplicationRecord
   # started_at, datetime,null: false、地図の作成開始時刻
   # ended_at, datetime、地図の作成終了時刻
 
+  # 定数定義
+  TITLE_MAX_LENGTH = 100
+
   # enum 定義
   # 地図の公開ステータス
   # 非公開:0, 限定公開:10, 公開:20
@@ -17,6 +20,10 @@ class Trip < ApplicationRecord
 
   # バリデーション定義
   validates :user_id, :name, :activity_time, :total_distance, :status, :started_at, presence: true
+  validates :name,
+    presence: true,
+    length: { maximum: TITLE_MAX_LENGTH },
+    format: { without: /\R/, message: "に改行は使えません" }
 
   # アソシエーション定義
   belongs_to :user

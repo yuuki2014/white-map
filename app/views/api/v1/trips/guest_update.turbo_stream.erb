@@ -1,0 +1,16 @@
+<%= turbo_stream.update "modal-container",
+      partial: "shared/modal",
+      locals: {
+        title: "探索を記録しました！",
+        close_button: false,
+        close_backdrop: false,
+        choice: false,
+        content_partial: "shared/guest_save_completed_modal",
+        context: "trips",
+        content_locals: {
+          choices: {
+            skip:  { label: "スキップ", value: "end" },
+            yes: { label: "はじめる", value: "end" }
+          }
+        }
+      } %>

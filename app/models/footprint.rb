@@ -6,8 +6,7 @@ class Footprint < ApplicationRecord
   before_validation :generate_geohash
 
   # 定数定義
-  GEOHASH_PRECISION = 6
-
+  GEOHASH_PRECISION = 9
 
   # バリデーション定義
   validates :trip_id, :latitude, :longitude, :geohash, :recorded_at, presence: true

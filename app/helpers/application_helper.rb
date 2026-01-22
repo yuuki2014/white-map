@@ -2,7 +2,18 @@ module ApplicationHelper
   def tab_class(path)
     base = "flex-1 flex flex-col items-center justify-center gap-1 text-gray-400 active:scale-95 transition hover:bg-gray-100 rounded-xl user-select: none"
 
-    if current_page?(path)
+    is_active = current_page?(path)
+
+    # mypageからリダイレクトされて開いているユーザー詳細ページもアクティブに
+    if user_signed_in?
+      if path == user_path(current_user)
+        if controller_name == "users" && action_name == "show"
+          is_active = true
+        end
+      end
+    end
+
+    if is_active
       "#{base} text-gray-900 font-medium"
     else
       "#{base} text-gray-400"
@@ -13,6 +24,7 @@ module ApplicationHelper
   def show_footer?
     allowed_paths = [
       root_path,
+      trips_path,
       mypage_path
     ]
 
@@ -41,5 +53,13 @@ module ApplicationHelper
 
       safe_join(items)
     end
+  end
+
+  def format_duration(seconds)
+    hours = (seconds / 3600) || 0
+    minutes = ((seconds % 3600) / 60) || 0
+    sec = ((seconds % 3600) % 60) || 0
+
+    "#{hours}時間#{minutes}分#{sec}秒"
   end
 end

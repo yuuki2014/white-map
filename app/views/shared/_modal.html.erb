@@ -1,11 +1,11 @@
-<%# locals: (title: nil, close_button: true, choice: false, content_partial: nil, content_locals: {}, context: nil, modal_backdrop: true, close_backdrop: true) %>
+<%# locals: (title: nil, close_button: true, choice: false, content_partial: nil, content_locals: {}, context: nil, modal_backdrop: true, close_backdrop: true, trip_id: nil) %>
 
 <div class="fixed inset-0 min-h-screen pointer-events-none w-full z-40 flex justify-center items-center opacity-0 transition-all duration-300 p-10" data-controller="modal">
   <% if modal_backdrop %>
     <div class="modal-backdrop absolute inset-0 bg-black/50 z-0 pointer-events-auto" data-modal-target="modalBackdrop" <% if close_backdrop %>data-action="click->modal#close"<% end %>></div>
   <% end %>
 
-  <div class="relative max-w-sm pointer-events-auto modal-box max-h-[90vh] w-full bg-[#fff9d6] p-4 gap-3 flex flex-col items-center rounded-[20px] z-10 transition-all duration-500 ease-out shadow-xl translate-y-40 opacity-0 overflow-hidden" data-modal-target="modalBox">
+  <div class="relative max-w-sm pointer-events-auto modal-box max-h-[90vh] w-full bg-[#fff9d6] p-4 gap-3 flex flex-col items-center rounded-[20px] z-10 transition-all duration-500 ease-out shadow-xl translate-y-40 opacity-0" data-modal-target="modalBox">
     <% if close_button && context == "terms" %>
       <%= form_with url: decisions_path, method: :post, data: { turbo: true }, class: "absolute right-2 top-2 h-6 w-6 flex items-center justify-center leading-none bg-gray-500/50 rounded-full z-30" do %>
         <%= hidden_field_tag :context, context %>
@@ -26,7 +26,7 @@
     </div>
 
     <%# モーダル本文 %>
-    <div class="modal-body flex-1 min-h-0 px-4 z-20">
+    <div class="modal-body w-full flex-1 min-h-0 px-4 z-20 overflow-y-auto overscroll-contain">
       <% if defined?(content_partial) && content_partial.present? %>
         <%= render partial: content_partial, locals: (local_assigns[:content_locals] || {}) %>
       <% end %>
@@ -35,7 +35,7 @@
     <% if local_assigns.fetch(:choice, false) %>
       <%= form_with url: decisions_path, method: :post, data: { turbo: true }, class: "modal-footer shrink-0 flex justify-between z-20 w-full px-5" do %>
         <%= hidden_field_tag :context, context %>
-        <% content_locals&.dig(:choices).each do |key, choice| %>
+        <% content_locals&.dig(:choices)&.each do |key, choice| %>
           <button type="submit" name="decision" value="<%= choice[:value] %>" class="btn" data-action="click->modal#close">
             <% case choice[:label] %>
             <% when "スキップ" %>

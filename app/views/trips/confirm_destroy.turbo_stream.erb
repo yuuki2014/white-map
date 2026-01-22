@@ -1,0 +1,11 @@
+<%= turbo_stream.update "modal-container",
+      partial: "shared/confirm_destroy_modal",
+      locals: {
+        title: "地図を削除しますか？",
+        close_button: true,
+        close_backdrop: true,
+        choice: true,
+        content_partial: "shared/confirm_destroy",
+        context: "trips",
+        trip_id: @trip.id
+      } %>

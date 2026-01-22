@@ -1,0 +1,26 @@
+<div class="flex flex-col gap-10">
+  <div>
+    <div>
+      お疲れ様でした！
+    </div>
+    <div>
+      今回の探索が記録されました！
+    </div>
+  </div>
+  <div>
+    <div>
+      <span class="text-red-500">会員登録（無料）</span>をすると、データを半永続的に保存し、他の端末でも見られる見られるようになります！
+    </div>
+  </div>
+  <div>
+    <div>
+      ゲストのままだと地図データの削除が出来なくなる可能性があるので、会員登録をオススメします！
+    </div>
+  </div>
+  <div class="flex justify-between">
+    <button type="button" data-action="click->modal#close click->ui#endRecording" class="text-gray-400 hover:text-gray-600">
+      今はしない
+    </button>
+    <%= link_to "登録してデータを守る", new_user_registration_path, class: "rounded-full bg-orange-400 text-white px-3 hover:text-gray-100 hover:bg-orange-300", data: { action: "click->modal#close click->ui#endRecording" } %>
+  </div>
+</div>

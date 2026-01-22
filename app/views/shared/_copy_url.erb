@@ -1,0 +1,25 @@
+<div id="copy-url" class="w-full" data-controller="copy" data-copy-text-value="<%= trip_url(trip.id) %>">
+
+  <div class="mb-6 w-full flex items-center gap-2 <%= trip.visibility_private? ? 'hidden' : '' %>">
+    <div class="flex-1 min-w-0 rounded-md bg-gray-100/80 px-3 py-2 text-sm text-gray-700 shadow-inner truncate"
+      data-action="click->copy#selectAll"
+      role="button"
+      tabindex="0">
+      <%= trip_url(trip.id) %>
+    </div>
+    <button type="button" class="shrink-0 rounded-md bg-gray-200/80 p-2 text-gray-700 shadow-sm hover:bg-gray-200 active:scale-95 transition"
+      data-action="click->copy#copy">
+      <%= lucide_icon("copy", class: "h-5 w-5")%>
+    </button>
+  </div>
+
+  <div class="mb-6 flex w-full items-center gap-2 <%= trip.visibility_private? ? '' : 'hidden' %>">
+    <div class="flex-1 min-w-0 rounded-md bg-gray-200/80 px-3 py-2 text-sm text-gray-400 shadow-inner select-none truncate">
+      <%= trip_url(trip.id) %>
+    </div>
+    <button type="button" disabled class="shrink-0 rounded-md bg-gray-200/80 p-2 text-gray-400 shadow-sm">
+      <%= lucide_icon("copy", class: "h-5 w-5")%>
+    </button>
+  </div>
+
+</div>

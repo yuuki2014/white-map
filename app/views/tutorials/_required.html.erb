@@ -1,8 +1,8 @@
 <%# locals: (context: nil) %>
 
 <div class="flex flex-col gap-8">
-  <%= link_to "利用規約", "xxx", class: "underline text-blue-400 mx-auto", data: { turbo_stream: true } %>
-  <%= link_to "プライバシーポリシー", "xxx", class: "underline text-blue-400 mx-auto", data: { turbo_stream: true } %>
+  <%= link_to "利用規約", terms_path, class: "underline text-blue-400 mx-auto", data: { turbo_stream: true } %>
+  <%= link_to "プライバシーポリシー", privacy_policy_path, class: "underline text-blue-400 mx-auto", data: { turbo_stream: true } %>
   <%= form_with url: decisions_path, method: :post, data: { turbo: true }, class: "modal-footer shrink-0 mx-auto" do %>
     <%= hidden_field_tag :context, context %>
     <button type="submit" name="decision" value="accepted" class="btn" data-action="click->modal#close">

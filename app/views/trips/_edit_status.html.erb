@@ -1,0 +1,17 @@
+<%= turbo_stream.update "modal-container",
+      partial: "shared/modal",
+      locals: {
+        title: "公開設定・シェア",
+        close_button: true,
+        close_backdrop: true,
+        choice: false,
+        content_partial: "shared/edit_status_modal",
+        context: "trips",
+        content_locals: {
+          trip: @trip,
+          choices: {
+            skip:  { label: "スキップ", value: "end" },
+            yes: { label: "はじめる", value: "end" }
+          }
+        }
+      } %>

@@ -4,14 +4,26 @@
 
 import { application } from "./application"
 
+import BottomSheetController from "./bottom_sheet_controller"
+application.register("bottom-sheet", BottomSheetController)
+
+import CopyController from "./copy_controller"
+application.register("copy", CopyController)
+
 import DispatchController from "./dispatch_controller"
 application.register("dispatch", DispatchController)
+
+import ErrorController from "./error_controller"
+application.register("error", ErrorController)
 
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import HistoryMapController from "./history_map_controller"
+application.register("history-map", HistoryMapController)
 
 import MapController from "./map_controller"
 application.register("map", MapController)

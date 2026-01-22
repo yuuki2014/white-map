@@ -1,6 +1,14 @@
 class Api::V1::TripsController < ApplicationController
   def create
-    @trip = current_user.trips.build
+    @trip = current_user&.trips&.build
+
+    unless @trip
+      flash.now[:alert] = "この機能はゲストか会員しか使えません"
+      return respond_to do |format|
+        format.html { redirect_to root_path }
+        format.turbo_stream { render "shared/flash_message" }
+      end
+    end
 
     if @trip.save
       flash.now[:notice] = "探索を開始しました"
@@ -33,9 +41,16 @@ class Api::V1::TripsController < ApplicationController
       activity_time: activity_time,
       total_distance: total_distance)
 
-      respond_to do |format|
-        format.html { redirect_to root_path }
-        format.turbo_stream
+      if current_user.general?
+        respond_to do |format|
+          format.html { redirect_to root_path }
+          format.turbo_stream
+        end
+      elsif current_user.guest?
+        respond_to do |format|
+          format.html { redirect_to root_path }
+          format.turbo_stream { render :guest_update }
+        end
       end
     else
       flash.now[:alert] = "保存に失敗しました"

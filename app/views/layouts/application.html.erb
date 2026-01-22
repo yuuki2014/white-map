@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Myapp" %></title>
+    <title><%= content_for(:title) || "しろいちず" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -27,6 +27,7 @@
   </head>
 
   <body class="" data-controller="ui" data-ui-map-outlet="#main-map">
+    <div class="fixed inset-0 z-50 hidden" data-ui-target="uiOverlay" data-action="click->ui#clearUiOverlay"></div>
     <%= yield :header %>
     <main class="font-sans">
       <%= yield %>
@@ -34,7 +35,13 @@
     <% if show_footer? %>
       <%= render "shared/footer" %>
     <% end %>
+    <%= render "bottom_sheets/bottom_sheets_shell" %>
     <%= render "shared/modal_shell" %>
     <%= render "shared/flash_message" %>
+    <div id="error-root" class="fixed inset-0 z-50 pointer-events-none">
+      <div id="error-container" class="pointer-events-auto fixed top-6 left-1/2 -translate-x-1/2">
+        <%= render "shared/error_messages" %>
+      </div>
+    </div>
   </body>
 </html>

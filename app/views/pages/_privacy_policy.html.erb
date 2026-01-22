@@ -1,0 +1,72 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 transition-opacity duration-300" 
+     data-controller="modal">
+  
+  <%# 背景（バックドロップ） %>
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" 
+       data-action="click->modal#close"></div>
+
+  <%# --- モーダル本体 --- %>
+  <div class="relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl animate-fade-in-up transition-all duration-300"
+       data-modal-target="modalBox">
+    
+    <%# ヘッダー（固定） %>
+    <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white z-10">
+      <h2 class="text-xl font-bold text-gray-800">プライバシーポリシー</h2>
+      <button type="button" class="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition" 
+              data-action="click->modal#close">
+        <%= lucide_icon('x', class: "w-6 h-6") %>
+      </button>
+    </div>
+
+    <%# コンテンツエリア（スクロール可能） %>
+    <div class="flex-1 overflow-y-auto px-6 py-6 text-sm leading-relaxed text-gray-600">
+      <div class="space-y-6">
+        
+        <p>
+          White Map（以下「当サービス」といいます。）は、ユーザーの個人情報保護の重要性を認識し、以下の通りプライバシーポリシーを定めます。
+        </p>
+
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">1. 取得する情報</h3>
+          <p class="mb-2">当サービスでは、主に以下の情報を取得します。</p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><strong>位置情報（GPSデータ）:</strong> 「霧晴らし」機能による地図作成のため、端末の緯度・経度・移動時刻を取得します。</li>
+            <li><strong>端末情報・Cookie:</strong> ゲストユーザーの識別やログイン状態の保持、利用状況の解析のために利用します。</li>
+            <li><strong>入力データ:</strong> ユーザーが任意で設定する地図のタイトルやメモなど。</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">2. 利用目的</h3>
+          <p>取得した情報は、以下の目的で利用します。</p>
+          <ul class="list-disc pl-5 space-y-1 mt-2">
+            <li>地図の描画および探索履歴の保存・再生機能の提供のため</li>
+            <li>ゲストユーザー機能におけるデータの一時保存のため</li>
+            <li>サービスの不正利用防止およびセキュリティ確保のため</li>
+            <li>サービスの改善および新機能開発のための統計データ作成のため</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">3. 位置情報の第三者提供・公開について</h3>
+          <p>
+            当サービスは、ユーザーの同意なく位置情報を第三者に提供することはありません。
+            ただし、ユーザー自身が地図の公開設定を「公開」または「限定公開（URL共有）」に設定した場合、その地図に含まれる位置情報（探索ログ）は、該当URLを知る第三者が閲覧可能となります。
+            公開設定はユーザーご自身の責任において管理してください。
+          </p>
+        </section>
+
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">4. 外部サービスの利用</h3>
+          <p>
+            当サービスでは、地図データの表示のために「MapTiler」等の外部地図サービスを利用しています。
+            また、サービスの利用状況を把握するためにアクセス解析ツールを利用する場合があります。
+            これらの外部サービスは、独自のプライバシーポリシーに基づいてデータを処理する場合があります。
+          </p>
+        </section>
+
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">5. データの保存と削除</h3>
+          <p>
+             ユーザーは、当サービスの機能（削除ボタン等）を利用して、自身の作成した地図データをいつでもサーバーから削除することができます。
+             地図を削除した場合、関連する位置情報ログも完全に削除され、復元することは

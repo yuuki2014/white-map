@@ -1,0 +1,100 @@
+<%# --- モーダル全体 --- %>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" data-controller="modal">
+
+  <%# 背景（バックドロップ） %>
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+       data-action="click->modal#close"></div>
+
+  <%# --- モーダル本体 --- %>
+  <div class="relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl animate-fade-in-up" data-modal-target="modalBox">
+    
+    <%# ヘッダー（固定） %>
+    <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white z-10">
+      <h2 class="text-xl font-bold text-gray-800">利用規約</h2>
+      <button type="button" class="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition" data-action="click->modal#close">
+        <%= lucide_icon('x', class: "w-6 h-6") %>
+      </button>
+    </div>
+
+    <%# コンテンツエリア（スクロール可能） %>
+    <div class="flex-1 overflow-y-auto px-6 py-6 text-sm leading-relaxed text-gray-600">
+      <div class="space-y-6">
+        
+        <%# 前文 %>
+        <p>
+          この利用規約（以下「本規約」といいます。）は、White Map（以下「当サービス」といいます。）の利用条件を定めるものです。
+          ユーザーの皆様には、本規約に従って当サービスをご利用いただきます。
+        </p>
+
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">第1条（位置情報の利用）</h3>
+          <p>
+            当サービスは、ユーザーの移動軌跡を地図上に可視化する「霧晴らし」機能を提供するために、端末の位置情報（GPSデータ等）を利用します。
+            ユーザーは、本サービスの利用にあたり、位置情報の取得および利用に同意するものとします。
+            なお、取得した位置情報は、地図の描画および共有機能以外の目的（ユーザーの特定や追跡など）には利用いたしません。
+          </p>
+        </section>
+
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">第2条（安全の確保）</h3>
+          <p>
+            当サービスは現実世界を移動して楽しむアプリですが、ユーザーは以下の点に十分注意してください。
+          </p>
+          <ul class="list-disc pl-5 space-y-1 mt-2">
+            <li>歩行中のスマートフォンの操作（歩きスマホ）は大変危険ですのでおやめください。</li>
+            <li>私有地、立入禁止区域、危険な場所への立ち入りは絶対に行わないでください。</li>
+            <li>交通ルールや公共のマナーを遵守してください。</li>
+          </ul>
+          <p class="mt-2 text-red-500 font-bold">
+            当サービスの利用中に発生した事故、怪我、トラブルについて、運営者は一切の責任を負いません。
+          </p>
+        </section>
+
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">第3条（地図データの公開とプライバシー）</h3>
+          <p>
+            ユーザーが作成した地図データの公開設定は、ユーザー自身の責任において管理するものとします。
+            「公開」または「限定公開（URL共有）」設定にされた地図に含まれる情報（自宅や職場の位置など）により発生したプライバシー上の問題について、運営者は責任を負いません。
+          </p>
+        </section>
+
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">第4条（ゲスト利用）</h3>
+          <p>
+            アカウント登録を行わずに利用する「ゲストユーザー」の場合、ブラウザのCookieやキャッシュの削除、端末の変更等により、作成した地図データが消失する可能性があります。
+            重要なデータの保存には、アカウント登録を推奨します。
+          </p>
+        </section>
+
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">第5条（禁止事項）</h3>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>法令または公序良俗に違反する行為</li>
+            <li>意図的に不正な位置情報を送信する行為（GPSスプーフィング等）</li>
+            <li>当サービスのサーバーに過度な負荷をかける行為</li>
+            <li>他人のプライバシーを侵害する地図データの公開</li>
+          </ul>
+        </section>
+        
+        <section>
+          <h3 class="mb-2 font-bold text-gray-800">第6条（免責事項）</h3>
+          <p>
+            当サービスは、地図データの正確性や、位置情報の完全な記録を保証するものではありません。
+            通信環境やGPSの精度により、地図が正しく描画されない場合があります。
+          </p>
+        </section>
+
+      </div>
+    </div>
+
+    <%# フッター（固定） %>
+    <div class="border-t border-gray-100 bg-gray-50 px-6 py-4 flex justify-end">
+      <button type="button"
+              class="rounded-lg bg-gray-800 px-6 py-2.5 text-sm font-medium text-white shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition"
+              data-action="click->modal#close">
+        閉じる
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = [ "modalBox", "modalBackdrop" ]
+  static values  = { url: String }
 
   connect() {
     requestAnimationFrame(() => {
@@ -16,8 +17,19 @@ export default class extends Controller {
       this.modalBoxTarget.classList.add("opacity-0", "translate-y-40")
     })
 
-    this.modalBoxTarget.addEventListener("transitionend", () => {
+    // this.modalBoxTarget.addEventListener("transitionend", () => {
+    //   this.element.remove();
+    // }, { once: true });
+    setTimeout(() => {
       this.element.remove();
-    }, { once: true });
+    }, 300);
+  }
+
+  open(event){
+    const url = event.params.url;
+
+    if(url){
+      window.open(url, '_blank', 'noopener,noreferrer')
+    }
   }
 }

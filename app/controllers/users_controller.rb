@@ -3,6 +3,11 @@ class UsersController < ApplicationController
   before_action :set_user, only: [ :show ]
 
   def show
+    if @user.present?
+      render
+    else
+      redirect_to root_path
+    end
   end
 
   def mypage

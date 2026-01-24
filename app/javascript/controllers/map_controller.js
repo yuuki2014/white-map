@@ -20,6 +20,7 @@ const MAP_OVERLAY_DISTANCE = 100; // マップオーバーレイを消すまで�
 
 // Connects to data-controller="map"
 export default class extends Controller {
+  static outlets = [ "ui" ]
   static targets = [ "mapOverlay" ]
   static values = { longitude: String,
                     latitude : String
@@ -32,6 +33,14 @@ export default class extends Controller {
     this.ac?.abort();
     const abortController = new AbortController();
     this.ac = abortController;
+
+    // 累計のgeohashをセット
+    this.cumulativeGeohashes = new Set()
+    this.cumulativeFeature = { value: null };
+    this.cumulativeMode = false;
+    this.cumulativeModeStatus = "notReady";
+    this.forceStopCumulative = false;
+    this.setCumulativeGeohashesAndFeature(this.cumulativeGeohashes, this.cumulativeFeature);
 
     // 自作イベント発火用
     // 規約同意時にmap:geolocateが発火して位置情報を取得
@@ -172,6 +181,8 @@ export default class extends Controller {
 
     // on.geolocate用ハンドラ
     this._onGeolocate = (data) => {
+      if (!this.map || !this.element.isConnected) return;
+
       const lng = data.coords.longitude; // 経度
       const lat = data.coords.latitude;  // 緯度
       const recordTime = new Date(data.timestamp).toISOString(); // 取得時間
@@ -274,7 +285,6 @@ export default class extends Controller {
         this.maybeClearOverlay();
       }
 
-
       // // ▼▼▼ デバッグ用：クリックで霧を晴らす ▼▼▼
       // this.map.on('click', (e) => {
       //   const { lng, lat } = e.lngLat;
@@ -317,6 +327,8 @@ export default class extends Controller {
   disconnect() {
     console.log("disconnect:", this.map)
 
+    this.uiOutlet.cumulativeModeOff();
+
     // アボートでフェッチやイベントリスナーを止める
     this.ac?.abort();
     this.ac = null;
@@ -330,6 +342,7 @@ export default class extends Controller {
     if (this.map) {
       if (this.geolocate) {
         this.geolocate.off('geolocate', this._onGeolocate);
+        this.geolocate = null;
       }
 
       this.map.remove(); // 地図機能の停止、画面から削除
@@ -344,6 +357,7 @@ export default class extends Controller {
     if(this.status === STATUS.RECORDING){
       this.postFootprint();
     }
+    this.mapInitEnd = false;
   }
 
   getCookie(name) {
@@ -527,17 +541,19 @@ export default class extends Controller {
     return turf.bboxPolygon(bbox);
   }
 
-  addGeohashesAndGetNew(){
-    const newGeohashes = []
+  addGeohashesAndGetNew(currentGeohash, visitedGeohashes){
+    if(!currentGeohash) return [];
+
+    const newGeohashes = [];
 
     // 現在地の周囲8方向のgeohashを取得
-    const neighbors = ngeohash.neighbors(this.currentGeohash);
-    const aroundGeohashes = [this.currentGeohash, ...neighbors];
+    const neighbors = ngeohash.neighbors(currentGeohash);
+    const aroundGeohashes = [currentGeohash, ...neighbors];
 
     // 保持していないものを追加
     for (const hash of aroundGeohashes) {
-      if (this.visitedGeohashes.has(hash)) continue // すでに保持していた場合はスキップ
-      this.visitedGeohashes.add(hash);
+      if (visitedGeohashes.has(hash)) continue // すでに保持していた場合はスキップ
+      visitedGeohashes.add(hash);
       newGeohashes.push(hash);
     }
 
@@ -575,7 +591,11 @@ export default class extends Controller {
 
     const fogPolygon = turf.difference(turf.featureCollection([this.worldFeature, feature]));
 
-    this.updateFog(fogPolygon);
+    if (this.cumulativeMode) {
+      this.executeFogClearing(true);
+    } else {
+      this.updateFog(fogPolygon);
+    }
   }
 
   resetFogData() {
@@ -583,12 +603,11 @@ export default class extends Controller {
     this.visitedGeohashes.clear();
   }
 
-  executeFogClearing(){
+  executeFogClearing(force = false){
     // console.log("execute実行")
-    const newGeohashes = this.addGeohashesAndGetNew();
-    // console.log(newGeohashes)
+    const newGeohashes = this.addGeohashesAndGetNew(this.currentGeohash, this.visitedGeohashes);
 
-    if(newGeohashes.length === 0){
+    if(!force && newGeohashes.length === 0){
       console.log("新たに訪れた場所がないので何も実行しません")
       return;
     }
@@ -609,8 +628,15 @@ export default class extends Controller {
       this.visitedFeature = polygonsToMerge[0];
     }
 
+    let visitedUnion = turf.clone(this.visitedFeature);
+
+    if (this.cumulativeMode && this.cumulativeFeature.value) {
+      const featureCollection = turf.featureCollection([visitedUnion, this.cumulativeFeature.value].filter(Boolean));
+      visitedUnion = turf.union(featureCollection);
+    }
+
     // 世界全体からvisitedを引いて霧を作る
-    const fogPolygon = turf.difference(turf.featureCollection([this.worldFeature, this.visitedFeature]));
+    const fogPolygon = turf.difference(turf.featureCollection([this.worldFeature, visitedUnion]));
 
     if (fogPolygon) {
       this.updateFog(fogPolygon);
@@ -722,5 +748,76 @@ export default class extends Controller {
   // mapOverlayが接続された時に自動実行
   mapOverlayTargetConnected(_element) {
     this.maybeClearOverlay();
+  }
+
+  // 累計地図セット
+  setCumulativeGeohashesAndFeature(cumulativeGeohashes, cumulativeFeature){
+    if(this.cumulativeModeStatus === "loading") return;
+    this.cumulativeModeStatus = "loading"
+
+    return fetch("/api/v1/my_map", { signal: this.ac.signal })
+      .then(res => {
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (this.ac.signal.aborted || !this.element.isConnected) return;
+
+        data.geohashes.forEach((geohash) => {
+          this.addGeohashesAndGetNew(geohash, cumulativeGeohashes)
+        });
+
+        // 今回追加するポリゴンを全て配列にする
+        const polygonsToMerge = [...cumulativeGeohashes].map(hash => this.createPolygonFromGeohash(hash));
+
+        if (polygonsToMerge.length > 1) {
+          // 配列をFeatureCollectionに変換してから、unionに渡す
+          const featureCollection = turf.featureCollection(polygonsToMerge);
+          cumulativeFeature.value = turf.union(featureCollection);
+        } else {
+          cumulativeFeature.value = polygonsToMerge[0];
+        }
+        this.cumulativeModeStatus = "isReady"
+      })
+      .catch((e) => {
+        this.cumulativeModeStatus = "notReady"
+        this.uiOutlet.disableCumulative();
+        if (e.name == "AbortError") {
+          console.debug("ページ遷移によるエラー", e);
+          return;
+        }
+        console.error(e);
+      });
+  }
+
+  async cumulativeModeOn(){
+    if (this.cumulativeModeStatus === "loading") return;
+
+    if (this.cumulativeModeStatus === "notReady"){
+      this.forceStopCumulative = false;
+
+      await this.setCumulativeGeohashesAndFeature(this.cumulativeGeohashes, this.cumulativeFeature);
+
+      if (this.forceStopCumulative) {
+        return;
+      }
+
+      this.cumulativeMode = true;
+      this.executeFogClearing(true);
+
+    } else if (this.cumulativeModeStatus === "isReady"){
+      this.cumulativeMode = true;
+      this.executeFogClearing(true);
+    }
+  }
+
+  cumulativeModeOff(){
+    if (!this.map) {
+      return; // 何もせず静かに終了させる
+    }
+
+    this.forceStopCumulative = true;
+    this.cumulativeMode = false;
+    this.executeFogClearing(true);
   }
 }

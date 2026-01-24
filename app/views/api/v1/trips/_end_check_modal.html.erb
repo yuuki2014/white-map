@@ -39,8 +39,8 @@
             まだ続ける
           </div>
         </button>
-        <% if trip_id %>
-          <%= form_with model: @trip, url: api_v1_trip_path(trip_id), method: :patch, data: { action: "submit->modal#close", turbo: true } do |f| %>
+        <% if trip_id.present? %>
+          <%= form_with url: api_v1_trip_path(trip_id), method: :patch, scope: :trip, data: { action: "submit->modal#close", turbo: true } do |f| %>
             <%= f.button type: "submit", class: "" do %>
               保存して終了
             <% end %>

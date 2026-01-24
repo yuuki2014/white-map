@@ -46,6 +46,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      resource :my_map, only: :show
       resources :trips, only: %i[ create update ] do
         member do
           get :end_check

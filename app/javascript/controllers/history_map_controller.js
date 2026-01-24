@@ -16,6 +16,11 @@ export default class extends Controller {
     this.mapInitEnd         = false;
     this.clearMapOverlayEnd = false;
 
+    // geohashをセット
+    this.cumulativeGeohashes = new Set()
+    this.cumulativeFeature = { value: null };
+    this.setCumulativeGeohashesAndFeature(this.cumulativeGeohashes, this.cumulativeFeature);
+
     const apiKey = this.element.dataset.maptilerKey;
     // 地図のstyleを取得
     const res = await fetch(`https://api.maptiler.com/maps/jp-mierune-dark/style.json?key=${apiKey}`);
@@ -26,10 +31,6 @@ export default class extends Controller {
     } else {
       this.center = [ 139.745, 35.658 ];
     }
-
-    // TurfのFeatureオブジェクトとして管理
-    this.visitedFeature = null;
-    this.visitedGeohashes = new Set()
 
     // 世界を覆う霧のマスク
     this.worldFeature = turf.polygon([[
@@ -126,24 +127,13 @@ export default class extends Controller {
   }
 
   executeFogClearing(){
-    if(this.visitedGeohashesValue.length === 0){
+    if(this.cumulativeFeature.value .length === 0){
       console.log("geohashがないので何も実行しません")
       return;
     }
 
-    // 今回追加するポリゴンを全て配列にする
-    const polygonsToMerge = this.visitedGeohashesValue.map(hash => this.createPolygonFromGeohash(hash));
-
-    if (polygonsToMerge.length > 1) {
-      // 配列をFeatureCollectionに変換してから、unionに渡す
-      const featureCollection = turf.featureCollection(polygonsToMerge);
-      this.visitedFeature = turf.union(featureCollection);
-    } else {
-      this.visitedFeature = polygonsToMerge[0];
-    }
-
     // 世界全体からvisitedを引いて霧を作る
-    const fogPolygon = turf.difference(turf.featureCollection([this.worldFeature, this.visitedFeature]));
+    const fogPolygon = turf.difference(turf.featureCollection([ this.worldFeature, this.cumulativeFeature.value ]));
 
     if (fogPolygon) {
       this.updateFog(fogPolygon);
@@ -176,6 +166,43 @@ export default class extends Controller {
   // mapOverlayが接続された時に自動実行
   mapOverlayTargetConnected(_element) {
     this.maybeClearOverlay();
+  }
+
+  addGeohashesAndGetNew(currentGeohash, visitedGeohashes){
+    if(!currentGeohash) return [];
+
+    const newGeohashes = [];
+
+    // 現在地の周囲8方向のgeohashを取得
+    const neighbors = ngeohash.neighbors(currentGeohash);
+    const aroundGeohashes = [currentGeohash, ...neighbors];
+
+    // 保持していないものを追加
+    for (const hash of aroundGeohashes) {
+      if (visitedGeohashes.has(hash)) continue // すでに保持していた場合はスキップ
+      visitedGeohashes.add(hash);
+      newGeohashes.push(hash);
+    }
+
+    return newGeohashes
+  }
+
+  // 累計地図セット
+  setCumulativeGeohashesAndFeature(cumulativeGeohashes, cumulativeFeature){
+    this.visitedGeohashesValue.forEach((geohash) => {
+      this.addGeohashesAndGetNew(geohash, cumulativeGeohashes)
+    });
+
+    // 今回追加するポリゴンを全て配列にする
+    const polygonsToMerge = [...cumulativeGeohashes].map(hash => this.createPolygonFromGeohash(hash));
+
+    if (polygonsToMerge.length > 1) {
+      // 配列をFeatureCollectionに変換してから、unionに渡す
+      const featureCollection = turf.featureCollection(polygonsToMerge);
+      cumulativeFeature.value = turf.union(featureCollection);
+    } else {
+      cumulativeFeature.value = polygonsToMerge[0];
+    }
   }
 
   disconnect(_element) {

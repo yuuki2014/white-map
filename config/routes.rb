@@ -43,6 +43,7 @@ Rails.application.routes.draw do
 
   get "privacy_policy", to: "pages#privacy_policy"
   get "terms", to: "pages#terms"
+  resource :my_map, only: :show
 
   namespace :api do
     namespace :v1 do

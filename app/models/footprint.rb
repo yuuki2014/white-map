@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: footprints
+#
+#  id          :bigint           not null, primary key
+#  trip_id     :bigint           not null
+#  latitude    :float            not null
+#  longitude   :float            not null
+#  geohash     :string           not null
+#  recorded_at :datetime         not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+
 class Footprint < ApplicationRecord
   # アソシエーション定義
   belongs_to :trip

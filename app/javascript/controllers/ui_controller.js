@@ -7,7 +7,20 @@ const EVENTS = [ "click", "touchstart", "pointerdown" ]
 // Connects to data-controller="ui"
 export default class extends Controller {
   static outlets = [ "map" ]
-  static targets = [ "footer", "leftButtonContainer", "rightNormalButtonContainer", "rightRecordingButtonContainer", "pauseButtonContainer", "bottomSheet", "playButton", "pauseButton", "tripIdReceiver", "uiOverlay" ]
+  static targets = [
+    "footer",
+    "leftButtonContainer",
+    "rightNormalButtonContainer",
+    "rightRecordingButtonContainer",
+    "pauseButtonContainer",
+    "bottomSheet",
+    "playButton",
+    "pauseButton",
+    "tripIdReceiver",
+    "uiOverlay",
+    "cumulativeButtonActive",
+    "cumulativeButtonInactive",
+  ]
   static values = { status: String,
                     tripId: String
                   }
@@ -102,6 +115,7 @@ export default class extends Controller {
     this.statusValue = STATUS.ENDED
     this.mapOutlet.setStatus(this.statusValue);
     this.mapOutlet.resetFog();
+    this.mapOutlet.setCumulativeGeohashesAndFeature(this.mapOutlet.cumulativeGeohashes, this.mapOutlet.cumulativeFeature);
 
     this.documentRemoveHiddenTimer();
   }
@@ -116,10 +130,10 @@ export default class extends Controller {
         if (this.hasPlayButtonTarget) {
           this.playButtonTarget.classList.remove("hidden")
           this.pauseButtonContainerTarget.classList.add("translate-y-[calc(100%+6rem)]")
-          this.rightNormalButtonContainerTarget.classList.remove("translate-x-full")
+          this.rightNormalButtonContainerTarget.classList.remove("translate-x-[calc(100%+8px)]")
           this.pauseButtonTarget.classList.add("hidden")
           this.leftButtonContainerTarget.classList.add("-translate-x-full")
-          this.rightRecordingButtonContainerTarget.classList.add("translate-x-full")
+          this.rightRecordingButtonContainerTarget.classList.add("translate-x-[calc(100%+8px)]")
         }
         if (this.hasBottomSheetTarget) {
           this.bottomSheetTarget.classList.remove("translate-y-full")
@@ -130,8 +144,8 @@ export default class extends Controller {
         this.playButtonTarget.classList.add("hidden")
         this.pauseButtonTarget.classList.remove("hidden")
         this.leftButtonContainerTarget.classList.remove("-translate-x-full")
-        this.rightNormalButtonContainerTarget.classList.add("translate-x-full")
-        this.rightRecordingButtonContainerTarget.classList.remove("translate-x-full")
+        this.rightNormalButtonContainerTarget.classList.add("translate-x-[calc(100%+8px)]")
+        this.rightRecordingButtonContainerTarget.classList.remove("translate-x-[calc(100%+8px)]")
         this.bottomSheetTarget.classList.add("translate-y-full")
         this.pauseButtonContainerTarget.classList.add("translate-y-[calc(100%+6rem)]")
         break;
@@ -164,12 +178,12 @@ export default class extends Controller {
     this.maplibreTopContainer.addEventListener("transitionend", this._handleTransitionEnd, { signal: this.transitionEvents.signal, once: true });
 
     this.leftButtonContainerTarget.classList.add("-translate-x-full")
-    this.rightRecordingButtonContainerTarget.classList.add("translate-x-full")
+    this.rightRecordingButtonContainerTarget.classList.add("translate-x-[calc(100%+8px)]")
   }
 
   visibleUi(){
     this.leftButtonContainerTarget.classList.remove("-translate-x-full")
-    this.rightRecordingButtonContainerTarget.classList.remove("translate-x-full")
+    this.rightRecordingButtonContainerTarget.classList.remove("translate-x-[calc(100%+8px)]")
 
     if(this.maplibreTopContainer){
       this.maplibreTopContainer = document.querySelector(".maplibregl-ctrl-group")
@@ -215,6 +229,40 @@ export default class extends Controller {
         this.hiddenIcon();
       }
     }, HIDDEN_TIMEOUT);
+  }
+
+  async cumulativeModeOn(){
+    if (this.hasMapOutlet && !this.mapOutlet.mapInitEnd) return;
+
+    this.cumulativeButtonInactiveTargets.forEach(el => {
+      el.classList.add("hidden");
+    });
+    this.cumulativeButtonActiveTargets.forEach(el => {
+      el.classList.remove("hidden");
+    });
+
+    if (this.hasMapOutlet) {
+      await this.mapOutlet.cumulativeModeOn();
+    }
+  }
+
+  cumulativeModeOff(){
+    if (this.hasMapOutlet && !this.mapOutlet.mapInitEnd) return;
+
+    this.cumulativeButtonActiveTargets.forEach(el => {
+      el.classList.add("hidden");
+    });
+    this.cumulativeButtonInactiveTargets.forEach(el => {
+      el.classList.remove("hidden");
+    });
+
+    if (this.hasMapOutlet){
+      this.mapOutlet.cumulativeModeOff();
+    }
+  }
+
+  disableCumulative(){
+    this.cumulativeModeOff()
   }
 
   disconnect(){

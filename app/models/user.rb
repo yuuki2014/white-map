@@ -72,6 +72,10 @@ class User < ApplicationRecord
     end
   end
 
+  def cumulative_geohashes
+    footprints.distinct.pluck(:geohash)
+  end
+
   # User モデルの :id を public_uidに
   def to_param
     public_uid

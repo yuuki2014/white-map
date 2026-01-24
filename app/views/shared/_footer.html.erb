@@ -24,7 +24,7 @@
       </div>
 
       <%# 右側ノーマルボタンコンテナ %>
-      <div class="absolute bottom-full right-0 pr-4 mb-3 pointer-events-auto duration-500" data-ui-target="rightNormalButtonContainer">
+      <div class="absolute bottom-full right-0 pr-4 mb-3 flex flex-col-reverse gap-3 pointer-events-auto duration-500" data-ui-target="rightNormalButtonContainer">
 
         <%# 探索開始ボタン %>
         <%= form_with model: @trip, url: api_v1_trips_path, method: :post, data: { action: "submit->ui#checkGeolocate", turbo: true } do |f| %>
@@ -36,10 +36,27 @@
           <% end %>
         <% end %>
 
+        <%# 累計地図表示ボタン %>
+        <div class="flex flex-col">
+
+          <%= tag.button type: "button",
+            data: { action: "click->ui#cumulativeModeOn", ui_target: "cumulativeButtonInactive" },
+            class: "btn btn-primary bg-yellow-400/80 hover:bg-yellow500/80 text-black p-3 rounded-full shadow-lg active:scale-95 transition" do %>
+            <%= lucide_icon('map') %>
+          <% end %>
+
+          <%= tag.button type: "button",
+            data: { action: "click->ui#cumulativeModeOff", ui_target: "cumulativeButtonActive"  },
+            class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 active:scale-95 transition ring-2 ring-orange-400 ring-offset-2 ring-offset-white hidden" do %>
+            <%= lucide_icon('map') %>
+          <% end %>
+
+        </div>
+
       </div>
 
       <%# 右側探索中ボタンコンテナ %>
-      <div class="absolute bottom-full right-0 pr-4 mb-3 flex flex-col-reverse gap-3 pointer-events-auto duration-500 translate-x-full" data-ui-target="rightRecordingButtonContainer">
+      <div class="absolute bottom-full right-0 pr-4 mb-3 flex flex-col-reverse gap-3 pointer-events-auto duration-500 translate-x-[calc(100%+8px)]" data-ui-target="rightRecordingButtonContainer">
 
         <%# 現在地ボタン %>
         <%= tag.button type: "button",
@@ -56,11 +73,21 @@
         <% end %>
 
         <%# 累計地図表示ボタン %>
-        <%= tag.button type: "button",
-          data: { action: "" },
-          class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 active:scale-95 transition" do %>
-          <%= lucide_icon('map') %>
-        <% end %>
+        <div class="flex flex-col">
+
+          <%= tag.button type: "button",
+            data: { action: "click->ui#cumulativeModeOn", ui_target: "cumulativeButtonInactive" },
+            class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 active:scale-95 transition" do %>
+            <%= lucide_icon('map') %>
+          <% end %>
+
+          <%= tag.button type: "button",
+            data: { action: "click->ui#cumulativeModeOff", ui_target: "cumulativeButtonActive"  },
+            class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 active:scale-95 transition ring-2 ring-orange-400 ring-offset-2 ring-offset-white hidden" do %>
+            <%= lucide_icon('map') %>
+          <% end %>
+
+        </div>
 
       </div>
 

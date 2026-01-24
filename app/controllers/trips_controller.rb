@@ -61,7 +61,7 @@ class TripsController < ApplicationController
       end
     end
 
-    if @trip.update(name: trip_param_title[:name])
+    if @trip.update(title: trip_param_title[:title])
       respond_to do |format|
         format.html { head :not_acceptable }
         format.turbo_stream do
@@ -180,6 +180,6 @@ class TripsController < ApplicationController
   end
 
   def trip_param_title
-    params.require(:trip).permit(:name)
+    params.require(:trip).permit(:title)
   end
 end

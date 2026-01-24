@@ -6,19 +6,7 @@
 
 <%= render "shared/copy_url", trip: trip %>
 
-<%
-  text_body = "#{trip.name}"
-  url = trip_url(trip)
-  hashtags = "#しろいちず"
-  share_text = "#{text_body}\n#{hashtags}\n#{url}"
-%>
-
-<%= button_to status_trip_path(trip, trip: { status: 'unlisted', x: 'post' }),method: :patch, class: "w-full", data: { turbo: true, action: "click->modal#open", modal_url_param: "https://x.com/intent/tweet?text=#{u(share_text)}" }, form_class: "w-full mb-10" do %>
-  <div class="flex w-full items-center justify-center gap-2 rounded-lg bg-black px-4 py-3 font-bold text-white shadow-lg transition hover:bg-gray-800 active:scale-[0.98]">
-    <%= image_tag "x_logo.svg", alt: "Share on X", class: "w-4 h-4" %>
-    <span>ポストして地図を公開</span>
-  </div>
-<% end %>
+<%= render "shared/share_button", trip: trip %>
 
 <div class="text-center w-full">
   <button type="button" data-action="click->modal#close click->ui#endRecording" class="rounded-full bg-[#cccaca] px-8 py-2 text-sm font-semibold text-gray-600 shadow-sm transition hover:bg-gray-400 hover:text-white">

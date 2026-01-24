@@ -2,7 +2,7 @@ class Trip < ApplicationRecord
   # テーブルデータ
   # id、主キー
   # user_id null: false、外部キー
-  # name, string, null: false、地図の名前、デフォルトで開始時の場所から名前をつける
+  # title, string, null: false、地図の名前、デフォルトで開始時の場所から名前をつける
   # activity_time, integer, default: 0, null: false、活動時間を秒数で保存
   # total_distance, integer, default: 0, null: false、合計距離をmで保存
   # public_uid, uuid, default: -> { "gen_random_uuid()" }, null: false、地図公開用URLに使用するUUID
@@ -19,8 +19,8 @@ class Trip < ApplicationRecord
   enum :status, { private: 0, unlisted: 10, public: 20 }, prefix: :visibility
 
   # バリデーション定義
-  validates :user_id, :name, :activity_time, :total_distance, :status, :started_at, presence: true
-  validates :name,
+  validates :user_id, :activity_time, :total_distance, :status, :started_at, presence: true
+  validates :title,
     presence: true,
     length: { maximum: TITLE_MAX_LENGTH },
     format: { without: /\R/, message: "に改行は使えません" }
@@ -33,5 +33,5 @@ class Trip < ApplicationRecord
   # 開始時刻はアプリ側の時間を入れる
   attribute :started_at, :datetime, default: -> { Time.current }
   # 地図名のデフォルト値は、開始位置から取得するように後で設定を変える
-  attribute :name, :string, default: "デフォルト地図"
+  attribute :title, :string, default: "デフォルト地図"
 end

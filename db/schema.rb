@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_23_110526) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_23_042843) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -29,7 +29,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_23_110526) do
 
   create_table "trips", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "name", null: false
+    t.string "title", null: false
     t.integer "activity_time", default: 0, null: false
     t.integer "total_distance", default: 0, null: false
     t.uuid "public_uid", default: -> { "gen_random_uuid()" }, null: false

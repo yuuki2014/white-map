@@ -1,4 +1,4 @@
-<div id="copy-url" class="w-full" data-controller="copy" data-copy-text-value="<%= trip_url(trip.id) %>">
+<div id="copy-url" class="w-full relative" data-controller="copy" data-copy-text-value="<%= trip_url(trip.id) %>">
 
   <div class="mb-6 w-full flex items-center gap-2 <%= trip.visibility_private? ? 'hidden' : '' %>">
     <div class="flex-1 min-w-0 rounded-md bg-gray-100/80 px-3 py-2 text-sm text-gray-700 shadow-inner truncate"

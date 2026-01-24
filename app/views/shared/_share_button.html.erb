@@ -1,0 +1,25 @@
+<%
+  text_body = "#{trip.title}"
+  url = trip_url(trip)
+  hashtags = "#しろいちず"
+  share_text = "#{text_body}\n#{hashtags}\n#{url}"
+%>
+<div class="flex flex-col gap-2" data-controller="share-button" data-share-button-title-value="<%= trip.title %>" data-share-button-text-value="<%= hashtags %>" data-share-button-url-value="<%= url %>">
+
+  <div class="text-sm text-gray-400 text-center">※共有すると公開設定が変更されます</div>
+  <%= button_to status_trip_path(trip, trip: { status: 'unlisted', x: 'post' }),method: :patch, class: "w-full", data: { turbo: true, action: "click->modal#open", share_button_target: "fallbackShare", modal_url_param: "https://x.com/intent/tweet?text=#{u(share_text)}" }, form_class: "w-full" do %>
+    <div class="flex w-full items-center justify-center gap-2 rounded-lg bg-black px-4 py-3 font-bold text-white border border-white/30 shadow-sm transition hover:bg-gray-800 active:scale-[0.98]">
+      <%= image_tag "x_logo.svg", alt: "Share on X", class: "w-4 h-4" %>
+      <span>ポストして地図を公開</span>
+    </div>
+  <% end %>
+
+  <%= button_to status_trip_path(trip, trip: { status: 'unlisted', x: 'post' }),method: :patch, class: "w-full", data: { turbo: true, action: "click->share-button#open", share_button_target: "nativeShare", modal_url_param: "https://x.com/intent/tweet?text=#{u(share_text)}" }, form_class: "w-full" do %>
+    <div class="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-100 px-4 py-3 font-medium text-gray-700 border border-gray-300 shadow-sm transition hover:bg-gray-200 active:scale-[0.98]">
+      <%= lucide_icon "share-2", class: "w-4 h-4" %>
+      <span>共有</span>
+    </div>
+  <% end %>
+  <div class="mb-6"></div>
+
+</div>

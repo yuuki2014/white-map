@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_23_042843) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_26_012657) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -25,6 +25,22 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_23_042843) do
     t.index ["trip_id", "geohash"], name: "index_footprints_on_trip_id_and_geohash"
     t.index ["trip_id", "recorded_at"], name: "index_footprints_on_trip_id_and_recorded_at"
     t.index ["trip_id"], name: "index_footprints_on_trip_id"
+  end
+
+  create_table "posts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "trip_id"
+    t.text "body"
+    t.float "latitude", null: false
+    t.float "longitude", null: false
+    t.uuid "public_uid", default: -> { "gen_random_uuid()" }, null: false
+    t.integer "visibility", default: 0, null: false
+    t.datetime "visited_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["public_uid"], name: "index_posts_on_public_uid", unique: true
+    t.index ["trip_id"], name: "index_posts_on_trip_id"
+    t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
   create_table "trips", force: :cascade do |t|
@@ -62,5 +78,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_23_042843) do
   end
 
   add_foreign_key "footprints", "trips"
+  add_foreign_key "posts", "trips"
+  add_foreign_key "posts", "users"
   add_foreign_key "trips", "users"
 end

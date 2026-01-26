@@ -18,6 +18,7 @@ class User < ApplicationRecord
   has_many :trips, dependent: :destroy
   # trips を経由して footprints を取得
   has_many :footprints, through: :trips
+  has_many :posts, dependent: :destroy
 
   # Devise の機能をオーバーライド
   # ゲスト以外の時だけメールアドレスを必須にする

@@ -1,0 +1,58 @@
+<%= form_with(model: post, data: { controller: "post-form" }, class: "flex flex-col h-full") do |f| %>
+
+  <%# 隠しフィールド（座標用） %>
+  <%= f.hidden_field :latitude, data: { posts_target: "latitude" } %>
+  <%= f.hidden_field :longitude, data: { posts_target: "longitude" } %>
+
+  <%# --- ヘッダー部分 (✕ボタンと保存ボタン) --- %>
+  <div class="flex items-center justify-between px-4 py-3 shrink-0">
+    <%# 閉じるボタン（✕） %>
+    <%= button_tag "キャンセル",
+      type: "button",
+      data: { action: "click->posts#close" },
+      class: "p-2 -ml-2 text-gray-500 hover:text-gray-800 transition rounded-full hover:bg-gray-100" do %>
+      <%= lucide_icon("x") %>
+    <% end %>
+
+    <%# 保存ボタン（地図に記録） %>
+    <%= f.button class: "bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full shadow-md transition transform active:scale-95 text-sm flex items-center gap-1" do %>
+      <%= lucide_icon("map-pin") %>
+      <span>地図に記録</span>
+    <% end %>
+  </div>
+
+  <%# --- メインエリア (スクロール可能) --- %>
+  <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+
+    <%# 1. テキスト入力エリア %>
+    <%# flex-1 をつけて、余白がある限り縦に伸びるようにしています %>
+    <div class="flex-1 min-h-[40vh] border border-gray-400 flex">
+      <%= f.text_area :body,
+          placeholder: "地図に思いを残そう(省略可)",
+          class: "w-full flex-1 resize-none border-none outline-none focus:ring-0 text-lg placeholder-gray-300 leading-relaxed",
+          style: "box-shadow: none;" # iOSのデフォルト影を消す
+      %>
+    </div>
+
+    <%# 2. 画像エリア (今はプレビューなしの準備段階) %>
+    <div class="shrink-0">
+      <div class="flex items-center justify-center mb-4">
+        <button type="button" class="bg-orange-100 text-orange-600 px-6 py-2 rounded-full font-bold text-sm hover:bg-orange-200 transition">
+          写真を追加
+        </button>
+      </div>
+
+      <%# 横スクロール用のコンテナ（ここに将来画像が入る） %>
+      <div class="flex gap-3 overflow-x-auto pb-4 snap-x">
+        <%# ダミー画像（イメージ確認用。実装時は削除） %>
+        <% 9.times do %>
+          <div class="shrink-0 w-40 h-40 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center snap-center">
+            <span class="text-gray-400 text-xs">No Image</span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+
+<% end %>

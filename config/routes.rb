@@ -29,13 +29,21 @@ Rails.application.routes.draw do
   resources :trips, only: %i[ index show destroy ] do
     member do
       get "confirm_destroy", to: "trips#confirm_destroy"
+      get "post_bottom_sheet", to: "bottom_sheets#show_post_bottom_sheet"
       patch :status
       get :edit_status
       get :edit_title
       patch :update_title
+      resources :posts, only: %i[ new create ] do
+        collection do
+        end
+      end
     end
-    resource :bottom_sheets, only: %i[ show ]
+    resource :bottom_sheets, only: %i[ show ] do
+    end
   end
+
+  get "select_position", to: "posts#select_position"
 
   post "decisions", to: "decisions#create", as: :decisions
   get "location_denied", to: "tutorials#location_denied", as: :location_denied

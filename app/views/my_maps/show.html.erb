@@ -26,6 +26,7 @@
   <div class="relative flex-1 min-h-0 w-full">
     <div id="history-map"
       data-controller="history-map"
+      data-history-map-ui-outlet="#ui"
       class="absolute inset-0 h-full w-full"
       data-maptiler-key="<%= Rails.application.credentials.dig(:maptiler, :api_key) %>"
       data-history-map-longitude-value="<%= @first_footprint&.longitude %>"

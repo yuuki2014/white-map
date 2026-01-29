@@ -22,7 +22,9 @@ export default class extends Controller {
     "cumulativeButtonInactive",
   ]
   static values = { status: String,
-                    tripId: String
+                    tripId: String,
+                    currentLatitude: Number,
+                    currentLongitude: Number,
                   }
 
   connect() {

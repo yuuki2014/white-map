@@ -22,25 +22,77 @@ module ApplicationHelper
 
   # フッター表示用
   def show_footer?
-    allowed_paths = [
-      root_path,
-      trips_path,
-      mypage_path
-    ]
+    # allowed_paths = [
+    #   root_path,
+    #   trips_path,
+    #   mypage_path
+    # ]
+
+    # if user_signed_in?
+    #   allowed_paths << user_path(current_user)
+    # end
 
     if user_signed_in?
-      allowed_paths << user_path(current_user)
+      if controller_name == "users"
+        if action_name == "show"
+          return true
+        end
+      end
     end
 
-    allowed_paths.include?(request.path)
+    if controller_name == "trips"
+      if action_name.in?(%w[ new show index ])
+        return true
+      end
+    end
+
+    if controller_name == "users"
+      if action_name.in?(%w[ mypage ])
+        return true
+      end
+    end
+
+    return false
   end
 
   def show_recording_button?
-    allowed_paths = [
-      root_path
-    ]
+    # allowed_paths = [
+    #   root_path
+    # ]
+    # if @trip
+    #   allowed_paths << trip_path(@trip)
+    # end
 
-    allowed_paths.include?(request.path)
+    # allowed_paths.include?(request.path)
+    controller_name == "trips" && action_name.in?(%w[new])
+  end
+
+  def show_tab_bar?
+    if user_signed_in?
+      if controller_name == "users"
+        if action_name == "show"
+          return true
+        end
+      end
+    end
+
+    if controller_name == "trips"
+      if action_name.in?(%w[ new index ])
+        return true
+      end
+    end
+
+    if controller_name == "users"
+      if action_name.in?(%w[ mypage ])
+        return true
+      end
+    end
+
+    return false
+  end
+
+  def show_history_button?
+    controller_name == "trips" && action_name.in?(%w[show])
   end
 
   def mypage_card(show_elements)

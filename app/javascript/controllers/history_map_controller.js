@@ -6,6 +6,7 @@ import * as turf from "@turf/turf"
 
 // Connects to data-controller="history-map"
 export default class extends Controller {
+  static outlets = [ "ui" ]
   static targets = [ "mapOverlay" ]
   static values = { longitude: Number,
                     latitude: Number,
@@ -16,6 +17,7 @@ export default class extends Controller {
     this.mapInitEnd         = false;
     this.clearMapOverlayEnd = false;
 
+    console.log(this.uiOutlet);
     // geohashをセット
     this.cumulativeGeohashes = new Set()
     this.cumulativeFeature = { value: null };
@@ -32,6 +34,10 @@ export default class extends Controller {
       this.center = [ 139.745, 35.658 ];
     }
 
+    this.currentLongitude = this.center[0]
+    this.currentLatitude = this.center[1]
+    this.uiOutlet.longitudeValue = this.currentLongitude
+    this.uiOutlet.latitudeValue = this.currentLatitude
     // 世界を覆う霧のマスク
     this.worldFeature = turf.polygon([[
       [-180, 90],
@@ -78,6 +84,13 @@ export default class extends Controller {
         }
       });
 
+      this.map.on('move', () => {
+        const center = this.map.getCenter();
+        this.currentLatitude = center.lat
+        this.currentLongitude = center.lng
+        this.uiOutlet.longitudeValue = this.currentLongitude
+        this.uiOutlet.latitudeValue = this.currentLatitude
+      })
       this.executeFogClearing();
 
       this.mapInitEnd = true;

@@ -31,6 +31,9 @@ application.register("map", MapController)
 import ModalController from "./modal_controller"
 application.register("modal", ModalController)
 
+import PostsController from "./posts_controller"
+application.register("posts", PostsController)
+
 import ShareButtonController from "./share_button_controller"
 application.register("share-button", ShareButtonController)
 

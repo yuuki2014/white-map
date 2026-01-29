@@ -1,0 +1,44 @@
+<%# 画面全体を覆うオーバーレイ %>
+<div class="fixed inset-0 z-40 flex flex-col justify-between pointer-events-none" data-controller="posts" data-posts-ui-outlet="#ui">
+
+  <%# --- ヘッダー部分 (ここは操作したいので pointer-events-auto) --- %>
+  <header class="pointer-events-auto relative flex items-center justify-between bg-white/90 backdrop-blur-sm px-4 py-4 shadow-sm">
+    <%# タイトル：ヘッダー全体の中心に固定 %>
+    <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+      <div class="text-lg font-bold text-gray-800">
+        場所を決めてください
+      </div>
+    </div>
+
+    <%# 左：将来ボタン置くならここ %>
+    <div class="flex items-center">
+      <%# 例: 戻るボタンとか %>
+    </div>
+
+    <%# 右：キャンセル %>
+    <%= button_tag "キャンセル",
+      type: "button",
+      data: { action: "click->posts#close" },
+      class: "text-sm text-gray-600 hover:text-gray-900 font-medium transition select-none" %>
+  </header>
+
+  <%# --- 画面中央の十字（照準） --- %>
+  <%# ヘッダーやフッターに関係なく、画面の絶対的な中央に配置 %>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none drop-shadow-md">
+    <%# ターゲットアイコン（Lucideの crosshair や plus、あるいはカスタムSVG） %>
+    <%= lucide_icon('plus', class: "w-8 h-8 text-gray-800 stroke-[3] text-red-600") %>
+
+    <%# もし「ピン」のような見た目がよければこちら %>
+    <%#= lucide_icon('map-pin', class: "w-8 h-8 text-red-500 mb-4") %>
+  </div>
+
+  <%# --- 下部の決定ボタン (操作可能にする) --- %>
+  <div class="w-full flex justify-center pb-10">
+    <%= link_to new_post_path(@trip),
+          class: "flex items-center pointer-events-auto justify-center w-16 h-16 bg-orange-500 rounded-full shadow-lg text-white hover:bg-orange-600 active:scale-95 transition-all duration-200",
+          data: { action: "click->map#confirmLocation", turbo_stream: true } do %>
+      <%= lucide_icon('check', class: "w-8 h-8 stroke-[3]") %>
+    <% end %>
+  </div>
+
+</div>

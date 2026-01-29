@@ -28,8 +28,8 @@
 
         <%# 探索開始ボタン %>
         <%= form_with model: @trip, url: api_v1_trips_path, method: :post, data: { action: "submit->ui#checkGeolocate", turbo: true } do |f| %>
-          <%= f.hidden_field :latitude, id: "latitude" %>
-          <%= f.hidden_field :longitude, id: "longitude" %>
+          <%#= f.hidden_field :latitude, id: "latitude" %>
+          <%#= f.hidden_field :longitude, id: "longitude" %>
           <%= f.button type: "submit",
             class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 transition" do %>
             <%= lucide_icon('footprints') %>
@@ -100,34 +100,57 @@
       </div>
 
     <% end %>
+    <% if show_history_button? %>
+      <%# 右側ノーマルボタンコンテナ %>
+      <div class="absolute bottom-full right-0 pr-4 pb-10 mb-8 flex flex-col-reverse gap-3 pointer-events-auto duration-500" data-ui-target="rightNormalButtonContainer">
+
+        <%# 画像投稿ボタン %>
+        <%= link_to post_bottom_sheet_trip_path(@trip), class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 transition", data: { turbo_stream: true } do %>
+          <%= lucide_icon('map-pin') %>
+        <% end %>
+
+        <%# 探索開始ボタン %>
+        <%= form_with model: @trip, url: api_v1_trips_path, method: :post, data: { action: "submit->ui#checkGeolocate", turbo: true } do |f| %>
+          <%#= f.hidden_field :latitude, data: { ui_target: "latitude"} %>
+          <%#= f.hidden_field :longitude, data: { ui_target: "longitude" } %>
+          <%= f.button type: "submit",
+            class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 transition" do %>
+            <%= lucide_icon('map-pin') %>
+          <% end %>
+        <% end %>
+
+      </div>
+    <% end %>
     <%# ▲▲▲ アイコンエリア ▲▲▲ %>
 
     <%# ▼▼▼ タブバーエリア ▼▼▼ %>
-    <div class="mx-auto max-w-md px-4 pointer-events-auto transition-transform duration-500 pb-4" data-ui-target="bottomSheet">
-      <div class="bg-white/20 backdrop-blur-sm rounded-2xl shadow-lg px-6 py-3">
-        <nav class="flex">
-          <%= link_to root_path, class: tab_class(root_path) do %>
-            <%= lucide_icon('map') %>
-            <span class="text-xs">地図</span>
-          <% end %>
+    <% if show_tab_bar? %>
+      <div class="mx-auto max-w-md px-4 pointer-events-auto transition-transform duration-500 pb-4" data-ui-target="bottomSheet">
+        <div class="bg-white/20 backdrop-blur-sm rounded-2xl shadow-lg px-6 py-3">
+          <nav class="flex">
+            <%= link_to root_path, class: tab_class(root_path) do %>
+              <%= lucide_icon('map') %>
+              <span class="text-xs">地図</span>
+            <% end %>
 
-          <%= link_to trips_path, class: tab_class(trips_path) do %>
-            <%= lucide_icon('history') %>
-            <span class="text-xs">履歴</span>
-          <% end %>
+            <%= link_to trips_path, class: tab_class(trips_path) do %>
+              <%= lucide_icon('history') %>
+              <span class="text-xs">履歴</span>
+            <% end %>
 
-          <%= link_to "#", class: tab_class(tutorial_path), data: { turbo_stream: true } do %>
-            <%= lucide_icon('users') %>
-            <span class="text-xs">みんなの地図</span>
-          <% end %>
+            <%= link_to "#", class: tab_class(tutorial_path), data: { turbo_stream: true } do %>
+              <%= lucide_icon('users') %>
+              <span class="text-xs">みんなの地図</span>
+            <% end %>
 
-          <%= link_to mypage_path, class: tab_class(mypage_path) do %>
-            <%= lucide_icon('circle-user-round') %>
-            <span class="text-xs">マイページ</span>
-          <% end %>
-        </nav>
+            <%= link_to mypage_path, class: tab_class(mypage_path) do %>
+              <%= lucide_icon('circle-user-round') %>
+              <span class="text-xs">マイページ</span>
+            <% end %>
+          </nav>
+        </div>
       </div>
-    </div>
+    <% end %>
     <%# ▲▲▲ タブバーエリア ▲▲▲ %>
 
   </div>

@@ -38,6 +38,14 @@ class PostsController < ApplicationController
     end
   end
 
+  def post_flash
+    flash.now[:alert] = "場所を選択してください"
+    respond_to do |format|
+      format.html { redirect_to root_path }
+      format.turbo_stream
+    end
+  end
+
   private
 
   def post_params

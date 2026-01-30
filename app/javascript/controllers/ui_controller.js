@@ -6,7 +6,7 @@ const EVENTS = [ "click", "touchstart", "pointerdown" ]
 
 // Connects to data-controller="ui"
 export default class extends Controller {
-  static outlets = [ "map" ]
+  static outlets = [ "map", "history-map" ]
   static targets = [
     "footer",
     "leftButtonContainer",
@@ -23,8 +23,8 @@ export default class extends Controller {
   ]
   static values = { status: String,
                     tripId: String,
-                    currentLatitude: Number,
-                    currentLongitude: Number,
+                    postLatitude: Number,
+                    postLongitude: Number,
                   }
 
   connect() {
@@ -265,6 +265,15 @@ export default class extends Controller {
 
   disableCumulative(){
     this.cumulativeModeOff()
+  }
+
+  enablePostPositionMode(){
+    this.historyMapOutlet.enablePostPositionMode();
+  }
+
+  disablePostPositionMode(){
+    console.log("おふ")
+    this.historyMapOutlet.disablePostPositionMode();
   }
 
   disconnect(){

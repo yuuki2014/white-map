@@ -9,6 +9,7 @@ class TripsController < ApplicationController
       if @trip.user_id == current_user&.id || @trip.visibility_unlisted? || @trip.visibility_public?
         @first_footprint = @trip.footprints.first
         @visited_geohashes =  @trip.footprints.distinct.pluck(:geohash)
+        @posts = current_user.posts
 
         render
       else

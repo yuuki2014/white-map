@@ -49,10 +49,10 @@
 
       <%# 地図上から場所を選ぶボタン %>
       <% if @trip && @trip.user_id == current_user&.id %>
-        <%= button_to select_position_path,
+        <%= button_to select_position_trip_path(@trip),
               method: :get,
               params: { format: :turbo_stream },
-              data: { action: "click->bottom-sheet#close" },
+              data: { action: "click->bottom-sheet#close click->ui#enablePostPositionMode" },
               form: { class: "contents" },
               class: "flex items-center gap-3 rounded-full bg-[#FFE4C4] px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-[#ffd8a8]" do %>
           <div class="flex items-center justify-center text-red-500">

@@ -26,7 +26,7 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body id="ui" class="" data-controller="ui" data-ui-map-outlet="#main-map">
+  <body id="ui" class="" data-controller="ui" data-ui-map-outlet="#main-map" data-ui-history-map-outlet="#history-map">
     <div class="fixed inset-0 z-50 hidden" data-ui-target="uiOverlay" data-action="click->ui#clearUiOverlay"></div>
     <%= yield :header %>
     <main class="font-sans">

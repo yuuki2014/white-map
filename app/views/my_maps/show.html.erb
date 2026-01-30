@@ -27,11 +27,13 @@
     <div id="history-map"
       data-controller="history-map"
       data-history-map-ui-outlet="#ui"
+      data-history-map-posts-outlet="#posts"
       class="absolute inset-0 h-full w-full"
       data-maptiler-key="<%= Rails.application.credentials.dig(:maptiler, :api_key) %>"
       data-history-map-longitude-value="<%= @first_footprint&.longitude %>"
       data-history-map-latitude-value="<%= @first_footprint&.latitude %>"
       data-history-map-visited-geohashes-value="<%= json_escape(@visited_geohashes&.to_json) %>"
+      data-history-map-posts-value="<%= @posts&.to_json %>"
     >
       <div class="fixed bg-white w-full h-[130%] -bottom-[30%] inset-0 z-20 transition-transform duration-[2000ms] opacity-100 pointer-events-none ease-in-out
                   [mask-image:linear-gradient(to_bottom,black_80%,transparent)]"

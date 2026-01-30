@@ -34,6 +34,7 @@ Rails.application.routes.draw do
       get :edit_status
       get :edit_title
       patch :update_title
+      get "select_position", to: "posts#select_position"
       resources :posts, only: %i[ new create ] do
         collection do
         end
@@ -47,6 +48,7 @@ Rails.application.routes.draw do
 
   post "decisions", to: "decisions#create", as: :decisions
   get "location_denied", to: "tutorials#location_denied", as: :location_denied
+  get "post_flash", to: "posts#post_flash", as: :post_flash
   root "trips#new"
 
   get "privacy_policy", to: "pages#privacy_policy"

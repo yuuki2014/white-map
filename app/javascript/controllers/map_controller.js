@@ -186,11 +186,11 @@ export default class extends Controller {
       const lng = data.coords.longitude; // 経度
       const lat = data.coords.latitude;  // 緯度
       const recordTime = new Date(data.timestamp).toISOString(); // 取得時間
-      const lngInput = document.getElementById("longitude");
-      const latInput = document.getElementById("latitude");
+      // const lngInput = document.getElementById("longitude");
+      // const latInput = document.getElementById("latitude");
       const geohash = ngeohash.encode(lat, lng, GEOHASH_PRECISION); // geohashを計算
-      lngInput.value = lng;
-      latInput.value = lat;
+      // lngInput.value = lng;
+      // latInput.value = lat;
 
       // 自作パルスの現在地を更新
       this.pulseMarker.setLngLat([lng, lat]);

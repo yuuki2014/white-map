@@ -1,2 +1,6 @@
 <%= turbo_stream.update "modal-container", "" %>
 <%= turbo_stream.replace "flash", partial: "shared/flash_message" %>
+<%= turbo_stream.append "history-map" do %>
+  <div data-history-map-target="appendMarker" data-post="<%= @post&.to_json %>">
+  </div>
+<% end %>

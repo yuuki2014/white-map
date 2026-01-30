@@ -2,6 +2,11 @@
   <%= turbo_stream.append "main-map" do %>
     <div id="trip-id-receiver" data-ui-target="tripIdReceiver" data-trip-id="<%= @trip.id %>"></div>
   <% end %>
+  <%= turbo_stream.replace "post-button" do %>
+    <%= link_to post_bottom_sheet_trip_path(@trip), class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 transition", data: { turbo_stream: true } do %>
+      <%= lucide_icon('map-pin') %>
+    <% end %>
+  <% end %>
 <% end %>
 <%= turbo_stream.update "end-trip-button-container", partial: "shared/end_trip_button", locals: { trip: @trip } %>
 <%= turbo_stream.replace "flash", partial: "shared/flash_message" %>

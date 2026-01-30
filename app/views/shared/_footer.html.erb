@@ -66,11 +66,7 @@
         <% end %>
 
         <%# 画像投稿ボタン %>
-        <%= tag.button type: "button",
-          data: { action: "" },
-          class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 active:scale-95 transition" do %>
-          <%= lucide_icon('map-pin') %>
-        <% end %>
+        <div id="post-button"></div>
 
         <%# 累計地図表示ボタン %>
         <div class="flex flex-col">

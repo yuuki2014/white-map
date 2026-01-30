@@ -4,3 +4,7 @@
   <div data-history-map-target="appendMarker" data-post="<%= @post&.to_json %>">
   </div>
 <% end %>
+<%= turbo_stream.append "main-map" do %>
+  <div data-map-target="appendMarker" data-post="<%= @post&.to_json %>">
+  </div>
+<% end %>

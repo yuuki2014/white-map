@@ -1,5 +1,10 @@
 <div class="relative h-screen w-full">
-  <div id="main-map" data-controller="map" data-map-ui-outlet="#ui" class="absolute inset-0 h-full w-full" data-maptiler-key="<%= Rails.application.credentials.dig(:maptiler, :api_key) %>">
+  <div id="main-map"
+    data-controller="map"
+    data-map-ui-outlet="#ui"
+    data-map-posts-outlet="#posts"
+    class="absolute inset-0 h-full w-full"
+    data-maptiler-key="<%= Rails.application.credentials.dig(:maptiler, :api_key) %>">
     <div class="fixed bg-white inset-0 z-20 transition-opacity duration-1000 opacity-100" data-map-target="mapOverlay"></div>
   </div>
 </div>

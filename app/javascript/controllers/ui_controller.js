@@ -268,12 +268,21 @@ export default class extends Controller {
   }
 
   enablePostPositionMode(){
-    this.historyMapOutlet.enablePostPositionMode();
+    if(this.hasMapOutlet){
+      this.mapOutlet.enablePostPositionMode();
+    }
+    if(this.hasHistoryMapOutlet){
+      this.historyMapOutlet.enablePostPositionMode();
+    }
   }
 
   disablePostPositionMode(){
-    console.log("おふ")
-    this.historyMapOutlet.disablePostPositionMode();
+    if(this.hasMapOutlet){
+      this.mapOutlet.disablePostPositionMode();
+    }
+    if(this.hasHistoryMapOutlet){
+      this.historyMapOutlet.disablePostPositionMode();
+    }
   }
 
   disconnect(){

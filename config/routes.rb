@@ -48,7 +48,6 @@ Rails.application.routes.draw do
 
   post "decisions", to: "decisions#create", as: :decisions
   get "location_denied", to: "tutorials#location_denied", as: :location_denied
-  get "post_flash", to: "posts#post_flash", as: :post_flash
   root "trips#new"
 
   get "privacy_policy", to: "pages#privacy_policy"
@@ -61,6 +60,8 @@ Rails.application.routes.draw do
       resources :trips, only: %i[ create update ] do
         member do
           get :end_check
+          get :resume
+          patch :finish_and_create
         end
 
         resources :footprints, only: [ :create ] do

@@ -1,66 +1,52 @@
 import { Controller } from "@hotwired/stimulus"
-import { get } from "@rails/request.js"
 
 // Connects to data-controller="posts"
 export default class extends Controller {
-  static outlets = [ "ui", "history-map" ]
-  static targets = [ "latitude", "longitude", "postButton" ]
+  static outlets = [ "ui" ]
+  static targets = [ "postButton" ]
   static instanceCount = 0;
   static values = {
     lat: Number,
     lng: Number
   }
 
+  // 接続時に実行
   connect() {
-    // console.log(this.element)
-    // console.log(this.uiOutlet.footerTarget)
-    console.log(this.latValue)
-    console.log(this.lngValue)
-    this.uiOutlet.footerTarget.classList.add("hidden")
-    this.constructor.instanceCount++;
-    // console.log(this.constructor.instanceCount);
+    this.uiOutlet.footerTarget.classList.add("hidden") // フッターのボタンを非表示に
+    this.constructor.instanceCount++; // data-controller="posts" のインスタンスの数を加算
   }
 
+  // 破棄時に実行
   disconnect(){
-    this.constructor.instanceCount--;
+    this.constructor.instanceCount--; // インスタンスの数を一つ減らす
 
-    console.log(this.constructor.instanceCount);
     if (this.constructor.instanceCount === 0){
+      // インスタンスが0になったらフッターのボタンを再度表示する
       this.uiOutlet.footerTarget.classList.remove("hidden")
     }
   }
 
-  postButtonTargetConnected(){
-    this.element.removeAttribute("data-posts-lat-value")
-    this.element.removeAttribute("data-posts-lng-value")
-    this.latValue = null;
-    this.lngValue = null;
+  // latValue変更時に自動で実行
+  latValueChanged(){
+    this.updateButtonUrl();
   }
 
-  postValidation(event){
-    console.log("バリデーション")
-    console.log(this.latValue)
-    console.log(this.lngValue)
-    if(this.latValue && this.lngValue) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    get("/post_flash", { responseKind: "turbo-stream" });
+  // lngValue変更時に自動で実行
+  lngValueChanged(){
+    this.updateButtonUrl();
   }
 
-  latitudeTargetConnected(){
-    console.log("ラティ")
-    console.log(this.latValue)
-    // this.latitudeTarget.value = String(this.latValue)
-    this.latitudeTarget.value = this.uiOutlet.postLatitudeValue
-    console.log(this.latitudeTarget.value)
-  }
+  // ボタンのURLにlng,latをセットする
+  updateButtonUrl(){
+    // ボタンが存在しない、latValue,lngValueがセットされていない時はreturn
+    if(!this.hasPostButtonTarget || !this.hasLatValue || !this.hasLngValue) return;
 
-  longitudeTargetConnected(){
-    console.log("ラング")
-    console.log(this.lngValue)
-    // this.longitudeTarget.value = String(this.lngValue)
-    this.longitudeTarget.value = this.uiOutlet.postLongitudeValue
-    console.log(this.longitudeTarget.value)
+    // lng,latをクエリパラメータとして今ののurlにセット
+    const url = new URL(this.postButtonTarget.href, window.location.origin);
+    url.searchParams.set("lat", this.latValue);
+    url.searchParams.set("lng", this.lngValue);
+
+    this.postButtonTarget.href = url.toString(); // 文字列に変換してからセット
   }
 
   close(){

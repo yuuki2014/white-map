@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import BaseMapController from "./base_map_controller"
+application.register("base-map", BaseMapController)
+
 import BottomSheetController from "./bottom_sheet_controller"
 application.register("bottom-sheet", BottomSheetController)
 

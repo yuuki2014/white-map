@@ -23,14 +23,9 @@ export default class extends Controller {
   ]
   static values = { status: String,
                     tripId: String,
-                    postLatitude: Number,
-                    postLongitude: Number,
                   }
 
   connect() {
-    console.log(EVENTS)
-    console.log("接続テスト");
-    // this.mapOutlet.showLocationDeniedModal()
     // 初期化
     // status の初期値をセット
     if(!this.hasStatusValue) {
@@ -81,6 +76,7 @@ export default class extends Controller {
     console.log("記録停止中")
     this.statusValue = STATUS.STOPPED;
     this.mapOutlet.setStatus(this.statusValue);
+    this.tripIdValue = "";
   }
 
   startRecording(){

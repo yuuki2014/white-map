@@ -8,8 +8,8 @@ class TripsController < ApplicationController
     if @trip.present?
       if @trip.user_id == current_user&.id || @trip.visibility_unlisted? || @trip.visibility_public?
         @first_footprint = @trip.footprints.first
-        @visited_geohashes =  @trip.footprints.distinct.pluck(:geohash)
-        @posts = @trip.posts
+        @visited_geohashes =  @trip.footprints.distinct.pluck(:geohash) || []
+        @posts = @trip.posts || []
 
         render
       else
@@ -24,7 +24,7 @@ class TripsController < ApplicationController
 
   def index
     if user_signed_in?
-      @trips = current_user.trips
+      @trips = current_user.trips.order(started_at: :desc)
       @geohash_counts = Footprint.where(trip_id: @trips.select(:id)).group(:trip_id).distinct.count(:geohash)
     else
       flash[:alert] = "この機能はゲストか会員しか使えません"

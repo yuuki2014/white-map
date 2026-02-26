@@ -1,54 +1,39 @@
 class PostsController < ApplicationController
-  def new
-    @trip = current_user.trips.find_by(id: params[:id])
-    @post = @trip.posts.new(user: current_user)
+  before_action :set_trip, only: %i[ new create select_position ]
 
-    respond_to do |format|
-      format.html { redirect_to root_path }
-      format.turbo_stream
-    end
+  def new
+    return respond_modal("shared/flash_and_error", flash_message: { alert: "場所を選択してください" }) if params[:lat].nil? || params[:lng].nil?
+
+    @post = @trip.posts.new(
+      latitude: params[:lat],
+      longitude: params[:lng]
+    )
+
+    respond_modal
   end
 
   def create
-    @trip = current_user.trips.find_by(id: params[:id])
     @post = @trip.posts.new(post_params)
     @post.user = current_user
 
     if @post.save
-      flash.now[:notice] = "地図に記録しました"
-      respond_to do |format|
-        format.html { redirect_to root_path }
-        format.turbo_stream
-      end
+      respond_modal(flash_message: { notice: "地図に記録しました" })
     else
-      flash.now[:alert] = "記録に失敗しました"
-      respond_to do |format|
-        format.html { redirect_to root_path }
-        format.turbo_stream { render "shared/flash_and_error" }
-      end
+      respond_modal("shared/flash_and_error", flash_message: { alert: "記録に失敗しました" })
     end
   end
 
   def select_position
-    @trip = current_user.trips.find_by(id: params[:id])
-
-    respond_to do |format|
-      format.html { redirect_to root_path }
-      format.turbo_stream
-    end
-  end
-
-  def post_flash
-    flash.now[:alert] = "場所を選択してください"
-    respond_to do |format|
-      format.html { redirect_to root_path }
-      format.turbo_stream
-    end
+    respond_modal
   end
 
   private
 
   def post_params
     params.require(:post).permit(:body, :latitude, :longitude)
+  end
+
+  def set_trip
+    @trip = current_user.trips.find_by(id: params[:id])
   end
 end

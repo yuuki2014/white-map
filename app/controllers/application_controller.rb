@@ -31,4 +31,20 @@ class ApplicationController < ActionController::Base
             parent_path
           end
   end
+
+  def respond_modal(*args, fallback: root_path, flash_message: {}, **kwargs, &block)
+    flash_message.each { |type, message| flash.now[type] = message }
+
+    respond_to do |format|
+      format.html { redirect_to fallback, alert: "このページは直接アクセスできません" }
+
+      format.turbo_stream do
+        if block
+          block.call
+        else
+          render(*args, **kwargs)
+        end
+      end
+    end
+  end
 end

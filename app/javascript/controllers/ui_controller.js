@@ -23,19 +23,16 @@ export default class extends Controller {
   ]
   static values = { status: String,
                     tripId: String,
-                    postLatitude: Number,
-                    postLongitude: Number,
                   }
 
   connect() {
-    console.log(EVENTS)
-    console.log("接続テスト");
-    // this.mapOutlet.showLocationDeniedModal()
     // 初期化
     // status の初期値をセット
     if(!this.hasStatusValue) {
       this.statusValue = STATUS.STOPPED;
     }
+
+    this.oldTripGeohashes = [];
 
     // UIを隠すタイマーIDを保持
     this.hiddenTimerId = null;
@@ -60,11 +57,22 @@ export default class extends Controller {
 
   // trip-id-receiver 接続時に呼ばれる
   tripIdReceiverTargetConnected(element){
-    const newId = element.dataset.tripId
+    const newId = element.dataset.tripId;
+    this.oldTripGeohashes = [];
+    this.mapOutlet.postsValue = [];
+    const oldGeohashes = JSON.parse(element.dataset.visitedGeohashes);
+    const oldPosts = JSON.parse(element.dataset.posts);
+
+    if(oldGeohashes){
+      this.oldTripGeohashes = oldGeohashes;
+    }
+    if(oldPosts){
+      this.mapOutlet.postsValue = oldPosts;
+    }
 
     if (newId) {
       console.log("trip ID: ", newId);
-      this.tripIdValue = newId
+      this.tripIdValue = newId;
     }
     element.remove();
   }
@@ -81,16 +89,20 @@ export default class extends Controller {
     console.log("記録停止中")
     this.statusValue = STATUS.STOPPED;
     this.mapOutlet.setStatus(this.statusValue);
+    this.tripIdValue = "";
+    this.oldTripGeohashes = [];
+    this.mapOutlet.postsValue = [];
   }
 
   startRecording(){
     console.log("記録モード開始")
-    this.mapOutlet.setTripId(this.tripIdValue);
+    this.mapOutlet.setTripId(this.tripIdValue, this.oldTripGeohashes);
+    this.mapOutlet.addMarkers();
     this.statusValue = STATUS.RECORDING
     this.mapOutlet.setStatus(this.statusValue);
     this.mapOutlet.postFootprint();
     this.mapOutlet.setFlushTimer();
-    this.mapOutlet.executeFogClearing();
+    this.mapOutlet.executeFogClearing(true);
 
     // デバウンスイベントをセット
     this.documentSetHiddenTimer();

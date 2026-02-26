@@ -1,0 +1,11 @@
+<%= turbo_stream.update "modal-container",
+      partial: "api/v1/trips/last_trip_check_modal",
+      locals: {
+        title: "終了していない探索があります",
+        close_button: true,
+        close_backdrop: true,
+        choice: true,
+        content_partial: "api/v1/trips/last_trip_check",
+        context: "trips",
+        trip_id: @trip_id
+      } %>

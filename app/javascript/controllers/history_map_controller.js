@@ -7,14 +7,13 @@ import * as turf from "@turf/turf"
 export default class extends BaseMapController {
   static values = { ...BaseMapController.values,
                     visitedGeohashes: Array,
-                    posts: Array,
                   }
 
   async connect(_element) {
     // base mapのconnectを実行
     super.connect();
 
-    this.updateCumulativeData(this.visitedGeohashesValue, this.cumulativeGeohashes, this.cumulativeFeature);
+    this.cumulativeFeature = this.generateFeatureFromGeohashes(this.visitedGeohashesValue, this.cumulativeGeohashes);
 
     // 中央位置設定
     if(this.longitudeValue && this.latitudeValue){
@@ -67,13 +66,13 @@ export default class extends BaseMapController {
   }
 
   executeFogClearing(){
-    if(!this.cumulativeFeature.value || this.cumulativeFeature.value.length === 0){
+    if(!this.cumulativeFeature){
       console.log("geohashがないので何も実行しません")
       return;
     }
 
     // 世界全体からvisitedを引いて霧を作る
-    const fogPolygon = turf.difference(turf.featureCollection([ this.worldFeature, this.cumulativeFeature.value ]));
+    const fogPolygon = turf.difference(turf.featureCollection([ this.worldFeature, this.cumulativeFeature ]));
 
     if (fogPolygon) {
       this.updateFog(fogPolygon);

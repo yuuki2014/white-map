@@ -10,8 +10,8 @@ import * as turf from "@turf/turf"
 // 定数定義
 const GEOHASH_PRECISION   = 9;    // 保存するgeohash精度
 const MIN_DISTANCE_METERS = 30;   // 30メートル
-const FORCE_RECORD_MS     = 500; // 3000ミリ秒 (記録間隔の最大値)
-const FLUSH_INTERVAL_MS   = 1000; // 6000ミリ秒 (送信間隔)
+const FORCE_RECORD_MS     = 30000; // 30000ミリ秒 (記録間隔の最大値)
+const FLUSH_INTERVAL_MS   = 60000; // 60000ミリ秒 (送信間隔)
 const MAP_OVERLAY_TIMEOUT = 5000; // マップオーバーレイを消すまでタイムアウト時間
 const MAP_OVERLAY_DISTANCE = 100; // マップオーバーレイを消すまで距離
 const GEOLOCATE_MAXIMUM_AGE = 3000; // 位置情報のキャッシュ許容時間
@@ -42,12 +42,12 @@ export default class extends BaseMapController {
   // --- セットアップ関連メソッド ---
 
   // データ初期化
-  initializeState(){
+  async initializeState(){
     // 累計地図の設定
     this.cumulativeMode = false;
     this.cumulativeModeStatus = "notReady";
     this.forceStopCumulative = false;
-    this.setCumulativeGeohashesAndFeature(this.cumulativeGeohashes, this.cumulativeFeature);
+    this.setCumulativeGeohashesAndFeature(this.cumulativeGeohashes);
 
     // 地図の設定
     this.status = STATUS.STOPPED; // 地図のステータスを初期化
@@ -411,8 +411,12 @@ export default class extends BaseMapController {
     this.status = uiStatus;
   }
 
-  setTripId(id) {
-    this.tripId = id
+  setTripId(id, oldVisitedGeohashes = []) {
+    this.tripId = id;
+    if(oldVisitedGeohashes){
+      this.visitedGeohashes.clear();
+      this.visitedFeature = this.generateFeatureFromGeohashes(oldVisitedGeohashes, this.visitedGeohashes);
+    }
   }
 
   // ターボストリームで位置情報が許可されていない時のモーダルを表示
@@ -516,6 +520,7 @@ export default class extends BaseMapController {
   resetFog() {
     this.visitedFeature = null;
     this.visitedGeohashes.clear();
+    console.log(this.visitedGeohashes)
     this.executeFogClearing(true);
 
     this.markers.forEach(marker => {
@@ -556,8 +561,8 @@ export default class extends BaseMapController {
 
     let visitedUnion = turf.clone(this.visitedFeature);
 
-    if (this.cumulativeMode && this.cumulativeFeature.value) {
-      const featureCollection = turf.featureCollection([visitedUnion, this.cumulativeFeature.value].filter(Boolean));
+    if (this.cumulativeMode && this.cumulativeFeature) {
+      const featureCollection = turf.featureCollection([visitedUnion, this.cumulativeFeature].filter(Boolean));
       visitedUnion = turf.union(featureCollection);
     }
 
@@ -654,8 +659,8 @@ export default class extends BaseMapController {
   }
 
   // 累計地図セット
-  setCumulativeGeohashesAndFeature(cumulativeGeohashes, cumulativeFeature){
-    if(this.cumulativeModeStatus === "loading") return;
+  setCumulativeGeohashesAndFeature(cumulativeGeohashes){
+    if(this.cumulativeModeStatus === "loading" || this.cumulativeModeStatus === "isReady") return;
     this.cumulativeModeStatus = "loading"
 
     return fetch("/api/v1/my_map", { signal: this.ac.signal })
@@ -666,7 +671,7 @@ export default class extends BaseMapController {
       .then((data) => {
         if (this.ac.signal.aborted || !this.element.isConnected) return;
 
-        this.updateCumulativeData(data.geohashes, cumulativeGeohashes, cumulativeFeature);
+        this.cumulativeFeature = this.generateFeatureFromGeohashes(data.geohashes, cumulativeGeohashes);
 
         this.cumulativeModeStatus = "isReady"
       })
@@ -687,7 +692,7 @@ export default class extends BaseMapController {
     if (this.cumulativeModeStatus === "notReady"){
       this.forceStopCumulative = false;
 
-      await this.setCumulativeGeohashesAndFeature(this.cumulativeGeohashes, this.cumulativeFeature);
+      await this.setCumulativeGeohashesAndFeature(this.cumulativeGeohashes);
 
       if (this.forceStopCumulative) {
         return;

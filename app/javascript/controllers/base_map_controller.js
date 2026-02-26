@@ -13,6 +13,7 @@ export default class extends Controller {
   static targets = [ "mapOverlay", "appendMarker" ]
   static values = { longitude: Number,
                     latitude: Number,
+                    posts: Array,
                   }
 
   connect(_element) {
@@ -29,7 +30,7 @@ export default class extends Controller {
 
     // 累計地図をセット
     this.cumulativeGeohashes = new Set();
-    this.cumulativeFeature = { value: null }
+    this.cumulativeFeature = null;
 
     // 世界を覆う霧のマスク
     this.worldFeature = turf.polygon([[
@@ -90,23 +91,23 @@ export default class extends Controller {
 
   }
 
-  // 累計地図を設定する関数
-  updateCumulativeData(visitedGeohashes = [], cumulativeGeohashes, cumulativeFeature){
-    if(visitedGeohashes.length === 0) return;
+  // 渡されたgeohash配列から、結合済みのFeatureを作って返す
+  generateFeatureFromGeohashes(visitedGeohashes = [], targetGeohashesSet){
+    if(visitedGeohashes.length === 0) return null;
 
     visitedGeohashes.forEach((geohash) => {
-      this.addGeohashesAndGetNew(geohash, cumulativeGeohashes)
+      this.addGeohashesAndGetNew(geohash, targetGeohashesSet)
     });
 
     // 今回追加するポリゴンを全て配列にする
-    const polygonsToMerge = [...cumulativeGeohashes].map(hash => this.createPolygonFromGeohash(hash));
+    const polygonsToMerge = [...targetGeohashesSet].map(hash => this.createPolygonFromGeohash(hash));
 
     if (polygonsToMerge.length > 1) {
       // 配列をFeatureCollectionに変換してから、unionに渡す
       const featureCollection = turf.featureCollection(polygonsToMerge);
-      cumulativeFeature.value = turf.union(featureCollection);
+      return turf.union(featureCollection);
     } else {
-      cumulativeFeature.value = polygonsToMerge[0];
+      return polygonsToMerge[0];
     }
   }
 
@@ -194,6 +195,7 @@ export default class extends Controller {
   // postsValueのデータを全てマップに追加
   addMarkers(){
     // データがない場合は何もしない
+    console.log(this.postsValue);
     if(!this.hasPostsValue) return;
     if (!this.postsValue?.length) return
 

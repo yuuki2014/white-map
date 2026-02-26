@@ -4,16 +4,19 @@ class Api::V1::TripsController < ApplicationController
   def create
     last_trip = current_user&.trips&.last # 最後の探索を取得
 
-    if last_trip.nil? || last_trip.ended_at.present? #最後の探索が完了していた場合
+    if last_trip.nil? || last_trip.ended_at.present?
+      # 最後の探索が完了していた場合。通常の探索を開始
       @trip = execute_create_trip
 
       if @trip
-        respond_modal(:create, flash_message: { notice: "探索を開始しました"})
+        respond_modal(:create, flash_message: { notice: "探索を開始しました" })
       else
         respond_modal("shared/flash_and_error", flash_message: { alert: "地図の作成に失敗しました" })
       end
     else
+      # 前回の探索が完了していなかった場合。モーダルを表示
       @trip_id = last_trip.id
+
       respond_modal(:last_trip_check)
     end
   end
@@ -43,9 +46,11 @@ class Api::V1::TripsController < ApplicationController
 
   def resume
     @trip = current_user&.trips&.find_by(id: params[:id])
+    @visited_geohashes =  @trip&.footprints.distinct.pluck(:geohash)
+    @posts = @trip&.posts
 
     if @trip
-      respond_modal(:create, flash_message: { notice: "探索の続きを開始しました"})
+      respond_modal(:create, flash_message: { notice: "探索の続きを開始しました" })
     else
       respond_modal("shared/flash_and_error", flash_message: { alert: "処理に失敗しました" })
     end
@@ -68,7 +73,7 @@ class Api::V1::TripsController < ApplicationController
     end
 
     if @trip
-      respond_modal(:create, flash_message: { notice: "前回の探索を記録し、新しい探索を開始しました"})
+      respond_modal(:create, flash_message: { notice: "前回の探索を記録し、新しい探索を開始しました" })
     else
       respond_modal("shared/flash_and_error", flash_message: { alert: "処理に失敗しました" })
     end

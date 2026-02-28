@@ -12,6 +12,7 @@
     "@hotwired/turbo-rails": "^8.0.20",
     "@rails/request.js": "^0.0.13",
     "@turf/turf": "^7.3.1",
+    "compressorjs": "^1.2.1",
     "geolib": "^3.3.4",
     "maplibre-gl": "^5.15.0",
     "ngeohash": "^0.6.3",

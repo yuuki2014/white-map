@@ -11,7 +11,7 @@ class Api::V1::TripsController < ApplicationController
       if @trip
         respond_modal(:create, flash_message: { notice: "探索を開始しました" })
       else
-        respond_modal("shared/flash_and_error", flash_message: { alert: "地図の作成に失敗しました" })
+        respond_modal("shared/flash_and_error", locals: { object: @trip }, flash_message: { alert: "地図の作成に失敗しました" })
       end
     else
       # 前回の探索が完了していなかった場合。モーダルを表示
@@ -52,7 +52,7 @@ class Api::V1::TripsController < ApplicationController
     if @trip
       respond_modal(:create, flash_message: { notice: "探索の続きを開始しました" })
     else
-      respond_modal("shared/flash_and_error", flash_message: { alert: "処理に失敗しました" })
+      respond_modal("shared/flash_and_error", locals: { object: @trip }, flash_message: { alert: "処理に失敗しました" })
     end
   end
 
@@ -75,7 +75,7 @@ class Api::V1::TripsController < ApplicationController
     if @trip
       respond_modal(:create, flash_message: { notice: "前回の探索を記録し、新しい探索を開始しました" })
     else
-      respond_modal("shared/flash_and_error", flash_message: { alert: "処理に失敗しました" })
+      respond_modal("shared/flash_and_error", locals: { object: @trip }, flash_message: { alert: "処理に失敗しました" })
     end
   rescue ActiveRecord::RecordNotFound
     respond_modal("shared/flash_message", flash_message: { alert: "データが見つかりません" })

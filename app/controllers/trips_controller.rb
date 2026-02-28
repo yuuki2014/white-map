@@ -54,7 +54,7 @@ class TripsController < ApplicationController
     if @trip.update(title: trip_param_title[:title])
       respond_modal(flash_message: { notice: "タイトルを更新しました" })
     else
-      respond_modal("shared/flash_and_error", flash_message: { alert: "タイトルの更新に失敗しました" })
+      respond_modal("shared/flash_and_error", locals: { object: @trip }, flash_message: { alert: "タイトルの更新に失敗しました" })
     end
   end
 
@@ -113,7 +113,7 @@ class TripsController < ApplicationController
     if @trip.destroy
       redirect_to trips_path, notice: "地図を削除しました"
     else
-      respond_modal("shared/flash_and_error", flash_message: { alert: "地図の削除に失敗しました" })
+      respond_modal("shared/flash_and_error", locals: { object: @trip }, flash_message: { alert: "地図の削除に失敗しました" })
     end
   end
 

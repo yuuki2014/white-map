@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import AvatarCompressController from "./avatar_compress_controller"
+application.register("avatar-compress", AvatarCompressController)
+
 import BaseMapController from "./base_map_controller"
 application.register("base-map", BaseMapController)
 

@@ -1,0 +1,63 @@
+<%= turbo_stream.replace "user-profile" do %>
+  <%= form_with(model: @user, url: profile_path, data: { controller: "avatar-compress" }, id: "user-profile", class: "bg-white rounded-xl shadow-md p-4 mb-4 flex items-center") do |f| %>
+
+    <%# アバター画像選択 %>
+    <div class="relative w-16 h-16 rounded-full flex-shrink-0 shadow-sm flex items-center justify-center bg-gray-100">
+
+      <% has_avatar = @user.avatar.attached? %>
+
+      <%# プレビュー画像 %>
+      <%= image_tag (has_avatar ? @user.avatar : ""),
+            class: "w-full h-full object-cover rounded-full #{has_avatar ? '' : 'hidden'}",
+            data: { avatar_compress_target: "preview" } %>
+
+      <%# デフォルトアイコン %>
+      <div class="w-full h-full bg-orange-400 rounded-full flex items-center justify-center <%= has_avatar ? 'hidden' : '' %>" data-avatar-compress-target="defaultIcon">
+        <%= lucide_icon('user-round', class: "m-1 w-full h-full text-white") %>
+      </div>
+
+      <%# 透過グレーの幕とカメラアイコン %>
+      <label class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center cursor-pointer hover:bg-black/50 transition-colors">
+        <%= lucide_icon('camera', class: "w-6 h-6 text-white opacity-80") %>
+
+        <%= f.file_field :avatar,
+            accept: "image/*",
+            class: "hidden",
+            data: {
+              avatar_compress_target: "input",
+              action: "change->avatar-compress#compress"
+            } %>
+      </label>
+
+      <%# 削除用のバツボタン %>
+      <button type="button"
+              class="absolute -top-1 -right-1 bg-white rounded-full text-gray-500 hover:text-gray-400 shadow border border-gray-200 p-0.5 z-10 <%= has_avatar ? '' : 'hidden' %>"
+              data-avatar-compress-target="removeButton"
+              data-action="click->avatar-compress#removePreview">
+        <%= lucide_icon('x', class: "w-4 h-4") %>
+      </button>
+
+      <%# 隠しチェックボックス %>
+      <%= f.check_box :remove_avatar, class: "hidden", data: { avatar_compress_target: "removeCheckbox" } %>
+
+    </div>
+
+    <%# 右側のテキストエリア %>
+    <div class="ml-4 flex-1 flex justify-between items-center">
+      <div class="text-xl font-bold text-gray-800 border border-gray-400 flex-1 mr-2">
+        <%= f.text_field :nickname,
+            maxlength: 20,
+            placeholder: "ニックネームを入力",
+            class: "w-full flex-1 resize-none border-none outline-none focus:ring-0 text-lg placeholder-gray-300 leading-relaxed",
+            style: "box-shadow: none;"
+        %>
+      </div>
+
+      <%# 確定ボタン %>
+      <%= f.button nil, class: "p-2 rounded-full hover:bg-gray-200 flex-shrink-0", data: { turbo: true } do %>
+        <%= lucide_icon('circle-check', class: "text-gray-700")%>
+      <% end %>
+
+    </div>
+  <% end %>
+<% end %>

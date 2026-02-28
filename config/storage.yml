@@ -21,6 +21,8 @@ cloudflare:
   secret_access_key: <%= Rails.application.credentials.dig(:cloudflare, :secret_access_key) %>
   region: auto
   bucket: "white-map-app-production"
+  request_checksum_calculation: "when_required"
+  response_checksum_validation: "when_required"
 
 # Remember not to checkin your GCS keyfile to a repository
 # google:

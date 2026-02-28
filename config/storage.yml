@@ -14,6 +14,14 @@ amazon:
   region: us-east-1
   bucket: your_own_bucket-<%= Rails.env %>
 
+cloudflare:
+  service: S3
+  endpoint: "https://89bd190ef8daebf81c24c61e64b27cc3.r2.cloudflarestorage.com"
+  access_key_id: <%= Rails.application.credentials.dig(:cloudflare, :access_key_id) %>
+  secret_access_key: <%= Rails.application.credentials.dig(:cloudflare, :secret_access_key) %>
+  region: auto
+  bucket: "white-map-app-production"
+
 # Remember not to checkin your GCS keyfile to a repository
 # google:
 #   service: GCS

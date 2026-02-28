@@ -1,22 +1,20 @@
-<div id="flash" class="z-50">
-  <% flash.each do |message_type, message| %>
-    <% if message_type == "notice" %>
-      <% flash_color = "bg-orange-400" %>
-    <% elsif message_type == "alert" %>
-      <% flash_color = "bg-red-500" %>
-    <% elsif message_type == "info" %>
-      <% flash_color = "bg-sky-500" %>
-    <% end %>
-
-    <div data-controller="flash" class="
-      flash-message <%= message_type %>
-      fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl min-w-[180px] max-w-[90vw] text-center
-      text-white text-sm font-medium shadow-lg select-none
-      opacity-0 -translate-y-2
-      transition-all duration-300
-      <%= flash_color %>
-    ">
-      <%= message %>
-    </div>
+<% flash.each do |message_type, message| %>
+  <% if message_type == "notice" %>
+    <% flash_color = "bg-orange-400" %>
+  <% elsif message_type == "alert" %>
+    <% flash_color = "bg-red-500" %>
+  <% elsif message_type == "info" %>
+    <% flash_color = "bg-sky-500" %>
   <% end %>
-</div>
+
+  <div data-controller="flash" class="
+    flash-message <%= message_type %>
+    pointer-events-auto px-4 py-2 rounded-xl min-w-[180px] text-center
+    text-white text-sm font-medium shadow-lg select-none
+    opacity-0 -translate-y-2
+    transition-all duration-300
+    <%= flash_color %>
+  ">
+    <%= message %>
+  </div>
+<% end %>

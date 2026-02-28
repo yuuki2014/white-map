@@ -9,8 +9,8 @@ Rails.application.routes.draw do
     registrations: "users/registrations",
     sessions: "users/sessions"
   }
-  # resources :users, param: :public_uid, only: [ :show ]
-  get "users/:public_uid", to: "users#show", as: "user"
+  resources :users, only: [ :show ]
+  # get "users/:public_uid", to: "users#show", as: "user"
   get "mypage", to: "users#mypage", as: "mypage"
   resource :tutorial, only: [ :show, :update ]
 
@@ -28,9 +28,10 @@ Rails.application.routes.draw do
   # root "posts#index"
   resources :trips, only: %i[ index show destroy ] do
     member do
+      resource :bottom_sheets, only: %i[ show ]
       get "confirm_destroy", to: "trips#confirm_destroy"
       get "post_bottom_sheet", to: "bottom_sheets#show_post_bottom_sheet"
-      patch :status
+      patch :update_status
       get :edit_status
       get :edit_title
       patch :update_title
@@ -39,8 +40,6 @@ Rails.application.routes.draw do
         collection do
         end
       end
-    end
-    resource :bottom_sheets, only: %i[ show ] do
     end
   end
 

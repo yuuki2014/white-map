@@ -34,6 +34,6 @@ class PostsController < ApplicationController
   end
 
   def set_trip
-    @trip = current_user.trips.find_by(id: params[:id])
+    @trip = current_user.trips.find_by(public_uid: params[:id])
   end
 end

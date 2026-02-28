@@ -18,7 +18,7 @@
 
     <%# 各データをループ表示 %>
     <% if @trips.present? %>
-      <% @trips&.each do |trip| %>
+      <% @trips.each do |trip| %>
         <% geohash_count = @geohash_counts[trip.id] || 0 %>
 
         <div class="flex flex-col items-center border-b border-gray-300 py-8 last:border-none">
@@ -34,7 +34,7 @@
           </div>
 
           <%# 地図画像コンテナ %>
-          <%= link_to trip_path(trip.id) do %>
+          <%= link_to trip_path(trip) do %>
             <div class="mb-4 h-64 w-64 overflow-hidden rounded-2xl border border-gray-400 bg-white shadow-sm">
               <%# <%= image_tag trip.image_url, class: "h-full w-full object-cover" %>
               <div class="flex h-full w-full items-center justify-center bg-gray-50 text-gray-400">

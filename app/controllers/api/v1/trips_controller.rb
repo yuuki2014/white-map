@@ -15,14 +15,14 @@ class Api::V1::TripsController < ApplicationController
       end
     else
       # 前回の探索が完了していなかった場合。モーダルを表示
-      @trip_id = last_trip.id
+      @trip_id = last_trip.public_uid
 
       respond_modal(:last_trip_check)
     end
   end
 
   def update
-    @trip = current_user.trips.find(params[:id])
+    @trip = current_user.trips.find_by(public_uid: params[:id])
 
     if execute_finish_trip(@trip)
       if current_user.general?
@@ -45,7 +45,7 @@ class Api::V1::TripsController < ApplicationController
   end
 
   def resume
-    @trip = current_user&.trips&.find_by(id: params[:id])
+    @trip = current_user&.trips&.find_by(public_uid: params[:id])
     @visited_geohashes =  @trip&.footprints.distinct.pluck(:geohash)
     @posts = @trip&.posts
 
@@ -57,7 +57,7 @@ class Api::V1::TripsController < ApplicationController
   end
 
   def finish_and_create
-    old_trip = current_user.trips.find(params[:id])
+    old_trip = current_user.trips.find_by(public_uid: params[:id])
 
     ActiveRecord::Base.transaction do
       # 過去の探索を終了させる

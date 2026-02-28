@@ -17,6 +17,7 @@ export default class extends Controller {
                   }
 
   connect(_element) {
+    console.log("base mapのconnect実行")
     // 初期化
     this.mapInitEnd = false; // 初期化終了フラグ
     this.clearMapOverlayEnd = false; // 初期のマップオーバーレイクリアフラグ

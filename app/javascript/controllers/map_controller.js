@@ -8,13 +8,14 @@ import { getDistance } from 'geolib'
 import * as turf from "@turf/turf"
 
 // 定数定義
-const GEOHASH_PRECISION   = 9;    // 保存するgeohash精度
-const MIN_DISTANCE_METERS = 30;   // 30メートル
-const FORCE_RECORD_MS     = 30000; // 30000ミリ秒 (記録間隔の最大値)
-const FLUSH_INTERVAL_MS   = 60000; // 60000ミリ秒 (送信間隔)
-const MAP_OVERLAY_TIMEOUT = 5000; // マップオーバーレイを消すまでタイムアウト時間
-const MAP_OVERLAY_DISTANCE = 100; // マップオーバーレイを消すまで距離
-const GEOLOCATE_MAXIMUM_AGE = 3000; // 位置情報のキャッシュ許容時間
+const GEOHASH_PRECISION     = 9;     // 保存するgeohash精度
+const MIN_DISTANCE_METERS   = 30;    // 30メートル
+const FORCE_RECORD_MS       = 30000; // 30000ミリ秒 (記録間隔の最大値)
+const FLUSH_INTERVAL_MS     = 60000; // 60000ミリ秒 (送信間隔)
+const MAP_OVERLAY_TIMEOUT   = 5000;  // マップオーバーレイを消すまでタイムアウト時間
+const MAP_OVERLAY_DISTANCE  = 100;   // マップオーバーレイを消すまで距離
+const GEOLOCATE_MAXIMUM_AGE = 3000;  // 位置情報のキャッシュ許容時間
+const PERMISSION_DENIED     = 1;     // 位置情報不許可時のerror値
 const DEBUG_MODE = false;
 
 // Connects to data-controller="map"
@@ -22,9 +23,11 @@ export default class extends BaseMapController {
   async connect() {
     if (document.documentElement.hasAttribute("data-turbo-preview")) return; // プレビューの時は戻る
 
+    console.log("-----初期化実行-----")
     super.connect(); // BaseMapの初期化
     if (!this.ac) return;
 
+    console.log("mapのconnect実行")
     this.initializeState(); // 初期ステータスや変数をセット
     this.setupEventListeners(); // イベントリスナーを登録
     if (this.ac.signal.aborted || !this.element.isConnected) return; // 途中で遷移してたらreturn
@@ -37,6 +40,7 @@ export default class extends BaseMapController {
     this.setupPulseMarker(); // 現在地のパルス設定
     this.addMarkers(); // マーカーをセット
     this.setupMapLoadEvents(); // 地図読み込み後の処理
+    console.log("-----初期化終了-----")
   }
 
   // --- セットアップ関連メソッド ---
@@ -68,10 +72,15 @@ export default class extends BaseMapController {
 
   // イベントリスナーをセット
   setupEventListeners() {
+    console.log("イベントリスナー登録")
     // 規約同意時にmap:geolocateが発火させて位置情報を取得
     window.addEventListener("map:geolocate", this.checkLocationPermissions, { signal: this.ac.signal });
     // リロード、タブ閉じ対策
     window.addEventListener('beforeunload', this.handleBeforeUnload, { signal: this.ac.signal });
+    // Turbo遷移を止める
+    document.addEventListener("turbo:before-visit", this.handleTurboBeforeVisit, { signal: this.ac.signal });
+    // ブラウザの戻る対策
+    this.enableBackGuard();
     // ターボがページ遷移時にキャッシュに保存するときにクリアする
     document.addEventListener("turbo:before-cache", this.cleanup, { signal: this.ac.signal});
     // ページ遷移時にデータを保存
@@ -250,7 +259,9 @@ export default class extends BaseMapController {
 
     this.hasAccepted = this.getCookie("terms_accepted"); // 規約に同意済みか最新のクッキーを取得
 
-    if(navigator.permissions && this.hasAccepted === "true") {
+    if(this.hasAccepted !== "true") return; // 規約に同意していない場合は何もしない
+
+    if(navigator.permissions) {
       navigator.permissions.query({ name: 'geolocation'}).then((result) => {
 
         // ページを開いた時点の状態をチェック
@@ -284,6 +295,29 @@ export default class extends BaseMapController {
               this.showLocationDeniedModal(); // 位置情報を許可するよう促すモーダルを表示
             }
           };
+        }
+      }).catch((e) => {
+        // queryでエラーが出た時の処理
+        console.warn("Permissions APIエラー", e);
+        this.executeFallbackGeolocation();
+      });
+    } else {
+      console.log("Permissions API非対応");
+      this.executeFallbackGeolocation();
+    }
+  }
+
+  // Permissions APIがうまくいかなかった時の処理
+  executeFallbackGeolocation(){
+    if (this.map && this.geolocate) {
+      this.geolocate.trigger();
+      this.mapInitEnd = true;
+      this.maybeClearOverlay();
+
+      this.geolocate.once('error', (e) => {
+        if (e.code === PERMISSION_DENIED) {
+          console.log("iPhone等で位置情報が拒否されました");
+          this.showLocationDeniedModal();
         }
       });
     }
@@ -337,12 +371,82 @@ export default class extends BaseMapController {
     }
   }
 
+  enableBackGuard(){
+    if(this.backGuardEnable) return;
+    this.backGuardEnable = true;
+
+    // navigation API用
+    if (window.navigation) {
+      window.navigation.addEventListener("navigate", this.handleNavigate, { signal: this.ac.signal });
+    }
+    else {
+      if (!window.location.hash.includes("map")) {
+        const safeUrl = window.location.pathname + window.location.search + "#map";
+        history.pushState(history.state, "", safeUrl);
+      }
+      window.addEventListener("popstate", this.handlePopState, { capture: true, signal: this.ac.signal });
+    }
+  }
+
+  // Navigation API用ハンドラ
+  handleNavigate = (event) => {
+    // "traverse" 戻る・進むを検知
+    if (event.navigationType === "traverse") {
+      if (!this.shouldConfirmLeave()) return;
+
+      const ok = window.confirm("探索中です。地図が正しく保存されない可能性がありますが移動しますか？");
+      if (!ok) {
+        event.preventDefault();
+      } else {
+        this.backGuardEnable = false;
+      }
+    }
+  }
+
+  // popstate用ハンドラ
+  handlePopState = (event) => {
+    if (!window.location.hash.includes("map")) {
+      event.stopImmediatePropagation(); // 他のリスナーとバブリングを止める
+
+      if (!this.shouldConfirmLeave()) {
+        this.executeRealBack();
+        return;
+      }
+
+      const ok = window.confirm("探索中です。地図が正しく保存されない可能性がありますが移動しますか？");
+      if (ok) {
+        this.executeRealBack();
+      } else {
+        const safeUrl = window.location.pathname + window.location.search + "#map";
+        history.pushState(history.state, "", safeUrl);
+      }
+    }
+  }
+
+  // popstateで戻るためのメソッド
+  executeRealBack = () => {
+    window.removeEventListener("popstate", this.handlePopState, { capture: true });
+    this.backGuardEnable = false;
+    history.back();
+  }
+
+  shouldConfirmLeave = () => {
+    return this.status === STATUS.RECORDING || this.status === STATUS.PAUSED
+  }
+
   // 未保存時のチェック
   handleBeforeUnload = (event) => {
-    if (this.status === STATUS.RECORDING || this.status === STATUS.PAUSED) {
-      event.preventDefault();
-      event.returnValue = '';
-    }
+    if(!this.shouldConfirmLeave()) return;
+    event.preventDefault();
+    event.returnValue = '';
+  }
+
+  // trubo遷移を止める
+  handleTurboBeforeVisit = (event) => {
+    if(!this.shouldConfirmLeave()) return;
+
+    const ok = window.confirm("探索中です。地図が正しく保存されない可能性がありますが移動しますか？");
+    if(!ok) event.preventDefault(); // turbo遷移を止める
   }
 
   // 既存のデータの掃除
@@ -351,8 +455,11 @@ export default class extends BaseMapController {
 
     console.log("cleanup 実行");
 
-    if(this.tripId){
-      this.tripId = null;
+    if (this.hasMapOverlayTarget) {
+      const el = this.mapOverlayTarget;
+      el.classList.remove("hidden");
+      el.classList.remove("opacity-0");
+      el.classList.add("opacity-100");
     }
 
     if(this.geolocate) {
@@ -382,15 +489,23 @@ export default class extends BaseMapController {
       clearTimeout(this.overlayTimer);
       this.overlayTimer = null;
     }
+    if(this.tripId){
+      this.tripId = null;
+    }
+    if(this.hasUiOutlet) {
+      this.uiOutlet.stopRecording();
+    }
     this.mapInitEnd = false;
+    this.ac?.abort()
   }
 
   // 要素削除時に起動
   disconnect() {
-    console.log("map controller disconnect")
+    console.log("-----終了処理開始-----")
 
     this.cleanup();
     super.disconnect();
+    console.log("-----終了処理完了-----")
   }
 
   // クッキーを取得
@@ -611,7 +726,7 @@ export default class extends BaseMapController {
       el.classList.remove("opacity-100")
       el.classList.add("opacity-0")
       el.addEventListener("transitionend", () => {
-        el.remove();
+        el.classList.add("hidden");
       }, { once: true })
     }
 

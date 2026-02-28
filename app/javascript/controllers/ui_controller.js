@@ -29,7 +29,9 @@ export default class extends Controller {
     // 初期化
     // status の初期値をセット
     if(!this.hasStatusValue) {
-      this.statusValue = STATUS.STOPPED;
+      if(this.hasMapOutlet){
+        this.statusValue = STATUS.STOPPED;
+      }
     }
 
     this.oldTripGeohashes = [];
@@ -81,6 +83,7 @@ export default class extends Controller {
     // 初期化時は何もしない
     if(!value) return
 
+    console.log("以前のtrip id: ", previousValue)
     console.log(`Trip ID が${value}になりました。`)
     this.startRecording();
   }
@@ -88,20 +91,22 @@ export default class extends Controller {
   stopRecording(){
     console.log("記録停止中")
     this.statusValue = STATUS.STOPPED;
-    this.mapOutlet.setStatus(this.statusValue);
     this.tripIdValue = "";
     this.oldTripGeohashes = [];
-    this.mapOutlet.postsValue = [];
+    if(this.hasMapOutlet){
+      this.mapOutlet.setStatus(this.statusValue);
+      this.mapOutlet.postsValue = [];
+    }
   }
 
   startRecording(){
     console.log("記録モード開始")
     this.mapOutlet.setTripId(this.tripIdValue, this.oldTripGeohashes);
-    this.mapOutlet.addMarkers();
     this.statusValue = STATUS.RECORDING
     this.mapOutlet.setStatus(this.statusValue);
     this.mapOutlet.postFootprint();
     this.mapOutlet.setFlushTimer();
+    this.mapOutlet.addMarkers();
     this.mapOutlet.executeFogClearing(true);
 
     // デバウンスイベントをセット
@@ -136,7 +141,9 @@ export default class extends Controller {
 
   // status 変化時に自動で呼ばれるメソッド
   statusValueChanged(value, previousValue){
-    console.log(`状態が ${previousValue} から ${value} に変わりました`)
+    if(value){
+      console.log(`状態が ${previousValue} から ${value} に変わりました`)
+    }
 
     switch (value){
       // 探索停止(初期状態)になった時

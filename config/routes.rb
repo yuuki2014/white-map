@@ -10,7 +10,7 @@ Rails.application.routes.draw do
     sessions: "users/sessions"
   }
   resources :users, only: %i[ show ]
-  resource :profile, controller: 'users', only: %i[ edit update ]
+  resource :profile, controller: "users", only: %i[ edit update ]
   # get "users/:public_uid", to: "users#show", as: "user"
   get "mypage", to: "users#mypage", as: "mypage"
   resource :tutorial, only: [ :show, :update ]

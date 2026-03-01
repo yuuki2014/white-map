@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import ngeohash from 'ngeohash';
+import { get } from "@rails/request.js"
 import * as turf from "@turf/turf"
 
 // 定数定義
@@ -217,22 +218,31 @@ export default class extends Controller {
   }
 
   createPopup(post){
-    const popup = new maplibregl.Popup({ offset: 25 })
-        .setHTML(`
-          <div class="p-2 text-gray-800">
-            <p class="text-sm mb-1">${post.visited_at ? new Date(post.visited_at).toLocaleDateString() : ''}</p>
-            <p class="font-bold whitespace-pre-wrap">${post.body}</p>
-          </div>
-        `)
-
     // マーカーを作成
     const marker = new maplibregl.Marker({
       color: "#FF5733", // ピンの色
       // element: el // 独自画像アイコン
     })
     .setLngLat([post.longitude, post.latitude]) // 座標をセット
-    .setPopup(popup) // ポップアップを紐付け
     .addTo(this.map) // 地図に追加
+
+    const halfHeight = window.innerHeight / 2
+
+    marker.getElement().addEventListener('click', () => {
+      const halfHeight = window.innerHeight / 2
+
+      this.map.easeTo({
+        center: [post.longitude, post.latitude],
+        duration: 500,
+        padding: {
+          top: 0,
+          bottom: halfHeight,
+          left: 0,
+          right: 0
+        },
+      })
+      get(`/posts/${post.public_uid}`, { responseKind: "turbo-stream" });
+    });
 
     this.markers.push(marker);
   }

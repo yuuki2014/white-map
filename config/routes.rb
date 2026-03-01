@@ -44,6 +44,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :posts, only: %i[ show ]
+
   get "select_position", to: "posts#select_position"
 
   post "decisions", to: "decisions#create", as: :decisions

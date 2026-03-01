@@ -27,10 +27,19 @@ class PostsController < ApplicationController
     respond_modal
   end
 
+  def show
+    @post = Post.find_by(public_uid: params[:id])
+    Rails.logger.debug @post.user
+    Rails.logger.debug @post.user
+    Rails.logger.debug @post.user
+    Rails.logger.debug @post.user
+    respond_modal
+  end
+
   private
 
   def post_params
-    params.require(:post).permit(:body, :latitude, :longitude)
+    params.require(:post).permit(:body, :latitude, :longitude, images: [])
   end
 
   def set_trip

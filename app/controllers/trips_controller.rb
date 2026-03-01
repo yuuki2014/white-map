@@ -8,8 +8,8 @@ class TripsController < ApplicationController
     if @trip.present?
       if @trip.user_id == current_user&.id || @trip.visibility_unlisted? || @trip.visibility_public?
         @first_footprint = @trip.footprints.first
-        @visited_geohashes =  @trip.footprints.distinct.pluck(:geohash) || []
-        @posts = @trip.posts || []
+        @visited_geohashes =  @trip.footprints.distinct.pluck(:geohash)
+        @posts = @trip.posts.with_attached_images.where(visibility: "public")
 
         render
       else

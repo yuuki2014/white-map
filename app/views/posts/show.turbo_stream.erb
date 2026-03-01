@@ -5,7 +5,7 @@
     <div class="absolute inset-0 bg-black/50 z-0 pointer-events-auto" data-bottom-sheet-target="bottomSheetBackdrop" data-action="click->bottom-sheet#close"></div>
 
     <%# --- ボトムシート全体 --- %>
-    <div class="relative inset-x-0 bottom-0 z-10 flex flex-col w-full h-[60vh] rounded-t-3xl bg-[#FFFBE6] pb-11 pt-3 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transition-transform translate-y-full duration-300 pointer-events-auto" data-bottom-sheet-target="bottomSheetBox">
+    <div class="relative inset-x-0 bottom-0 z-10 flex flex-col w-full max-h-[60vh] rounded-t-3xl bg-[#FFFBE6] pb-11 pt-3 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transition-transform translate-y-full duration-300 pointer-events-auto" data-bottom-sheet-target="bottomSheetBox">
 
       <%# --- ドラッグハンドル --- %>
       <div class="mx-auto mb-2 h-1.5 w-12 shrink-0 rounded-full bg-gray-300"></div>
@@ -51,7 +51,7 @@
       </div>
 
       <%# --- メインコンテンツ--- %>
-      <div class="flex-1 min-h-0 flex flex-col px-4 pb-4 gap-3 w-full max-w-2xl mx-auto">
+      <div class="flex-1 min-h-0 flex flex-col px-4 pb-4 gap-3 w-full max-w-xl mx-auto">
 
         <%# 日付 %>
         <div class="text-gray-700 text-md font-bold leading-none shrink-0"><%= @post.visited_at&.strftime("%Y/%m/%d %H:%M") %></div>
@@ -65,23 +65,23 @@
 
         <%# 画像エリア %>
         <% if @post.images.attached? %>
-          <div class="flex-1 min-h-0 w-full">
+          <div class="w-full shrink-0">
 
-            <% image_count = @post.images.count %>
+            <% image_count = @post.images.size %>
 
             <%# --- 画像が1枚だけの場合 --- %>
             <% if image_count == 1 %>
-              <div class="w-full h-full flex justify-center items-center">
+              <div class="w-full flex justify-center items-center">
                 <%= image_tag @post.images.first,
                               loading: "lazy",
-                              class: "max-w-full max-h-full object-contain rounded-xl shadow-sm" %>
+                              class: "max-w-full h-auto max-h-[40vh] object-contain rounded-xl shadow-sm" %>
               </div>
 
             <%# --- 画像が複数ある場合 --- %>
             <% else %>
-              <div class="grid grid-cols-2 auto-rows-fr gap-1 w-full h-full rounded-xl overflow-hidden">
+              <div class="grid grid-cols-2 gap-1 w-full rounded-xl overflow-hidden">
                 <% @post.images.first(4).each_with_index do |image, index| %>
-                  <div class="relative w-full h-full bg-gray-200" style="container-type: inline-size;">
+                  <div class="relative w-full aspect-[4/3] max-h-[18vh] bg-gray-200" style="container-type: inline-size;">
                     <%= image_tag image, loading: "lazy",
                           class: "absolute inset-0 w-full h-full object-cover" %>
 

@@ -45,7 +45,7 @@ class Api::V1::FootprintsController < ApplicationController
 
   def footprints_data_list(actual_trip_id)
     params.require(:footprints).filter_map do |fp|
-      p = fp.permit(:latitude, :longitude, :recorded_at)
+      p = fp.permit(:latitude, :longitude, :recorded_at, :trip_id)
 
       # 一つでも空がある場合はスキップ
       if p[:latitude].blank? || p[:longitude].blank? || p[:recorded_at].blank?

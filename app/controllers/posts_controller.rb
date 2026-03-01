@@ -28,12 +28,17 @@ class PostsController < ApplicationController
   end
 
   def show
-    @post = Post.find_by(public_uid: params[:id])
-    Rails.logger.debug @post.user
-    Rails.logger.debug @post.user
-    Rails.logger.debug @post.user
-    Rails.logger.debug @post.user
-    respond_modal
+    @post = Post.includes(:trip, user: { avatar_attachment: :blob }).with_attached_images.find_by(public_uid: params[:id])
+
+    if @post.nil?
+      return respond_modal("shared/flash_message", flash_message: { alert: "投稿が見つかりません" })
+    end
+
+    if @post.user == current_user || ((@post.trip.visibility_unlisted? || @post.trip.visibility_public?) && @post.visibility_public?)
+      respond_modal
+    else
+      respond_modal("shared/flash_message", flash_message: { alert: "この投稿は表示できません" })
+    end
   end
 
   private

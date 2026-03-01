@@ -35,12 +35,4 @@ class Post < ApplicationRecord
   def to_param
     public_uid
   end
-
-  def image_urls
-    return [] unless images.attached?
-
-    images.map do |image|
-      Rails.application.routes.url_helpers.rails_blob_path(image, only_path: true)
-    end
-  end
 end

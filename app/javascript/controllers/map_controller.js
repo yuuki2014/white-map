@@ -226,7 +226,7 @@ export default class extends BaseMapController {
     if (!this.map || !this.element.isConnected) return; // ガード
 
     // センターの設定
-    if(!mapInitEnd) {
+    if(!this.mapInitEnd) {
       this.map.setCenter([data.coords.longitude, data.coords.latitude])
     }
     // 各種データの取得
@@ -240,6 +240,10 @@ export default class extends BaseMapController {
     this.currentLat = lat;
     this.currentGeohash = geohash;
     this.currentRecordTime = recordTime;
+    if(this.hasUiOutlet){
+      this.uiOutlet.longitudeValue = lng;
+      this.uiOutlet.latitudeValue = lat;
+    }
 
     this.pulseMarker.setLngLat([this.currentLng, this.currentLat]); // 自作パルスの現在地を更新
 

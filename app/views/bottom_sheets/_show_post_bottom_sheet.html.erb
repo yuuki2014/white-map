@@ -19,12 +19,11 @@
 
       <%# 現在地に記録するボタン %>
       <% if @trip && @trip.user_id == current_user&.id %>
-        <%= button_to edit_title_trip_path(@trip),
-              id: "edit-title-button",
+        <%= button_to new_post_path(@trip),
               method: :get,
-              params: { format: :turbo_stream },
+              params: { format: :turbo_stream, lat: "", lng: "" },
               form: { class: "contents" },
-              data: { action: "click->bottom-sheet#close" },
+              data: { action: "click->bottom-sheet#close click->ui#currentPositionPost", ui_target: "current_position" },
               class: "flex items-center gap-3 rounded-full bg-[#FFE4C4] px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-[#ffd8a8]" do %>
           <div class="flex items-center justify-center text-sky-400">
             <%= lucide_icon("locate-fixed") %>

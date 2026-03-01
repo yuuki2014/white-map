@@ -1,0 +1,107 @@
+<%= turbo_stream.update "bottom-sheet-container" do %>
+  <div class="fixed inset-0 min-h-screen pointer-events-none opacity-0 w-full z-40 flex flex-col justify-end transition-all duration-300" data-controller="bottom-sheet">
+
+    <%# --- バックドロップ --- %>
+    <div class="absolute inset-0 bg-black/50 z-0 pointer-events-auto" data-bottom-sheet-target="bottomSheetBackdrop" data-action="click->bottom-sheet#close"></div>
+
+    <%# --- ボトムシート全体 --- %>
+    <div class="relative inset-x-0 bottom-0 z-10 flex flex-col w-full max-h-[60vh] rounded-t-3xl bg-[#FFFBE6] pb-11 pt-3 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transition-transform translate-y-full duration-300 pointer-events-auto" data-bottom-sheet-target="bottomSheetBox">
+
+      <%# --- ドラッグハンドル --- %>
+      <div class="mx-auto mb-2 h-1.5 w-12 shrink-0 rounded-full bg-gray-300"></div>
+
+      <%# --- ヘッダー --- %>
+      <div class="flex items-center justify-between px-4 pb-2 border-b border-gray-100 shrink-0">
+
+        <%# 左側エリア %>
+        <div class="flex items-center gap-2">
+
+          <%# ユーザー %>
+          <div class="flex items-center gap-3">
+
+            <%# アイコン %>
+            <% if @post.user.avatar.attached? %>
+              <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center shadow-md">
+                <%= image_tag @post.user.avatar, class: "w-full h-full object-cover rounded-full" %>
+              </div>
+            <% else %>
+              <div class="w-10 h-10 bg-orange-400 rounded-full overflow-hidden shrink-0 flex items-center justify-center shadow-md">
+                <%= lucide_icon('user-round', class: "m-1 w-full h-full text-white") %>
+              </div>
+            <% end %>
+
+            <%# ユーザー名 %>
+            <div class="font-bold text-gray-800 text-sm">
+              <%= @post.user.nickname %>
+            </div>
+
+          </div>
+
+        </div>
+
+        <%# 右側ボタンエリア %>
+        <div class="flex items-center gap-2">
+
+          <%# バツボタン %>
+          <button type="button" class="p-2 text-gray-500 hover:bg-gray-200 bg-gray-100 rounded-full transition active:scale-95" data-action="click->bottom-sheet#close">
+            <%= lucide_icon('x', class: "w-5 h-5") %>
+          </button>
+
+        </div>
+      </div>
+
+      <%# --- メインコンテンツ--- %>
+      <div class="flex-1 min-h-0 flex flex-col px-4 pb-4 gap-3 w-full max-w-xl mx-auto">
+
+        <%# 日付 %>
+        <div class="text-gray-700 text-md font-bold leading-none shrink-0"><%= @post.visited_at&.strftime("%Y/%m/%d %H:%M") %></div>
+
+        <%# 本文 %>
+        <% if @post.body.present? %>
+          <% text_classes = @post.images.attached? ? "line-clamp-3 shrink-0" : "" %>
+
+          <div class="text-gray-700 text-base whitespace-pre-wrap leading-tight font-medium <%= text_classes %>"><%= @post.body %></div>
+        <% end %>
+
+        <%# 画像エリア %>
+        <% if @post.images.attached? %>
+          <div class="w-full shrink-0">
+
+            <% image_count = @post.images.size %>
+
+            <%# --- 画像が1枚だけの場合 --- %>
+            <% if image_count == 1 %>
+              <div class="w-full flex justify-center items-center">
+                <%= image_tag @post.images.first,
+                              loading: "lazy",
+                              class: "max-w-full h-auto max-h-[40vh] object-contain rounded-xl shadow-sm" %>
+              </div>
+
+            <%# --- 画像が複数ある場合 --- %>
+            <% else %>
+              <div class="grid grid-cols-2 gap-1 w-full rounded-xl overflow-hidden">
+                <% @post.images.first(4).each_with_index do |image, index| %>
+                  <div class="relative w-full aspect-[4/3] max-h-[18vh] bg-gray-200" style="container-type: inline-size;">
+                    <%= image_tag image, loading: "lazy",
+                          class: "absolute inset-0 w-full h-full object-cover" %>
+
+                    <% if index == 3 && image_count > 4 %>
+                      <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                        <span class="text-white font-bold tracking-wider text-center" style="font-size: 25cqw;">
+                          + <%= image_count - 4 %>
+                        </span>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+
+          </div>
+        <% end %>
+
+      </div>
+
+    </div>
+  </div>
+<% end %>

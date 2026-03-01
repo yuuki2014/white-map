@@ -23,6 +23,8 @@ export default class extends Controller {
   ]
   static values = { status: String,
                     tripId: String,
+                    longitude: Number,
+                    latitude: Number,
                   }
 
   connect() {
@@ -311,5 +313,20 @@ export default class extends Controller {
     // this.maplibreTopContainer.removeEventListener("transitionend", this._handleTransitionEnd);
     this.transitionEvents?.abort();
     this.documentRemoveHiddenTimer();
+  }
+
+  currentPositionPost(event){
+    event.preventDefault()
+    if(!this.hasLongitudeValue || !this.hasLatitudeValue) return;
+
+    const lat = this.latitudeValue
+    const lng = this.longitudeValue
+
+    const form = event.currentTarget.closest("form")
+
+    form.querySelector('input[name="lat"]').value = lat
+    form.querySelector('input[name="lng"]').value = lng
+
+    form.requestSubmit()
   }
 }

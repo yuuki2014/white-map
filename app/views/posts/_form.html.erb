@@ -37,17 +37,32 @@
     <%# 画像エリア %>
     <div class="shrink-0">
       <div class="flex items-center justify-center mb-4">
-        <button type="button" class="bg-orange-100 text-orange-600 px-6 py-2 rounded-full font-bold text-sm hover:bg-orange-200 transition">
+        <label class="bg-orange-100 text-orange-600 px-6 py-2 rounded-full font-bold text-sm hover:bg-orange-200 transition cursor-pointer">
           写真を追加
-        </button>
+          <%= f.file_field :images,
+            accept: "image/*",
+            multiple: true,
+            class: "hidden",
+            data: {
+              avatar_compress_target: "input",
+              action: ""
+            } %>
+        </label>
       </div>
 
       <%# 横スクロールコンテナ %>
       <div class="flex gap-3 overflow-x-auto pb-4 snap-x">
-        <%# ダミー画像 %>
-        <% 9.times do %>
+        <%# 画像 %>
+        <% if post.images.attached? %>
+          <% post.images.each do |image| %>
+            <div class="shrink-0 w-40 h-40 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center snap-center">
+              <%= image_tag image %>
+              <%= f.hidden_field :images, multiple: true, value: image.signed_id %>
+            </div>
+          <% end %>
+        <% else %>
           <div class="shrink-0 w-40 h-40 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center snap-center">
-            <span class="text-gray-400 text-xs">No Image</span>
+            <span class="text-gray-400 text-sm">No Image</span>
           </div>
         <% end %>
       </div>

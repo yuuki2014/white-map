@@ -4,7 +4,7 @@
   <div class="absolute inset-0 bg-black/50 z-0 pointer-events-auto" data-bottom-sheet-target="bottomSheetBackdrop" data-action="click->bottom-sheet#close"></div>
 
   <%# --- ボトムシート全体 --- %>
-  <div class="fixed inset-x-0 bottom-0 z-10 rounded-t-[2rem] bg-[#FFFBE6] pb-11 pt-4 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transition-transform translate-y-60 duration-500 pointer-events-auto" data-bottom-sheet-target="bottomSheetBox">
+  <div class="fixed inset-x-0 bottom-0 z-10 rounded-t-[2rem] bg-[#FFFBE6] pb-11 pt-4 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transition-transform translate-y-full duration-300 pointer-events-auto" data-bottom-sheet-target="bottomSheetBox">
 
     <%# --- ドラッグハンドル（つまみ） --- %>
     <div class="mx-auto mb-6 h-1.5 w-12 rounded-full bg-gray-400"></div>
@@ -19,12 +19,11 @@
 
       <%# 現在地に記録するボタン %>
       <% if @trip && @trip.user_id == current_user&.id %>
-        <%= button_to edit_title_trip_path(@trip),
-              id: "edit-title-button",
+        <%= button_to new_post_path(@trip),
               method: :get,
-              params: { format: :turbo_stream },
+              params: { format: :turbo_stream, lat: "", lng: "" },
               form: { class: "contents" },
-              data: { action: "click->bottom-sheet#close" },
+              data: { action: "click->bottom-sheet#close click->ui#currentPositionPost", ui_target: "current_position" },
               class: "flex items-center gap-3 rounded-full bg-[#FFE4C4] px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-[#ffd8a8]" do %>
           <div class="flex items-center justify-center text-sky-400">
             <%= lucide_icon("locate-fixed") %>

@@ -2,7 +2,6 @@ import BaseMapController from "./base_map_controller.js"
 import { STATUS } from "../constants/status"
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { get } from "@rails/request.js"
 import ngeohash from 'ngeohash';
 import { getDistance } from 'geolib'
 import * as turf from "@turf/turf"
@@ -226,6 +225,10 @@ export default class extends BaseMapController {
   handleGeolocate = (data) => {
     if (!this.map || !this.element.isConnected) return; // ガード
 
+    // センターの設定
+    if(!this.mapInitEnd) {
+      this.map.setCenter([data.coords.longitude, data.coords.latitude])
+    }
     // 各種データの取得
     const lng = data.coords.longitude; // 経度
     const lat = data.coords.latitude;  // 緯度
@@ -237,6 +240,10 @@ export default class extends BaseMapController {
     this.currentLat = lat;
     this.currentGeohash = geohash;
     this.currentRecordTime = recordTime;
+    if(this.hasUiOutlet){
+      this.uiOutlet.longitudeValue = lng;
+      this.uiOutlet.latitudeValue = lat;
+    }
 
     this.pulseMarker.setLngLat([this.currentLng, this.currentLat]); // 自作パルスの現在地を更新
 

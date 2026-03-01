@@ -25,6 +25,9 @@ class Post < ApplicationRecord
   belongs_to :user
   belongs_to :trip, optional: true
 
+  # Active Storage設定
+  has_many_attached :images
+
   # 初期値定義
   # 開始時刻はアプリ側の時間を入れる
   attribute :visited_at, :datetime, default: -> { Time.current }

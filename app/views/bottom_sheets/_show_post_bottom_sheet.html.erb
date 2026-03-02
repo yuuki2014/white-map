@@ -1,4 +1,4 @@
-<div class="fixed inset-0 min-h-screen pointer-events-none w-full z-40 flex justify-center items-center opacity-0 transition-all duration-300 p-10" data-controller="bottom-sheet">
+<div class="fixed inset-0 h-full pointer-events-none w-full z-40 flex justify-center items-center opacity-0 transition-all duration-300 p-10" data-controller="bottom-sheet">
 
   <%# バックドロップ %>
   <div class="absolute inset-0 bg-black/50 z-0 pointer-events-auto" data-bottom-sheet-target="bottomSheetBackdrop" data-action="click->bottom-sheet#close"></div>
@@ -11,7 +11,11 @@
 
     <%# --- タイトル --- %>
     <div class="mb-8 text-center text-lg font-bold text-gray-900">
-      過去の地図に思い出を記録する
+      <% if request.referer&.include?("/trips/") %>
+        過去の地図に思い出を記録する
+      <% else %>
+        探索中の地図に思い出を残す
+      <% end %>
     </div>
 
     <%# --- アクションボタンエリア --- %>
@@ -19,17 +23,19 @@
 
       <%# 現在地に記録するボタン %>
       <% if @trip && @trip.user_id == current_user&.id %>
-        <%= button_to new_post_path(@trip),
-              method: :get,
-              params: { format: :turbo_stream, lat: "", lng: "" },
-              form: { class: "contents" },
-              data: { action: "click->bottom-sheet#close click->ui#currentPositionPost", ui_target: "current_position" },
-              class: "flex items-center gap-3 rounded-full bg-[#FFE4C4] px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-[#ffd8a8]" do %>
-          <div class="flex items-center justify-center text-sky-400">
-            <%= lucide_icon("locate-fixed") %>
-          </div>
-          <span>現在地に記録する</span>
-        <% end %>
+        <% unless request.referer&.include?("/trips/") %>
+          <%= button_to new_post_path(@trip),
+                method: :get,
+                params: { format: :turbo_stream, lat: "", lng: "" },
+                form: { class: "contents" },
+                data: { action: "click->bottom-sheet#close click->ui#currentPositionPost", ui_target: "current_position" },
+                class: "flex items-center gap-3 rounded-full bg-[#FFE4C4] px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-[#ffd8a8]" do %>
+            <div class="flex items-center justify-center text-sky-400">
+              <%= lucide_icon("locate-fixed") %>
+            </div>
+            <span>現在地に記録する</span>
+          <% end %>
+        <%end %>
       <% end %>
 
       <%# 写真の位置情報を使うボタン %>

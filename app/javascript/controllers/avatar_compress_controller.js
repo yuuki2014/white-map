@@ -1,6 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 import Compressor from 'compressorjs'
 
+const QUALITY    = 0.8;
+const MAX_WIDTH  = 128;
+const MAX_HEIGHT = 128;
+
 // Connects to data-controller="avatar-compress"
 export default class extends Controller {
   static targets = ["input", "preview", "defaultIcon", "removeButton", "removeCheckbox"]
@@ -29,9 +33,9 @@ export default class extends Controller {
 
     // Compressor.jsで圧縮
     new Compressor(file, {
-      quality: 1, // 画質 0-1
-      maxWidth: 128, // 最大幅
-      maxHeight: 128, // 最大高さ
+      quality: QUALITY, // 画質 0-1
+      maxWidth: MAX_WIDTH, // 最大幅
+      maxHeight: MAX_HEIGHT, // 最大高さ
       mimeType: 'image/webp',
       success: (result) => {
         // 圧縮されたresultで元のinputの中身をすり替える

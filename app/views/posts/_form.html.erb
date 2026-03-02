@@ -1,4 +1,4 @@
-<%= form_with(model: post, class: "flex flex-col h-full") do |f| %>
+<%= form_with(model: post, class: "flex flex-col h-full", data: { controller: "images-compress" }) do |f| %>
 
   <%# 隠しフィールド（座標用） %>
   <%= f.hidden_field :latitude %>
@@ -35,7 +35,8 @@
     </div>
 
     <%# 画像エリア %>
-    <div class="shrink-0">
+    <div class="shrink-0 w-full">
+
       <div class="flex items-center justify-center mb-4">
         <label class="bg-orange-100 text-orange-600 px-6 py-2 rounded-full font-bold text-sm hover:bg-orange-200 transition cursor-pointer">
           写真を追加
@@ -44,28 +45,33 @@
             multiple: true,
             class: "hidden",
             data: {
-              avatar_compress_target: "input",
-              action: ""
+              images_compress_target: "input",
+              action: "change->images-compress#compress"
             } %>
         </label>
       </div>
 
-      <%# 横スクロールコンテナ %>
-      <div class="flex gap-3 overflow-x-auto pb-4 snap-x">
-        <%# 画像 %>
-        <% if post.images.attached? %>
-          <% post.images.each do |image| %>
-            <div class="shrink-0 w-40 h-40 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center snap-center">
-              <%= image_tag image %>
-              <%= f.hidden_field :images, multiple: true, value: image.signed_id %>
+      <div class="relative w-full">
+
+        <div data-images-compress-target="preview" class="flex gap-3 overflow-x-auto pb-4 snap-x w-full">
+          <% if post.images.attached? %>
+            <% post.images.each do |image| %>
+              <div class="shrink-0 w-40 h-40 bg-gray-100 rounded-lg flex items-center justify-center snap-center overflow-hidden relative">
+                <%= image_tag image, class: "w-full h-full object-cover" %>
+                <%= f.hidden_field :images, multiple: true, value: image.signed_id %>
+              </div>
+            <% end %>
+          <% else %>
+            <div data-images-compress-target="defaultIcon" class="shrink-0 w-40 h-40 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center snap-center">
+              <span class="text-gray-400 text-sm">No Image</span>
             </div>
           <% end %>
-        <% else %>
-          <div class="shrink-0 w-40 h-40 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center snap-center">
-            <span class="text-gray-400 text-sm">No Image</span>
-          </div>
-        <% end %>
+        </div>
+
+        </div>
+
       </div>
+
     </div>
 
   </div>

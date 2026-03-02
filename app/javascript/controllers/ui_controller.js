@@ -329,4 +329,10 @@ export default class extends Controller {
 
     form.requestSubmit()
   }
+
+  geolocateTrigger(){
+    if(this.hasMapOutlet){
+      this.mapOutlet.geolocateTrigger();
+    }
+  }
 }

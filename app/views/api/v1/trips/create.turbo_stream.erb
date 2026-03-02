@@ -8,9 +8,12 @@
     </div>
   <% end %>
   <%= turbo_stream.replace "post-button" do %>
-    <%= link_to post_bottom_sheet_trip_path(@trip), class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 transition", data: { turbo_stream: true } do %>
-      <%= lucide_icon('map-pin') %>
-    <% end %>
+      <%= link_to post_bottom_sheet_trip_path(@trip),
+            id: "post-button",
+            class: "inline-flex items-center justify-center btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 transition",
+            data: { turbo_stream: true } do %>
+        <%= lucide_icon('map-pin') %>
+      <% end %>
   <% end %>
 <% end %>
 <%= turbo_stream.update "end-trip-button-container", partial: "shared/end_trip_button", locals: { trip: @trip } %>

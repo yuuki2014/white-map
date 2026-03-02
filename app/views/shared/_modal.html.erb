@@ -1,6 +1,6 @@
 <%# locals: (title: nil, close_button: true, choice: false, content_partial: nil, content_locals: {}, context: nil, modal_backdrop: true, close_backdrop: true, trip_id: nil) %>
 
-<div class="fixed inset-0 min-h-screen pointer-events-none w-full z-40 flex justify-center items-center opacity-0 transition-all duration-300 p-10" data-controller="modal">
+<div class="fixed inset-0 h-full pointer-events-none w-full z-40 flex justify-center items-center opacity-0 transition-all duration-300 p-10" data-controller="modal">
   <% if modal_backdrop %>
     <div class="modal-backdrop absolute inset-0 bg-black/50 z-0 pointer-events-auto" data-modal-target="modalBackdrop" <% if close_backdrop %>data-action="click->modal#close"<% end %>></div>
   <% end %>

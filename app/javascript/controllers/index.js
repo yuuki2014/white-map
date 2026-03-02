@@ -31,6 +31,9 @@ application.register("hello", HelloController)
 import HistoryMapController from "./history_map_controller"
 application.register("history-map", HistoryMapController)
 
+import ImagesCompressController from "./images_compress_controller"
+application.register("images-compress", ImagesCompressController)
+
 import MapController from "./map_controller"
 application.register("map", MapController)
 

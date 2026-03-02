@@ -31,7 +31,7 @@ class UsersController < ApplicationController
     if params[:user] && params[:user][:avatar].present?
       uploaded_file = params[:user][:avatar]
 
-      if uploaded_file.size > 100.kilobytes
+      if uploaded_file.size > 200.kilobytes
         @user.errors.add(:avatar, "のサイズが大きすぎます。不正なデータの可能性があります")
         return respond_modal("shared/flash_and_error", locals: { object: @user }, flash_message: { alert: "保存に失敗しました" })
       end

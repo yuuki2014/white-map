@@ -226,25 +226,37 @@ export default class extends Controller {
     .setLngLat([post.longitude, post.latitude]) // 座標をセット
     .addTo(this.map) // 地図に追加
 
-    const halfHeight = window.innerHeight / 2
+    const el = marker.getElement();
 
-    marker.getElement().addEventListener('click', () => {
-      const halfHeight = window.innerHeight / 2
+    el.setAttribute("data-action", `click->${this.identifier}#openPostDetails`);
 
-      this.map.easeTo({
-        center: [post.longitude, post.latitude],
-        duration: 500,
-        padding: {
-          top: 0,
-          bottom: halfHeight,
-          left: 0,
-          right: 0
-        },
-      })
-      get(`/posts/${post.public_uid}`, { responseKind: "turbo-stream" });
-    });
+    el.setAttribute("data-post-uid", post.public_uid);
+    el.setAttribute("data-post-lng", post.longitude);
+    el.setAttribute("data-post-lat", post.latitude);
 
     this.markers.push(marker);
+  }
+
+  openPostDetails(event) {
+    const el = event.currentTarget;
+
+    const uid = el.getAttribute("data-post-uid");
+    const lng = parseFloat(el.getAttribute("data-post-lng"));
+    const lat = parseFloat(el.getAttribute("data-post-lat"));
+    const halfHeight = window.innerHeight / 2;
+
+    this.map.easeTo({
+      center: [lng, lat],
+      duration: 500,
+      padding: {
+        top: 0,
+        bottom: halfHeight,
+        left: 0,
+        right: 0
+      },
+    });
+
+    get(`/posts/${uid}`, { responseKind: "turbo-stream" });
   }
 
   // 霧の初期化

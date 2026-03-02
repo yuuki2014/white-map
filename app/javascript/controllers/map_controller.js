@@ -838,4 +838,8 @@ export default class extends BaseMapController {
     this.cumulativeMode = false;
     this.executeFogClearing(true);
   }
+
+  geolocateTrigger(){
+    this.geolocate.trigger();
+  }
 }

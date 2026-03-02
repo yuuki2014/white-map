@@ -16,6 +16,15 @@ class PostsController < ApplicationController
     @post = @trip.posts.new(post_params)
     @post.user = current_user
 
+    if params[:post] && params[:post][:images].present?
+      params[:post][:images].each do |image|
+        if image.size > 5.megabytes
+          @post.errors.add(:images, "のサイズが大きすぎます。不正なデータの可能性があります。")
+          return respond_modal("shared/flash_and_error", locals: { object: @post }, flash_message: { alert: "保存に失敗しました" })
+        end
+      end
+    end
+
     if @post.save
       respond_modal(flash_message: { notice: "地図に記録しました" })
     else

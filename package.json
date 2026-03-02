@@ -16,6 +16,6 @@
     "geolib": "^3.3.4",
     "maplibre-gl": "^5.15.0",
     "ngeohash": "^0.6.3",
-    "swiper": "^12.0.3"
+    "swiper": "^12.1.2"
   }
 }

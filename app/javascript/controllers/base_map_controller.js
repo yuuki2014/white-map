@@ -228,7 +228,7 @@ export default class extends Controller {
 
     const el = marker.getElement();
 
-    el.setAttribute("data-action", `click->${this.identifier}#openPostDetails`);
+    el.setAttribute("data-action", `click->${this.identifier}#openPostPreview`);
 
     el.setAttribute("data-post-uid", post.public_uid);
     el.setAttribute("data-post-lng", post.longitude);
@@ -237,7 +237,7 @@ export default class extends Controller {
     this.markers.push(marker);
   }
 
-  openPostDetails(event) {
+  openPostPreview(event) {
     const el = event.currentTarget;
 
     const uid = el.getAttribute("data-post-uid");
@@ -256,7 +256,7 @@ export default class extends Controller {
       },
     });
 
-    get(`/posts/${uid}`, { responseKind: "turbo-stream" });
+    get(`/posts/${uid}/preview`, { responseKind: "turbo-stream" });
   }
 
   // 霧の初期化

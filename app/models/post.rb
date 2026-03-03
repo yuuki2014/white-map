@@ -20,6 +20,7 @@ class Post < ApplicationRecord
 
   # バリデーション定義
   validates :user_id, :latitude, :longitude, :visibility, :visited_at, presence: true
+  validate :body_or_images_presence
 
   # アソシエーション定義
   belongs_to :user
@@ -34,5 +35,13 @@ class Post < ApplicationRecord
 
   def to_param
     public_uid
+  end
+
+  private
+
+  def body_or_images_presence
+    if body.blank? && images.blank?
+      errors.add(:base, "本文または画像のどちらかが必須です")
+    end
   end
 end

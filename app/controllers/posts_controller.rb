@@ -36,7 +36,7 @@ class PostsController < ApplicationController
     respond_modal
   end
 
-  def show
+  def preview
     @post = Post.includes(:trip, user: { avatar_attachment: :blob }).with_attached_images.find_by(public_uid: params[:id])
 
     if @post.nil?
@@ -48,6 +48,10 @@ class PostsController < ApplicationController
     else
       respond_modal("shared/flash_message", flash_message: { alert: "この投稿は表示できません" })
     end
+  end
+
+  def show
+    preview
   end
 
   private

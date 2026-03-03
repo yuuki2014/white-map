@@ -51,10 +51,7 @@
   animation: none !important;
 }
 
-
-/* ==========================================
-    究極のMac仕様スクロールバー
-========================================== */
+/* スクロールバー設定 */
 .overflow-y-auto::-webkit-scrollbar,
 .overflow-x-auto::-webkit-scrollbar {
   width: 12px;
@@ -66,24 +63,21 @@
   background: transparent !important;
 }
 
-/* 🚨 1. 普段は【完全に透明】（画面に乗っても出ない） */
 .overflow-y-auto::-webkit-scrollbar-thumb,
 .overflow-x-auto::-webkit-scrollbar-thumb {
   background-color: transparent;
   border-radius: 9999px;
-  border: 4px solid transparent; 
+  border: 4px solid transparent;
   background-clip: content-box;
 }
 
-/* 🚨 2. 「スクロール中（JSが付与するクラス）」または「バー自体をホバーした時」だけ出現！ */
 .overflow-y-auto.is-scrolling::-webkit-scrollbar-thumb,
 .overflow-x-auto.is-scrolling::-webkit-scrollbar-thumb,
 .overflow-y-auto::-webkit-scrollbar-thumb:hover,
 .overflow-x-auto::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(75, 85, 99, 0.5); /* スッ…と上品に出現 */
+  background-color: rgba(75, 85, 99, 0.5);
 }
 
-/* 🚨 3. バーをドラッグ（クリック）している最中はさらに濃くする */
 .overflow-y-auto::-webkit-scrollbar-thumb:active,
 .overflow-x-auto::-webkit-scrollbar-thumb:active {
   background-color: rgba(55, 65, 81, 0.8) !important;

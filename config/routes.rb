@@ -44,7 +44,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :posts, only: %i[ show ]
+  resources :posts, only: %i[ show ] do
+    member do
+      get :preview
+    end
+  end
 
   get "select_position", to: "posts#select_position"
 

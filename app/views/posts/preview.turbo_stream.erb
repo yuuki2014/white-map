@@ -1,0 +1,95 @@
+<%= turbo_stream.update "bottom-sheet-container" do %>
+  <div class="fixed inset-0 h-full pointer-events-none opacity-0 w-full z-40 flex flex-col justify-end transition-all duration-300" data-controller="bottom-sheet">
+
+    <%# --- バックドロップ --- %>
+    <div class="absolute inset-0 bg-black/50 z-0 pointer-events-auto" data-bottom-sheet-target="bottomSheetBackdrop" data-action="click->bottom-sheet#close"></div>
+
+    <%# --- ボトムシート全体 --- %>
+    <div data-bottom-sheet-target="bottomSheetBox"
+          class="relative inset-x-0 bottom-0 z-10 flex flex-col w-full max-h-[60vh] rounded-t-3xl bg-[#FFFBE6] pb-11 pt-8 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transition-transform translate-y-full duration-300 pointer-events-auto">
+
+      <%# --- 右上のバツボタン --- %>
+      <button class="absolute right-1 top-1 sm:right-1 sm:top-1 h-10 w-10 flex items-center justify-center leading-none bg-gray-500/50 hover:bg-gray-600/60 text-white rounded-full z-30 transition" data-action="click->bottom-sheet#close">
+        <%= lucide_icon('x', class: "w-6 h-6") %>
+      </button>
+
+      <%# --- ドラッグハンドル --- %>
+      <div class="absolute mx-auto mb-2 h-1.5 w-12 shrink-0 rounded-full bg-gray-300 top-3 left-1/2 -transrate-x-1/2"></div>
+
+      <%# --- ヘッダー --- %>
+      <div class="modal-header shrink-0 z-20 w-full px-2 sm:px-4">
+        <div class="flex items-center justify-between border-b border-orange-200/60 pb-3">
+          <div class="flex items-center gap-3">
+            <% if @post.user.avatar.attached? %>
+              <%= image_tag @post.user.avatar, class: "w-10 h-10 object-cover rounded-full shadow-sm" %>
+            <% else %>
+              <div class="w-10 h-10 bg-orange-400 rounded-full flex items-center justify-center shadow-sm">
+                <%= lucide_icon('user-round', class: "w-6 h-6 text-white") %>
+              </div>
+            <% end %>
+            <div class="font-bold text-gray-800 text-base"><%= @post.user.nickname %></div>
+          </div>
+          <div class="text-sm text-gray-500 font-medium">
+            <%= @post.visited_at&.strftime("%Y/%m/%d %H:%M") %>
+          </div>
+        </div>
+      </div>
+
+      <%# --- メインコンテンツ--- %>
+      <%= link_to post_path(@post),
+                  class: "w-full h-full",
+                  data: { turbo_stream: true, bottom_sheet_target: "bottomSheetBox" } do %>
+
+        <div class="flex-1 min-h-0 flex flex-col px-4 pb-4 gap-3 w-full max-w-xl mx-auto">
+
+          <%# 本文 %>
+          <% if @post.body.present? %>
+            <% text_classes = @post.images.attached? ? "line-clamp-3 shrink-0 pt-3" : "pt-3" %>
+
+            <div class="text-gray-700 text-base whitespace-pre-wrap leading-tight font-medium <%= text_classes %>"><%= @post.body %></div>
+          <% end %>
+
+          <%# 画像エリア %>
+          <% if @post.images.attached? %>
+            <div class="w-full shrink-0 pt-3">
+
+              <% image_count = @post.images.size %>
+
+              <%# --- 画像が1枚だけの場合 --- %>
+              <% if image_count == 1 %>
+                <div class="w-full flex justify-center items-center">
+                  <%= image_tag @post.images.first,
+                                loading: "lazy",
+                                class: "max-w-full h-auto max-h-[40vh] object-contain rounded-xl shadow-sm" %>
+                </div>
+
+              <%# --- 画像が複数ある場合 --- %>
+              <% else %>
+                <div class="grid grid-cols-2 gap-1 w-full rounded-xl overflow-hidden">
+                  <% @post.images.first(4).each_with_index do |image, index| %>
+                    <div class="relative w-full aspect-[4/3] max-h-[18vh] bg-gray-200" style="container-type: inline-size;">
+                      <%= image_tag image, loading: "lazy",
+                            class: "absolute inset-0 w-full h-full object-cover" %>
+
+                      <% if index == 3 && image_count > 4 %>
+                        <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                          <span class="text-white font-bold tracking-wider text-center" style="font-size: 25cqw;">
+                            + <%= image_count - 4 %>
+                          </span>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+
+            </div>
+          <% end %>
+
+        </div>
+
+      <% end %>
+
+    </div>
+  </div>
+<% end %>

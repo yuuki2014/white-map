@@ -1,0 +1,47 @@
+<%= turbo_stream.append "modal-container" do %>
+
+  <%# 全体の枠 %>
+  <div class="fixed inset-0 h-full pointer-events-none w-full z-40 flex justify-center items-center opacity-0 transition-all duration-300 p-10" data-controller="modal">
+
+    <%# バックドロップ %>
+    <div class="modal-backdrop absolute inset-0 bg-black/50 z-0 pointer-events-auto" data-modal-target="modalBackdrop" data-action="click->modal#close"></div>
+
+      <%# モーダル枠 %>
+      <div class="relative max-w-sm pointer-events-auto modal-box max-h-[90dvh] w-full bg-orange-100 p-4 gap-3 flex flex-col items-center rounded-xl z-10 transition-all duration-500 ease-out translate-y-40 opacity-0 overflow-hidden" data-modal-target="modalBox">
+        <button class="absolute right-2 top-2 h-6 w-6 flex items-center justify-center leading-none bg-gray-500/50 rounded-full z-30" data-action="click->modal#close">
+          <%= lucide_icon('x') %>
+        </button>
+
+        <div class="modal-header shrink-0 z-20">
+          <div class="text-lg font-bold">
+            この記録を削除しますか？
+          </div>
+        </div>
+
+        <%# モーダル本文 %>
+        <div class="modal-body flex-1 min-h-0 px-4 z-20">
+          <div class="flex flex-col items-center gap-4">
+            <div class="text-gray-400">
+              ※削除すると、二度と元に戻せません。
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer shrink-0 flex justify-between z-20 w-full px-5">
+          <button type="submit" name="decision" class="btn" data-action="click->modal#close">
+            <div class="text-gray-500">
+              キャンセル
+            </div>
+          </button>
+          <%= button_to "削除する", post_path(@post),
+                method: :delete,
+                class: "text-red-500",
+                data: { turbo_stream: true, action: "click->modal#close click->ui#removeMarker", post_uuid: @post.public_uid },
+                form: { class: "contents" } %>
+        </div>
+
+    </div>
+
+  </div>
+
+<% end %>

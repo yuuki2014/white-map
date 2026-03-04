@@ -23,7 +23,7 @@ export default class extends Controller {
     this.mapInitEnd = false; // 初期化終了フラグ
     this.clearMapOverlayEnd = false; // 初期のマップオーバーレイクリアフラグ
     this.isPostModeActive = false; // 投稿モードの状態管理変数を定義
-    this.markers = []; // マーカーを保存する配列
+    this.markers = {}; // マーカーを保存するオブジェクト
 
     // 前のが残っていた時に備えて最初に消してからアボートコントローラーをセット
     this.ac?.abort();
@@ -207,6 +207,11 @@ export default class extends Controller {
     })
   }
 
+  removeMarker(postUid){
+    this.markers[postUid]?.remove();
+    delete this.markers[postUid];
+  }
+
   // appendMarkerTargetが接続されたときにマップにマーカーを追加
   appendMarkerTargetConnected(element){
     const post = JSON.parse(element.dataset.post)
@@ -234,7 +239,7 @@ export default class extends Controller {
     el.setAttribute("data-post-lng", post.longitude);
     el.setAttribute("data-post-lat", post.latitude);
 
-    this.markers.push(marker);
+    this.markers[post.public_uid] = marker;
   }
 
   openPostPreview(event) {

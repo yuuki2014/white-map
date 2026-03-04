@@ -58,6 +58,32 @@ class PostsController < ApplicationController
     preview
   end
 
+  def confirm_destroy
+    @post = current_user&.posts&.find_by(public_uid: params[:id])
+
+    unless @post
+      respond_modal("shared/flash_message", flash_message: { alert: "削除できません" })
+      return
+    end
+
+    respond_modal
+  end
+
+  def destroy
+    @post = current_user.posts.find_by(public_uid: params[:id])
+
+    if @post.nil?
+      respond_modal("shared/flash_message", flash_message: { alert: "この記録は削除できません" })
+      return
+    end
+
+    if @post.destroy
+      respond_modal(flash_message: { alert: "記録を削除しました" })
+    else
+      respond_modal("shared/flash_and_error", locals: { object: @post }, flash_message: { alert: "記録の削除に失敗しました" })
+    end
+  end
+
   private
 
   def post_params

@@ -7,10 +7,24 @@
     <%# モーダル枠 %>
     <div class="relative w-full pointer-events-auto modal-box h-full sm:h-auto bg-[#FFFBE6] max-w-none sm:max-w-5xl max-h-none sm:max-h-[90vh] pt-1 sm:pt-2 pb-6 px-0 sm:px-0  rounded-none sm:rounded-xl gap-4 flex flex-col items-center z-10 transition-all duration-500 ease-out translate-y-40 opacity-0 overflow-hidden" data-modal-target="modalBox">
 
-      <%# --- 右上のバツボタン --- %>
-      <button class="absolute right-1 top-1 sm:right-1 sm:top-1 h-10 w-10 flex items-center justify-center leading-none bg-gray-500/50 hover:bg-gray-600/60 text-white rounded-full z-30 transition" data-action="click->modal#close">
-        <%= lucide_icon('x', class: "w-6 h-6") %>
-      </button>
+      <%# --- 右上の枠 --- %>
+      <div class="absolute right-1 top-1 z-30 flex items-center gap-2">
+
+        <%# --- 三点リーダボタン --- %>
+        <div class="relative" data-controller="dropdown" data-dropdown-post-url-value="<%= confirm_destroy_post_path(@post) %>">
+          <button type="button"
+                  class="h-10 w-10 flex items-center justify-center bg-gray-500/50 hover:bg-gray-600/60 text-white rounded-full transition"
+                  data-action="click->dropdown#toggle">
+            <%= lucide_icon('ellipsis-vertical', class: "w-6 h-6") %>
+          </button>
+        </div>
+
+        <%# --- バツボタン --- %>
+        <button class="h-10 w-10 flex items-center justify-center bg-gray-500/50 hover:bg-gray-600/60 text-white rounded-full transition" data-action="click->bottom-sheet#close">
+          <%= lucide_icon('x', class: "w-6 h-6") %>
+        </button>
+
+      </div>
 
       <%# --- ヘッダー --- %>
       <div class="modal-header shrink-0 z-20 w-full px-2 sm:px-4 pt-2">

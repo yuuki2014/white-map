@@ -335,4 +335,15 @@ export default class extends Controller {
       this.mapOutlet.geolocateTrigger();
     }
   }
+
+  removeMarker(event){
+    const postUuid = event.currentTarget.dataset.postUuid;
+
+    if(this.hasMapOutlet){
+      this.mapOutlet.removeMarker(postUuid);
+    }
+    if(this.hasHistoryMapOutlet){
+      this.historyMapOutlet.removeMarker(postUuid);
+    }
+  }
 }

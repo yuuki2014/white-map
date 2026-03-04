@@ -645,10 +645,10 @@ export default class extends BaseMapController {
     console.log(this.visitedGeohashes)
     this.executeFogClearing(true);
 
-    this.markers.forEach(marker => {
+    Object.values(this.markers).forEach(marker => {
       marker.remove();
     });
-    this.markers = [];
+    this.markers = {};
   }
 
   resetFogData() {

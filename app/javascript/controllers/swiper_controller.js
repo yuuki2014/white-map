@@ -1,26 +1,24 @@
 import { Controller } from "@hotwired/stimulus"
-// import Swiper bundle with all modules installed
 import Swiper from 'swiper/bundle';
-// import styles bundle
 import 'swiper/css/bundle';
 
 // Connects to data-controller="swiper"
 export default class extends Controller {
   connect() {
+    if (this.element.swiper) {
+      this.element.swiper.destroy(true, true)
+    }
     this.swiper = new Swiper(this.element, {
       observer: true,
       observeParents: true,
-      // Optional parameters
       direction: 'horizontal',
       loop: false,
 
-      // If we need pagination
       pagination: {
         el: '.swiper-pagination',
         clickable: true,
       },
 
-      // Navigation arrows
       navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
@@ -53,8 +51,7 @@ export default class extends Controller {
   }
 
   disconnect() {
-    if (this.swiper) {
-      this.swiper.destroy();
-    }
+    this.swiper?.destroy(true, true)
+    this.swiper = null
   }
 }

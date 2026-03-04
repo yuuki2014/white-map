@@ -54,6 +54,10 @@ class PostsController < ApplicationController
     preview
   end
 
+  def image_viewer
+    preview
+  end
+
   private
 
   def post_params

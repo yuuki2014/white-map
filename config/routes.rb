@@ -44,10 +44,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :posts, only: %i[ show ] do
+  resources :posts, only: %i[ show destroy ] do
     member do
       get :preview
       get :image_viewer
+      get :confirm_destroy
     end
   end
 

@@ -19,6 +19,9 @@ application.register("copy", CopyController)
 import DispatchController from "./dispatch_controller"
 application.register("dispatch", DispatchController)
 
+import DropdownController from "./dropdown_controller"
+application.register("dropdown", DropdownController)
+
 import ErrorController from "./error_controller"
 application.register("error", ErrorController)
 

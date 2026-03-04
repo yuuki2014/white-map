@@ -44,10 +44,10 @@
           <div class="w-full">
 
             <div class="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4 w-full">
-              <% @post.images.each do |image| %>
+              <% @post.images.each_with_index do |image, index| %>
 
                 <div class="break-inside-avoid mb-3 sm:mb-4 w-full">
-                  <%= link_to url_for(image), target: "_blank", rel: "noopener" do %>
+                  <%= link_to image_viewer_post_path(@post, index: index), data: { turbo_stream: true } do %>
                     <%= image_tag image, loading: "lazy", class: "w-full h-auto object-cover rounded-xl shadow-sm border border-orange-200/50 hover:brightness-50 transition duration-300 cursor-pointer" %>
                   <% end %>
                 </div>

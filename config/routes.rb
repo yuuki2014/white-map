@@ -47,6 +47,7 @@ Rails.application.routes.draw do
   resources :posts, only: %i[ show ] do
     member do
       get :preview
+      get :image_viewer
     end
   end
 

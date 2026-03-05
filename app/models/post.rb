@@ -21,6 +21,7 @@ class Post < ApplicationRecord
   # バリデーション定義
   validates :user_id, :latitude, :longitude, :visibility, :visited_at, presence: true
   validate :body_or_images_presence
+  validate :visited_at_cannot_be_in_the_future
 
   # アソシエーション定義
   belongs_to :user
@@ -42,6 +43,14 @@ class Post < ApplicationRecord
   def body_or_images_presence
     if body.blank? && images.blank?
       errors.add(:base, "本文または画像のどちらかが必須です")
+    end
+  end
+
+  def visited_at_cannot_be_in_the_future
+    return if visited_at.blank?
+
+    if visited_at > Time.current
+      errors.add(:visited_at, "は未来の日時に設定できません")
     end
   end
 end

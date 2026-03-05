@@ -87,7 +87,7 @@ class PostsController < ApplicationController
   private
 
   def post_params
-    params.require(:post).permit(:body, :latitude, :longitude, images: [])
+    params.require(:post).permit(:body, :latitude, :longitude, :visited_at, images: [])
   end
 
   def set_trip

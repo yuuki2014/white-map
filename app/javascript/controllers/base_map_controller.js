@@ -248,17 +248,15 @@ export default class extends Controller {
     const uid = el.getAttribute("data-post-uid");
     const lng = parseFloat(el.getAttribute("data-post-lng"));
     const lat = parseFloat(el.getAttribute("data-post-lat"));
-    const halfHeight = window.innerHeight / 2;
+    const moveHeight = window.innerHeight / 4;
+
+    const point = this.map.project([lng, lat]); // マーカーの緯度経度を画面上のピクセル座標に変換
+    point.y += moveHeight; // yを移動
+    const newCenter = this.map.unproject(point); // ずらしたピクセル座標を緯度軽度に変換
 
     this.map.easeTo({
-      center: [lng, lat],
+      center: newCenter,
       duration: 500,
-      padding: {
-        top: 0,
-        bottom: halfHeight,
-        left: 0,
-        right: 0
-      },
     });
 
     get(`/posts/${uid}/preview`, { responseKind: "turbo-stream" });

@@ -16,7 +16,7 @@ export default class extends Controller {
 
     // 画面サイズによって、倍率を変更
     const isMobile = window.matchMedia('(max-width: 640px)').matches;
-    const zoomMaxRatio = isMobile ? 20 : 3;
+    const zoomMaxRatio = isMobile ? 10 : 3;
 
     const paginationEl = this.element.querySelector('.swiper-pagination')
     const nextEl = this.element.querySelector('.custom-button-next')

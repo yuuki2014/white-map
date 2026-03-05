@@ -25,6 +25,19 @@
   <%# --- メイン --- %>
   <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
 
+    <%# 訪問日時入力エリア %>
+    <div class="shrink-0 w-full border-b border-gray-200 pb-2">
+      <%= f.label :visited_at, class: "flex items-center gap-4 w-fit" do %>
+        <span class="font-bold text-gray-700 whitespace-nowrap select-none">訪問日時</span>
+        <%= f.datetime_field :visited_at,
+            value: f.object.visited_at&.strftime('%Y-%m-%dT%H:%M'),
+            max: Time.current.strftime('%Y-%m-%dT%H:%M'),
+            class: "w-auto border-none outline-none focus:ring-0 text-lg leading-relaxed text-gray-700 bg-transparent",
+            style: "box-shadow: none;"
+        %>
+      <% end %>
+    </div>
+
     <%# テキスト入力エリア %>
     <div class="flex-1 min-h-[40vh] border border-gray-400 flex">
       <%= f.text_area :body,

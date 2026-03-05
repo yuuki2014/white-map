@@ -6,34 +6,19 @@
 
     <%# --- ボトムシート全体 --- %>
     <div data-bottom-sheet-target="bottomSheetBox"
-          class="relative inset-x-0 bottom-0 z-10 flex flex-col w-full max-h-[60dvh] rounded-t-3xl bg-[#FFFBE6] pb-11 pt-8 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transition-transform translate-y-full duration-300 pointer-events-auto">
-
-      <%# --- 右上の枠 --- %>
-      <div class="absolute right-1 top-1 z-30 flex items-center gap-2">
-
-        <%# --- 三点リーダボタン --- %>
-        <div class="relative" data-controller="dropdown" data-dropdown-post-url-value="<%= confirm_destroy_post_path(@post) %>">
-          <button type="button"
-                  class="h-10 w-10 flex items-center justify-center bg-gray-500/50 hover:bg-gray-600/60 text-white rounded-full transition"
-                  data-action="click->dropdown#toggle">
-            <%= lucide_icon('ellipsis-vertical', class: "w-6 h-6") %>
-          </button>
-        </div>
-
-        <%# --- バツボタン --- %>
-        <button class="h-10 w-10 flex items-center justify-center bg-gray-500/50 hover:bg-gray-600/60 text-white rounded-full transition" data-action="click->bottom-sheet#close">
-          <%= lucide_icon('x', class: "w-6 h-6") %>
-        </button>
-
-      </div>
+          class="relative inset-x-0 bottom-0 z-10 flex flex-col w-full max-h-[60vh] rounded-t-3xl bg-[#FFFBE6] pb-11 pt-8 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transition-transform translate-y-full duration-300 pointer-events-auto">
 
       <%# --- ドラッグハンドル --- %>
-      <div class="absolute mx-auto mb-2 h-1.5 w-12 shrink-0 rounded-full bg-gray-300 top-3 left-1/2 -transrate-x-1/2"></div>
+      <div class="absolute mx-auto mb-2 h-1.5 w-12 shrink-0 rounded-full bg-gray-400 top-3 left-1/2 -translate-x-1/2"></div>
 
       <%# --- ヘッダー --- %>
       <div class="modal-header shrink-0 z-20 w-full px-2 sm:px-4">
         <div class="flex items-center justify-between border-b border-orange-200/60 pb-3">
+
+          <%# 左上コンテナ %>
           <div class="flex items-center gap-3">
+
+            <%# アイコン %>
             <% if @post.user.avatar.attached? %>
               <%= image_tag @post.user.avatar, class: "w-10 h-10 object-cover rounded-full shadow-sm" %>
             <% else %>
@@ -41,10 +26,34 @@
                 <%= lucide_icon('user-round', class: "w-6 h-6 text-white") %>
               </div>
             <% end %>
-            <div class="font-bold text-gray-800 text-base"><%= @post.user.nickname %></div>
+
+            <%# ユーザー名と日時 %>
+            <div class="flex flex-col justify-center gap-1">
+              <div class="font-bold text-gray-800 text-base"><%= @post.user.nickname %></div>
+              <div class="text-sm text-gray-500 font-medium">
+                <%= @post.visited_at&.strftime("%Y/%m/%d %H:%M") %>
+              </div>
+            </div>
+
           </div>
-          <div class="text-sm text-gray-500 font-medium">
-            <%= @post.visited_at&.strftime("%Y/%m/%d %H:%M") %>
+
+          <%# --- 右上コンテナ --- %>
+          <div class="flex items-center gap-3">
+
+            <%# --- 三点リーダボタン --- %>
+            <div class="relative" data-controller="dropdown" data-dropdown-post-url-value="<%= confirm_destroy_post_path(@post) %>">
+              <button type="button"
+                      class="h-10 w-10 flex items-center justify-center bg-gray-500/50 hover:bg-gray-600/60 text-white rounded-full transition"
+                      data-action="click->dropdown#toggle">
+                <%= lucide_icon('ellipsis-vertical', class: "w-6 h-6") %>
+              </button>
+            </div>
+
+            <%# --- バツボタン --- %>
+            <button class="h-10 w-10 flex items-center justify-center bg-gray-500/50 hover:bg-gray-600/60 text-white rounded-full transition" data-action="click->bottom-sheet#close">
+              <%= lucide_icon('x', class: "w-6 h-6") %>
+            </button>
+
           </div>
         </div>
       </div>

@@ -294,4 +294,10 @@ export default class extends Controller {
     const source = this.map.getSource(`fog`);
     source.setData(geojsonData);
   }
+
+  setFogOpacity(opacity){
+    if(this.map){
+      this.map.setPaintProperty('fog-layer', 'fill-opacity', opacity);
+    }
+  }
 }

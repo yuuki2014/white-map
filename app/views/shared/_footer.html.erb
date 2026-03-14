@@ -51,6 +51,23 @@
 
         </div>
 
+        <%# 霧解除ボタン %>
+        <div class="flex flex-col">
+
+          <%= tag.button type: "button",
+            data: { action: "click->ui#fogOff", ui_target: "fogOffButtonInactive" },
+            class: "btn btn-primary bg-yellow-400/80 hover:bg-yellow500/80 text-black p-3 rounded-full shadow-lg active:scale-95 transition" do %>
+            <%= lucide_icon('cloud-fog') %>
+          <% end %>
+
+          <%= tag.button type: "button",
+            data: { action: "click->ui#fogOn", ui_target: "fogOffButtonActive"  },
+            class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 active:scale-95 transition ring-2 ring-orange-400 ring-offset-2 ring-offset-white hidden" do %>
+            <%= lucide_icon('cloud-fog') %>
+          <% end %>
+
+        </div>
+
       </div>
 
       <%# 右側探索中ボタンコンテナ %>
@@ -83,6 +100,36 @@
 
         </div>
 
+        <%# 霧解除ボタン %>
+        <div class="flex flex-col">
+
+          <%= tag.button type: "button",
+            data: { action: "click->ui#fogOff", ui_target: "fogOffButtonInactive" },
+            class: "btn btn-primary bg-yellow-400/80 hover:bg-yellow500/80 text-black p-3 rounded-full shadow-lg active:scale-95 transition" do %>
+            <%= lucide_icon('cloud-fog') %>
+          <% end %>
+
+          <%= tag.button type: "button",
+            data: { action: "click->ui#fogOn", ui_target: "fogOffButtonActive"  },
+            class: "btn btn-primary bg-yellow-400/80 text-black p-3 rounded-full shadow-lg hover:bg-yellow-500/80 active:scale-95 transition ring-2 ring-orange-400 ring-offset-2 ring-offset-white hidden" do %>
+            <%= lucide_icon('cloud-fog') %>
+          <% end %>
+
+        </div>
+
+      </div>
+
+      <%# 下側コンパスコンテナ %>
+      <div class="absolute bottom-full left-1/2 -translate-x-1/2 bg-white shadow-xl rounded-full px-5 py-3 flex items-center gap-4 transition-all hidden">
+        <div id="compass-arrow-container" class="relative w-10 h-10 flex items-center justify-center bg-blue-500 rounded-full text-white shadow-inner transition-transform duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-[10px] text-gray-500 font-bold tracking-wider">次の目的地まで</span>
+          <span id="nav-distance-text" class="text-xl font-extrabold text-gray-800 leading-none">-- m</span>
+        </div>
       </div>
 
       <%# 下側一時停止ボタンコンテナ %>

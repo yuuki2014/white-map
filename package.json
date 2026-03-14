@@ -10,6 +10,7 @@
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^8.0.20",
+    "@maplibre/maplibre-gl-geocoder": "^1.9.4",
     "@rails/request.js": "^0.0.13",
     "@turf/turf": "^7.3.1",
     "compressorjs": "^1.2.1",

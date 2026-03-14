@@ -20,6 +20,8 @@ export default class extends Controller {
     "uiOverlay",
     "cumulativeButtonActive",
     "cumulativeButtonInactive",
+    "fogOffButtonInactive",
+    "fogOffButtonActive",
   ]
   static values = { status: String,
                     tripId: String,
@@ -345,5 +347,33 @@ export default class extends Controller {
     if(this.hasHistoryMapOutlet){
       this.historyMapOutlet.removeMarker(postUuid);
     }
+  }
+
+  fogOff(){
+    if (this.hasMapOutlet && !this.mapOutlet.mapInitEnd) return;
+    console.log("霧を非表示")
+
+    this.fogOffButtonActiveTargets.forEach(el => {
+      el.classList.remove("hidden");
+    });
+    this.fogOffButtonInactiveTargets.forEach(el => {
+      el.classList.add("hidden");
+    });
+
+    this.mapOutlet.fogOff();
+  }
+
+  fogOn(){
+    if (this.hasMapOutlet && !this.mapOutlet.mapInitEnd) return;
+    console.log("霧を表示")
+
+    this.fogOffButtonActiveTargets.forEach(el => {
+      el.classList.add("hidden");
+    });
+    this.fogOffButtonInactiveTargets.forEach(el => {
+      el.classList.remove("hidden");
+    });
+
+    this.mapOutlet.fogOn();
   }
 }

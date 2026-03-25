@@ -7,7 +7,7 @@ import * as turf from "@turf/turf"
 
 // 定数定義
 const INITIAL_ZOOM_LEVEL = 18;    // 初期のズームレベル
-const DEBUG = false;
+const DEBUG_MODE = false;
 
 // Connects to data-controller="base-map"
 export default class extends Controller {
@@ -101,7 +101,7 @@ export default class extends Controller {
 
     let apiKey = null;
 
-    if(DEBUG) {
+    if(DEBUG_MODE) {
       apiKey = "test";
     } else {
       apiKey = this.element.dataset.maptilerKey;
@@ -142,22 +142,53 @@ export default class extends Controller {
   }
 
   // 渡されたgeohash配列から、結合済みのFeatureを作って返す
-  generateFeatureFromGeohashes(visitedGeohashes = [], targetGeohashesSet){
-    if(visitedGeohashes.length === 0) return null;
+  generateFeatureFromGeohashes(visitedGeohashes = [], targetGeohashesSet) {
+    if (visitedGeohashes.length === 0) return null;
 
+    // 訪問済みgeohashから周囲の開放するgeohashを重複抜きで取得する
     visitedGeohashes.forEach((geohash) => {
       this.addGeohashesAndGetNew(geohash, targetGeohashesSet)
     });
 
-    // 今回追加するポリゴンを全て配列にする
+    // geohashから開放するポリゴンの配列を作成
     const polygonsToMerge = [...targetGeohashesSet].map(hash => this.createPolygonFromGeohash(hash));
 
-    if (polygonsToMerge.length > 1) {
-      // 配列をFeatureCollectionに変換してから、unionに渡す
-      const featureCollection = turf.featureCollection(polygonsToMerge);
-      return turf.union(featureCollection);
-    } else {
+    if (polygonsToMerge.length === 1) {
       return polygonsToMerge[0];
+    }
+
+    // 分割でマージ
+    const chunkSize = 100; // 100個のずつに分ける
+    const intermediatePolygons = []; // 塊を保存する配列
+
+    // 100個ずつ四角形だけをマージして塊を複数作る
+    for (let i = 0; i < polygonsToMerge.length; i += chunkSize) {
+      const chunk = polygonsToMerge.slice(i, i + chunkSize);
+      try {
+        // chunkだけのFeatureCollectionを作ってマージ
+        const mergedChunk = turf.union(turf.featureCollection(chunk));
+        if (mergedChunk) {
+          intermediatePolygons.push(mergedChunk);
+        }
+      } catch (e) {
+        console.warn("Union chunk failed, skipping this chunk...", e);
+      }
+    }
+
+    // 塊たちを一気にマージする
+    try {
+      if (intermediatePolygons.length === 1) {
+        return intermediatePolygons[0];
+      }
+      return turf.union(turf.featureCollection(intermediatePolygons));
+    } catch (e) {
+      console.error("Final union failed, falling back to sequential merge...", e);
+      // マージでエラーになったら雪だるま式でリカバリー
+      let fallbackResult = intermediatePolygons[0];
+      for (let i = 1; i < intermediatePolygons.length; i++) {
+        fallbackResult = turf.union(turf.featureCollection([fallbackResult, intermediatePolygons[i]]));
+      }
+      return fallbackResult;
     }
   }
 

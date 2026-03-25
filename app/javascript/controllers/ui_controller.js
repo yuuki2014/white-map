@@ -137,8 +137,9 @@ export default class extends Controller {
     this.mapOutlet.clearFlushTimer();
     this.statusValue = STATUS.ENDED
     this.mapOutlet.setStatus(this.statusValue);
+
+    this.mapOutlet.mergeVisitedToCumulative();
     this.mapOutlet.resetFog();
-    this.mapOutlet.setCumulativeGeohashesAndFeature(this.mapOutlet.cumulativeGeohashes, this.mapOutlet.cumulativeFeature);
 
     this.documentRemoveHiddenTimer();
   }

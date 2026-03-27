@@ -96,7 +96,7 @@ Rails.application.configure do
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts << "shiroichizu.app"
   config.hosts << "www.shiroichizu.app"
-  config.hosts << "white-map.onrender.com/"
+  config.hosts << "white-map.onrender.com"
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end

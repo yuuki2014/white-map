@@ -82,15 +82,26 @@ export default class extends BaseMapController {
   }
 
   clearMapOverlay(){
+    if (!this.hasMapOverlayTarget) return;
+
     const el = this.mapOverlayTarget
 
-    if (!el) return;
+    const removeOverlay = () => {
+      if (el.isConnected) el.remove();
+    };
 
-    el.classList.add("-translate-y-full")
+    const fallbackTimer = setTimeout(removeOverlay, 5000);
 
     el.addEventListener("transitionend", () => {
-      el.remove();
+      clearTimeout(fallbackTimer);
+      removeOverlay();
     }, { once: true })
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.classList.add("-translate-y-full");
+      });
+    });
   }
 
   maybeClearOverlay(){

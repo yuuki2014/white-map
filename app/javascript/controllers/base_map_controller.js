@@ -6,7 +6,7 @@ import { get } from "@rails/request.js"
 import * as turf from "@turf/turf"
 
 // 定数定義
-const INITIAL_ZOOM_LEVEL = 18;    // 初期のズームレベル
+const INITIAL_ZOOM_LEVEL = 17;    // 初期のズームレベル
 const DEBUG_MODE = false;
 
 // Connects to data-controller="base-map"
@@ -134,7 +134,7 @@ export default class extends Controller {
           id: "background",
           type: "background",
           paint: {
-            "background-color": "#d9eef2"
+            "background-color": "#1955A6"
           }
         },
       ]

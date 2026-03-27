@@ -55,7 +55,7 @@
 
 .animate-fog-twinkle {
   background: linear-gradient(120deg, #ffffff 0%, #fff0f5 25%, #f1f5f9 50%, #fff0f5 75%, #ffffff 100%);
-  background-size: 200% 200%;
+  background-size: 100% 100%;
   animation: fog-twinkle 2.5s ease-in-out infinite;
   overflow: hidden;
 }

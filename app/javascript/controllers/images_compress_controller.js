@@ -11,6 +11,17 @@ export default class extends Controller {
 
   connect() {
     this.currentFiles = [];
+    this.isWebpSupported = this.checkWebpSupport(); // ブラウザがWebPエンコードに対応しているかチェック
+  }
+
+  // WebP書き出しに対応しているか判定
+  checkWebpSupport() {
+    const canvas = document.createElement('canvas');
+    if (canvas.getContext && canvas.getContext('2d')) {
+      // 実際にWebPを指定してデータURLを生成し、WebPとして生成されたか確認
+      return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+    }
+    return false;
   }
 
   compress(event) {
@@ -43,16 +54,19 @@ export default class extends Controller {
   }
 
   compressImages(file, dataTransfer){
+    const targetMimeType = this.isWebpSupported ? 'image/webp' : 'image/jpeg';
+    const targetExtension = this.isWebpSupported ? '.webp' : '.jpeg';
+
     new Compressor(file, {
       quality: QUALITY, // 画質 0-1
       maxWidth: MAX_WIDTH, // 最大幅
       maxHeight: MAX_HEIGHT, // 最大高さ
-      mimeType: 'image/webp',
+      mimeType: targetMimeType,
       success: (result) => {
         // 圧縮されたresultで元のinputの中身をすり替える
         const uniqueId = Date.now().toString(36) + Math.random().toString(36).slice(2, 7); // ランダムなIDを生成
-        const newFileName = file.name.replace(/\.[^/.]+$/, "") + ".webp";
-        const newFile = new File([result], newFileName, { type: 'image/webp' });
+        const newFileName = file.name.replace(/\.[^/.]+$/, "") + targetExtension;
+        const newFile = new File([result], newFileName, { type: targetMimeType });
         newFile.uniqueId = uniqueId;
         console.log(uniqueId);
 
@@ -95,7 +109,7 @@ export default class extends Controller {
           this.previewTarget.appendChild(div);
         }
 
-        console.log(`圧縮成功: ${(result.size / 1024).toFixed(2)} KB`);
+        console.log(`圧縮成功(${targetMimeType}): ${(result.size / 1024).toFixed(2)} KB`);
       },
       error(err){
         console.log("画像圧縮エラー:", err.message);

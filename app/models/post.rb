@@ -28,7 +28,13 @@ class Post < ApplicationRecord
   belongs_to :trip, optional: true
 
   # Active Storage設定
-  has_many_attached :images
+  has_many_attached :images do |attachable|
+    # マップ用アイコン
+    attachable.variant :map_icon, resize_to_fill: [ 100, 100 ], preprocessed: true
+
+    # 一覧表示用、比率維持
+    attachable.variant :thumb, resize_to_limit: [ 600, 600 ], saver: { quality: 100 }, preprocessed: true
+  end
 
   # 初期値定義
   # 開始時刻はアプリ側の時間を入れる

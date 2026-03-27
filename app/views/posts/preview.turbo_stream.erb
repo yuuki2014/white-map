@@ -60,7 +60,7 @@
 
       <%# --- メインコンテンツ--- %>
       <%= link_to post_path(@post),
-                  class: "w-full h-full",
+                  class: "w-full flex-1 min-h-0 flex",
                   data: { turbo_stream: true, bottom_sheet_target: "bottomSheetBox" } do %>
 
         <div class="flex-1 min-h-0 flex flex-col px-4 pb-4 gap-3 w-full max-w-xl mx-auto">
@@ -74,24 +74,24 @@
 
           <%# 画像エリア %>
           <% if @post.images.attached? %>
-            <div class="w-full shrink-0 pt-3">
+            <div class="w-full flex-1 min-h-0 pt-3">
 
               <% image_count = @post.images.size %>
 
               <%# --- 画像が1枚だけの場合 --- %>
               <% if image_count == 1 %>
-                <div class="w-full flex justify-center items-center">
-                  <%= image_tag @post.images.first,
+                <div class="w-full h-full min-h-0 flex items-center justify-center">
+                  <%= image_tag @post.images.first.variant(:thumb),
                                 loading: "lazy",
-                                class: "max-w-full h-auto max-h-[40vh] object-contain rounded-xl shadow-sm" %>
+                                class: "max-w-full max-h-full object-contain rounded-xl shadow-sm" %>
                 </div>
 
               <%# --- 画像が複数ある場合 --- %>
               <% else %>
-                <div class="grid grid-cols-2 gap-1 w-full rounded-xl overflow-hidden">
+                <div class="grid grid-cols-2 gap-1 w-full  h-full min-h-0  rounded-xl overflow-hidden">
                   <% @post.images.first(4).each_with_index do |image, index| %>
                     <div class="relative w-full aspect-[4/3] max-h-[18vh] bg-gray-200" style="container-type: inline-size;">
-                      <%= image_tag image, loading: "lazy",
+                      <%= image_tag image.variant(:thumb), loading: "lazy",
                             class: "absolute inset-0 w-full h-full object-cover" %>
 
                       <% if index == 3 && image_count > 4 %>

@@ -1,17 +1,15 @@
 class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
-  before_action :ensure_domain
-  before_action :refresh_session_expiration, :set_back_url
+  before_action :redirect_old_render_domain, if: -> { request.host == "white-map.onrender.com" }
+  before_action :set_initial_cookies, if: -> { user_signed_in? }
+  before_action :set_back_url
 
   private
 
-  def refresh_session_expiration
-    if user_signed_in?
-      current_user
-      cookies.permanent[:tutorials_end] = "true"
-      cookies.permanent[:terms_accepted] = "true"
-    end
+  def set_initial_cookies
+    cookies.permanent[:tutorials_end] = "true"
+    cookies.permanent[:terms_accepted] = "true"
   end
 
   def set_back_url
@@ -49,9 +47,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def ensure_domain
-    if request.host == "white-map.onrender.com"
-      redirect_to "https://shiroichizu.app#{request.fullpath}", status: :moved_permanently
+  def redirect_old_render_domain
+    old_host = "white-map.onrender.com"
+    new_host = "shiroichizu.app"
+
+    if request.host == old_host
+      redirect_to "https://#{new_host}#{request.fullpath}", allow_other_host: true, status: :moved_permanently
     end
   end
 end

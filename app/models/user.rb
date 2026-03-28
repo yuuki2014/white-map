@@ -34,7 +34,7 @@ class User < ApplicationRecord
   end
 
   def remember_expires_at
-    time = remember_created_at || Time.now.utc
+    time = Time.current
 
     case role
     when "guest"

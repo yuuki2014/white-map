@@ -17,8 +17,9 @@
       <div class="ml-4 flex-1 flex justify-between items-center">
         <div class="text-xl font-bold text-gray-800">
           <%= @user.nickname %>
+          <%= "[管理者]" if @user.admin?%>
         </div>
-        <% if current_user&.general? %>
+        <% if current_user&.general? || current_user&.admin? %>
           <%= link_to edit_profile_path, class: "p-2 rounded-full hover:bg-gray-200", data: { turbo_stream: true } do %>
             <%= lucide_icon('square-pen', class: "text-gray-700")%>
           <% end %>
@@ -32,7 +33,7 @@
         <div class="text-sm text-red-300">
           データが消えないように会員登録をしよう！
         </div>
-        <%= link_to new_registration_path(:user), class: "block w-full" do %>
+        <%= link_to new_email_verification_path, class: "block w-full" do %>
           <div class="bg-gradient-to-b from-orange-300 to-orange-500 text-white text-center font-bold text-lg py-4 rounded-2xl shadow-lg hover:opacity-90 transition">
             新規会員登録（無料）
           </div>
@@ -50,7 +51,7 @@
         tag.span("--", class: "text-gray-900 font-semibold"),
       ] %>
       <%= mypage_card(user_achievements) %>
-    <% elsif current_user&.general? %>
+    <% elsif current_user&.general? || current_user&.admin? %>
       <% user_achievements = [
         tag.span("[累計距離]", class: "") +
         tag.span("124.5 km / 300 マス", class: "text-gray-900 font-semibold"),
@@ -68,9 +69,9 @@
         link_to("・プライバシーポリシー", privacy_policy_path, class: "hover:text-gray-900", data: { turbo_stream: true }),
       ] %>
       <%= mypage_card(account_links) %>
-    <% elsif current_user.general? %>
+    <% elsif current_user.general? || current_user.admin? %>
       <% account_links = [
-        link_to("・アカウント設定", "#", class: "hover:text-gray-900"),
+        link_to("・アカウント設定", account_setting_path, class: "hover:text-gray-900"),
         link_to("・利用規約", terms_path, class: "hover:text-gray-900", data: { turbo_stream: true }),
         link_to("・プライバシーポリシー", privacy_policy_path, class: "hover:text-gray-900", data: { turbo_stream: true }),
         button_to("・ログアウト", destroy_user_session_path, method: :delete, class: "text-red-500 hover:text-red-700"),

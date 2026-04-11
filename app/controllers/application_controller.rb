@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   before_action :redirect_old_render_domain, if: -> { request.host == "white-map.onrender.com" }
   before_action :set_initial_cookies, if: -> { user_signed_in? }
   before_action :set_back_url
+  before_action :set_locale
 
   private
 
@@ -54,5 +55,13 @@ class ApplicationController < ActionController::Base
     if request.host == old_host
       redirect_to "https://#{new_host}#{request.fullpath}", allow_other_host: true, status: :moved_permanently
     end
+  end
+
+  def custom_verifier
+    ActiveSupport::MessageVerifier.new(Rails.application.secret_key_base, url_safe: true)
+  end
+
+  def set_locale
+    I18n.locale = http_accept_language.compatible_language_from(I18n.available_locales) || I18n.default_locale
   end
 end

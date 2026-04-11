@@ -52,6 +52,12 @@ module ApplicationHelper
       end
     end
 
+    if controller_name == "account_settings"
+      if action_name.in?(%w[ show ])
+        return true
+      end
+    end
+
     false
   end
 
@@ -67,6 +73,7 @@ module ApplicationHelper
     controller_name == "trips" && action_name.in?(%w[new])
   end
 
+  # タブバー表示設定
   def show_tab_bar?
     if user_signed_in?
       if controller_name == "users"
@@ -84,6 +91,12 @@ module ApplicationHelper
 
     if controller_name == "users"
       if action_name.in?(%w[ mypage ])
+        return true
+      end
+    end
+
+    if controller_name == "account_settings"
+      if action_name.in?(%w[ show ])
         return true
       end
     end

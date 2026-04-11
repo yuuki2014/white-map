@@ -80,19 +80,33 @@
 
               <%# --- 画像が1枚だけの場合 --- %>
               <% if image_count == 1 %>
-                <div class="w-full h-full min-h-0 flex items-center justify-center">
+                <div class="relative w-full min-h-[220px] max-h-[32vh] flex-1 overflow-hidden rounded-xl" data-controller="image-loader">
+                  <div class="absolute inset-0 flex items-center justify-center transition-opacity" data-image-loader-target="placeholder">
+                    <div class="w-10 h-10 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+                  </div>
                   <%= image_tag @post.images.first.variant(:thumb),
                                 loading: "lazy",
-                                class: "max-w-full max-h-full object-contain rounded-xl shadow-sm" %>
+                                class: "absolute inset-0 w-full h-full object-contain rounded-xl shadow-sm opacity-0 transition-opacity duration-300",
+                                data: {
+                                  image_loader_target: "image",
+                                  action: "load->image-loader#loaded error->image-loader#error"
+                                } %>
                 </div>
 
               <%# --- 画像が複数ある場合 --- %>
               <% else %>
                 <div class="grid grid-cols-2 gap-1 w-full  h-full min-h-0  rounded-xl overflow-hidden">
                   <% @post.images.first(4).each_with_index do |image, index| %>
-                    <div class="relative w-full aspect-[4/3] max-h-[18vh] bg-gray-200" style="container-type: inline-size;">
+                    <div class="relative w-full aspect-[4/3] max-h-[18vh] bg-gray-200" data-controller="image-loader" style="container-type: inline-size;">
+                      <div class="absolute inset-0 flex items-center justify-center transition-opacity" data-image-loader-target="placeholder">
+                        <div class="w-10 h-10 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+                      </div>
                       <%= image_tag image.variant(:thumb), loading: "lazy",
-                            class: "absolute inset-0 w-full h-full object-cover" %>
+                            class: "absolute inset-0 w-full h-full object-cover shadow-sm opacity-0 transition-opacity duration-300",
+                            data: {
+                              image_loader_target: "image",
+                              action: "load->image-loader#loaded error->image-loader#error"
+                            } %>
 
                       <% if index == 3 && image_count > 4 %>
                         <div class="absolute inset-0 bg-black/60 flex items-center justify-center">

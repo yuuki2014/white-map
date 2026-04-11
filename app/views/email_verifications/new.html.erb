@@ -1,0 +1,52 @@
+<%# 新規登録メール認証ページ %>
+<%# ヘッダー %>
+<% content_for :header do %>
+  <%= render 'shared/header', back_path: mypage_path, title: "新規会員登録", bg_color: "bg-orange-300" %>
+<% end %>
+
+<%# メインコンテナ %>
+<div class="h-full bg-[#FFFBE6] flex flex-col items-center px-6 pb-10 font-sans text-gray-800">
+
+  <%# ロゴエリア %>
+  <div class="mt-8 pt-4 pb-4 w-full flex justify-center">
+    <div class="size-40 rounded flex items-center justify-center">
+      <%= image_tag "logo-vertical.svg" %>
+    </div>
+  </div>
+
+  <%# 案内テキストエリア %>
+  <div class="w-full max-w-sm mb-6 text-center px-2">
+    <div class="text-lg font-bold text-gray-800 mb-2">メールアドレスの確認</div>
+    <div class="text-sm text-gray-600 leading-relaxed">ご入力いただいたメールアドレス宛に、</div>
+    <div class="text-sm text-gray-600 leading-relaxed">本登録へ進むための専用リンクをお送りします。</div>
+  </div>
+
+  <%# フォームエリア %>
+  <div class="w-full max-w-sm">
+    <%= form_with(url: email_verification_path, class: "space-y-6") do |f| %>
+
+      <%# メールアドレス %>
+      <div class="field bg-white p-5 rounded-2xl shadow-sm border border-orange-100">
+        <%= f.label :email, "メールアドレス", class: "block text-sm font-bold mb-2 text-gray-700" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "hello@shiroichizu.app",
+            class: "w-full px-4 py-3 bg-gray-100 rounded-xl border-none text-gray-700 placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-orange-300 outline-none transition" %>
+      </div>
+
+      <%# ボタンエリア %>
+      <div class="flex flex-col items-center pt-4">
+        <%# 送信ボタン %>
+        <%= f.submit "認証メールを送信する", class: "w-full max-w-[240px] bg-orange-400 hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-full shadow-md cursor-pointer transition text-center" %>
+      </div>
+
+    <% end %>
+  </div>
+
+  <%# 補足 %>
+  <div class="w-full max-w-sm mt-8 text-center px-4">
+    <div class="text-xs text-gray-500 leading-relaxed">※ドメイン指定受信を設定されている方は、</div>
+    <div class="text-xs text-gray-500 leading-relaxed">
+      <span class="font-semibold text-gray-600">@shiroichizu.app </span>からのメールを受信できるように設定してください。
+    </div>
+  </div>
+
+</div>

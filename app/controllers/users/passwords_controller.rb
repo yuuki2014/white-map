@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Users::PasswordsController < Devise::PasswordsController
+  before_action :validate_reset_password_token, only: %i[ edit update ]
   # GET /resource/password/new
   # def new
   #   super
@@ -31,4 +32,29 @@ class Users::PasswordsController < Devise::PasswordsController
   # def after_sending_reset_password_instructions_path_for(resource_name)
   #   super(resource_name)
   # end
+
+  private
+
+  def validate_reset_password_token
+    raw_token =
+      if action_name == "edit"
+        params[:reset_password_token].to_s
+      else
+        resource_params[:reset_password_token].to_s
+      end
+
+    digest = Devise.token_generator.digest(
+      resource_class,
+      :reset_password_token,
+      raw_token
+    )
+
+    # DBのdigestと合っているか検証
+    user = resource_class.find_by(reset_password_token: digest)
+
+    if user.nil? || !user.reset_password_period_valid?
+      flash[:alert] = t("devise.passwords.token_invalid")
+      redirect_to new_session_path(resource_name)
+    end
+  end
 end

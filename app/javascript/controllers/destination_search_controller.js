@@ -9,6 +9,10 @@ export default class extends Controller {
     "map"
   ]
 
+  static values = {
+    geoapifyApiKey: String
+  }
+
   static targets = [
     "searchPanel",
     "listPanel",
@@ -31,7 +35,7 @@ export default class extends Controller {
     this.isSearching = false;
     this.setSearchState("idle");
 
-    this.geocoderApi = createGeocoderApi(this);
+    this.geocoderApi = createGeocoderApi(this, { apiKey: this.geoapifyApiKeyValue });
     this.handleLocationUpdate = this.handleLocationUpdate.bind(this);
     this.handleMapReady = this.handleMapReady.bind(this);
     this.handleMapRotate = this.handleMapRotate.bind(this);

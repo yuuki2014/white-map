@@ -1,0 +1,11 @@
+ja:
+  mailer:
+    sender_name: "シロイチズ"
+  activerecord:
+    models:
+      user: ユーザー
+    attributes:
+      user:
+        password: パスワード
+        password_confirmation: 確認用パスワード
+        email: メールアドレス

@@ -1,0 +1,67 @@
+<%# アカウント設定 %>
+<%# ヘッダー %>
+<% content_for :header do %>
+  <%= render 'shared/header', back_path: mypage_path, title: "", bg_color: "" %>
+<% end %>
+
+<div class="min-h-screen pb-20 pt-6 bg-gray-100 flex justify-center">
+
+  <%# 各カードを包むコンテナ %>
+  <div class="max-w-md w-full flex flex-col gap-4 p-4">
+
+    <%# 現在のメールアドレスカード %>
+    <div class="bg-white rounded-xl shadow-md p-4 mb-4 flex items-center justify-between">
+      <div class="flex items-center min-w-0">
+        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center shadow-sm shrink-0">
+          <%= lucide_icon('mail', class: "w-6 h-6 text-orange-500") %>
+        </div>
+
+        <div class="ml-4 min-w-0">
+          <div class="text-sm text-gray-500">現在のメールアドレス</div>
+          <div class="text-base font-semibold text-gray-800 break-all">
+            <%= @user.email.present? ? @user.email : "未設定" %>
+          </div>
+        </div>
+      </div>
+
+      <% if @user.general? || @user.admin? %>
+        <%= link_to new_email_change_verification_path,
+            class: "ml-4 p-2 rounded-full hover:bg-gray-200 shrink-0" do %>
+          <%= lucide_icon('square-pen', class: "text-gray-700") %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%# 各種リンクカード %>
+    <div class="bg-white rounded-xl shadow-md p-4 mb-4">
+
+      <div class="flex justify-between items-center border-b border-gray-200 py-2 last:border-b-0 text-gray-700">
+        <%= link_to edit_user_registration_path,
+            class: "flex items-center gap-3 hover:text-gray-900",
+            data: { turbo_stream: true } do %>
+
+          <div class="w-8 h-8 rounded-lg bg-orange-400 flex items-center justify-center">
+            <%= lucide_icon('key', class: "w-4 h-4 text-white") %>
+          </div>
+
+          <span>パスワード変更</span>
+        <% end %>
+      </div>
+
+      <div class="flex justify-between items-center border-b border-gray-200 py-2 last:border-b-0 text-gray-700">
+        <%= button_to destroy_user_session_path,
+            method: :delete,
+            class: "flex items-center gap-3 text-red-500 hover:text-red-700" do %>
+
+          <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+            <%= lucide_icon('user-x', class: "w-4 h-4 text-red-500") %>
+          </div>
+
+          <span>退会（準備中）</span>
+        <% end %>
+      </div>
+
+    </div>
+
+  </div>
+</div>

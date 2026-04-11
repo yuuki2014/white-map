@@ -12,6 +12,6 @@ export default class extends Controller {
       this.element.addEventListener("transitionend", () => {
         this.element.remove();
       }, { once: true });
-    }, 1500)
+    }, 2300)
   }
 }

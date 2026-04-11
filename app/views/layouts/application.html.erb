@@ -22,8 +22,8 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#8b6b4a">
 
+    <link rel="icon" href="/favicon.ico">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="alternate icon" href="/favicon.ico">
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
     <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png">
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
@@ -47,13 +47,17 @@
     <meta name="twitter:description" content="<%= content_for(:description) || "歩いた場所が記録され、地図が少しずつ埋まっていく。探索が楽しくなる散歩アプリ" %>">
     <meta name="twitter:image" content="<%= "#{request.base_url}/ogp.png" %>">
 
+    <%# 外部 %>
+    <meta name="clarity-id" content="<%= ENV.fetch("CLARITY_ID") %>">
+    <meta name="sentry-dsn" content="<%= ENV.fetch("SENTRY_DSN") %>">
+
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "my_style", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body id="ui" class="h-dvh w-full flex flex-col overflow-hidden" data-controller="ui" data-ui-map-outlet="#main-map" data-ui-history-map-outlet="#history-map">
+  <body id="ui" class="h-dvh w-full flex flex-col overflow-hidden" data-controller="ui cookie-consent" data-ui-map-outlet="#main-map" data-ui-history-map-outlet="#history-map">
     <div class="fixed inset-0 z-50 hidden" data-ui-target="uiOverlay" data-action="click->ui#clearUiOverlay"></div>
     <%= yield :header %>
     <main class="flex-1 relative overflow-y-auto font-sans">
@@ -73,6 +77,9 @@
         <%= render "shared/error_messages" %>
       </div>
     </div>
+
+    <%# クッキー許諾バナー %>
+    <%= render "shared/cookie_banner" %>
 
   </body>
 </html>

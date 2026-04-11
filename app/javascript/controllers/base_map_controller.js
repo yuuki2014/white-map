@@ -7,7 +7,7 @@ import * as turf from "@turf/turf"
 
 // 定数定義
 const INITIAL_ZOOM_LEVEL = 17;    // 初期のズームレベル
-const DEBUG_MODE = false;
+const DEBUG_MODE = true;
 
 // Connects to data-controller="base-map"
 export default class extends Controller {

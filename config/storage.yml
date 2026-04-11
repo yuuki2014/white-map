@@ -17,10 +17,10 @@ amazon:
 cloudflare:
   service: S3
   endpoint: "https://89bd190ef8daebf81c24c61e64b27cc3.r2.cloudflarestorage.com"
-  access_key_id: <%= Rails.application.credentials.dig(:cloudflare, :access_key_id) %>
-  secret_access_key: <%= Rails.application.credentials.dig(:cloudflare, :secret_access_key) %>
+  access_key_id: <%= ENV.fetch("CLOUDFLARE_ACCESS_KEY_ID") %>
+  secret_access_key: <%= ENV.fetch("CLOUDFLARE_SECRET_ACCESS_KEY") %>
   region: auto
-  bucket: "white-map-app-production"
+  bucket: <%= ENV.fetch("CLOUDFLARE_R2_BUCKET") %>
   request_checksum_calculation: "when_required"
   response_checksum_validation: "when_required"
 

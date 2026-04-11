@@ -144,7 +144,7 @@ async function fetchGeoapify(url) {
   return response.json();
 }
 
-export function createGeocoderApi(controller) {
+export function createGeocoderApi(controller, { apiKey }) {
 
   return {
     forwardGeocode: async (config) => {
@@ -175,6 +175,7 @@ export function createGeocoderApi(controller) {
             currentLng: lng,
             currentLat: lat,
             limit: 50,
+            apiKey,
           });
 
           const filtered = stationResults.features
@@ -211,7 +212,8 @@ export function createGeocoderApi(controller) {
             query,
             currentLng: lng,
             currentLat: lat,
-            limit: 10
+            limit: 10,
+            apiKey,
           });
 
           const fallbackFiltered = fallback.features
@@ -240,7 +242,8 @@ export function createGeocoderApi(controller) {
             currentLng: lng,
             currentLat: lat,
             radius: 50000,
-            limit: 50
+            limit: 50,
+            apiKey,
           });
 
           let filtered = categoryResults.features;
@@ -280,7 +283,8 @@ export function createGeocoderApi(controller) {
             currentLng: lng,
             currentLat: lat,
             radius: 50000,
-            limit: 50
+            limit: 50,
+            apiKey,
           });
 
           const filteredBrandResults = brandResults.features
@@ -306,7 +310,8 @@ export function createGeocoderApi(controller) {
             query,
             currentLng: lng,
             currentLat: lat,
-            limit: 10
+            limit: 10,
+            apiKey,
           });
 
           return {
@@ -334,7 +339,8 @@ async function searchGeocode({
   query,
   currentLng,
   currentLat,
-  limit = 10
+  limit = 10,
+  apiKey,
 }) {
   const url = new URL("https://api.geoapify.com/v1/geocode/search");
 
@@ -347,7 +353,7 @@ async function searchGeocode({
   }
 
   url.searchParams.set("limit", String(limit));
-  url.searchParams.set("apiKey", GEOAPIFY_API_KEY);
+  url.searchParams.set("apiKey", apiKey);
 
   const data = await fetchGeoapify(url);
 
@@ -366,7 +372,8 @@ async function searchPlaces({
   currentLng,
   currentLat,
   radius,
-  limit = 10
+  limit = 10,
+  apiKey,
 }) {
   const url = new URL("https://api.geoapify.com/v2/places");
 
@@ -386,7 +393,7 @@ async function searchPlaces({
   }
 
   url.searchParams.set("lang", "ja");
-  url.searchParams.set("apiKey", GEOAPIFY_API_KEY);
+  url.searchParams.set("apiKey", apiKey);
 
   if (name && name.trim()) {
     url.searchParams.set("name", name);

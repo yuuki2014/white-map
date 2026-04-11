@@ -1,4 +1,8 @@
-<div class="space-y-2" data-controller="destination-search" data-destination-search-map-outlet="#main-map">
+<div class="space-y-2"
+    data-controller="destination-search"
+    data-destination-search-map-outlet="#main-map"
+    data-destination-search-geoapify-api-key-value="<%= ENV.fetch('GEOAPIFY_API_KEY') %>"
+>
 
   <%# 目的地の距離と方角 %>
   <div class="flex items-center gap-2">
@@ -61,7 +65,7 @@
           <%= lucide_icon("search", class: "w-5 h-5") %>
         </span>
         <span class="hidden" data-destination-search-target="loadingIcon">
-          <%= lucide_icon("loader-circle", class: "w-5 h-5 animate-spin") %>
+          <div class="w-5 h-5 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
         </span>
       </button>
     </form>

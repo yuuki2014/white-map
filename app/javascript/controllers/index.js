@@ -13,6 +13,9 @@ application.register("base-map", BaseMapController)
 import BottomSheetController from "./bottom_sheet_controller"
 application.register("bottom-sheet", BottomSheetController)
 
+import CookieConsentController from "./cookie_consent_controller"
+application.register("cookie-consent", CookieConsentController)
+
 import CopyController from "./copy_controller"
 application.register("copy", CopyController)
 
@@ -36,6 +39,9 @@ application.register("hello", HelloController)
 
 import HistoryMapController from "./history_map_controller"
 application.register("history-map", HistoryMapController)
+
+import ImageLoaderController from "./image_loader_controller"
+application.register("image-loader", ImageLoaderController)
 
 import ImageViewerController from "./image_viewer_controller"
 application.register("image-viewer", ImageViewerController)

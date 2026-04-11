@@ -1,0 +1,28 @@
+<% unless cookies[:analytics_consent] %>
+  <div class="fixed bottom-4 left-4 md:bottom-6 md:left-6 max-w-sm w-[calc(100%-2rem)] bg-white/95 backdrop-blur-sm shadow-2xl border border-gray-100 rounded-2xl p-5 z-20 flex flex-col gap-4 transition-all duration-300"
+        data-cookie-consent-target="banner">
+    <div class="text-sm text-gray-600 leading-relaxed">
+      <p class="font-semibold text-gray-800 mb-1">Cookieの使用について</p>
+      <p>
+        このサイトでは、サービス改善および利用状況の分析のためCookieを使用しています。
+        なお、サイトの動作に必要なCookieは常に使用されます。
+        「同意する」を押すことで、解析のためのCookieの使用に同意したものとみなします。
+      </p>
+      <p class="mt-2">
+        <%= link_to "詳しく見る", privacy_policy_path, class: "text-gray-900 underline", data: { turbo_stream: true } %>
+      </p>
+    </div>
+
+    <div class="flex gap-3 mt-1">
+      <button class="flex-1 px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-xl transition-colors"
+            data-action="click->cookie-consent#consent">
+        同意する
+      </button>
+
+      <button class="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition-colors"
+            data-action="click->cookie-consent#denied">
+        拒否する
+      </button>
+    </div>
+  </div>
+<% end %>

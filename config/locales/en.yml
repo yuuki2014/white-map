@@ -28,4 +28,9 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  mailer:
+    sender_name: "Shiroichizu"
+  activerecord:
+    attributes:
+      user:
+        email: Email

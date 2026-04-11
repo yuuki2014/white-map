@@ -2,6 +2,7 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable
+  before_validation :normalize_email
 
   # active storage設定
   has_one_attached :avatar
@@ -29,8 +30,7 @@ class User < ApplicationRecord
   # Devise の機能をオーバーライド
   # ゲスト以外の時だけメールアドレスを必須にする
   def email_required?
-    # ゲストなら false (いらない)、それ以外なら true (いる)
-    !guest?
+    !guest? # ゲストなら false (いらない)、それ以外なら true (いる)
   end
 
   def remember_expires_at
@@ -86,5 +86,11 @@ class User < ApplicationRecord
   # User モデルの :id を public_uidに
   def to_param
     public_uid
+  end
+
+  private
+
+  def normalize_email
+    self.email = email.to_s.strip.downcase.presence
   end
 end

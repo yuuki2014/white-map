@@ -7,9 +7,21 @@ Rails.application.routes.draw do
   # devise_for :users
   devise_for :users, controllers: {
     registrations: "users/registrations",
-    sessions: "users/sessions"
+    sessions: "users/sessions",
+    passwords: "users/passwords"
   }
-  resources :users, only: %i[ show ]
+  resources :users, only: %i[ show ] do
+    collection do
+    end
+  end
+
+  resource :email_verification, only: %i[ new create ]
+
+  resource :account_setting, only: %i[ show ]
+
+  resource :email_change_verification, only: %i[ new create ]
+  resource :email_change, only: %i[ edit ]
+
   resource :profile, controller: "users", only: %i[ edit update ]
   # get "users/:public_uid", to: "users#show", as: "user"
   get "mypage", to: "users#mypage", as: "mypage"
@@ -79,5 +91,15 @@ Rails.application.routes.draw do
         end
       end
     end
+  end
+
+  # good_jobのダッシュボード
+  authenticate :user, ->(user) { user.admin? } do
+    mount GoodJob::Engine => 'good_job'
+  end
+
+  # レターオープナー
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
 end

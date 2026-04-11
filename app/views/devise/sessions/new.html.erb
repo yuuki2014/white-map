@@ -1,3 +1,4 @@
+<%# ログインページ %>
 <%# ヘッダー %>
 <% content_for :header do %>
   <%= render 'shared/header', back_path: mypage_path, title: "ログイン", bg_color: "bg-orange-300" %>
@@ -20,7 +21,7 @@
       <%# メールアドレス %>
       <div class="field">
         <%= f.label :email, "メールアドレス", class: "block text-sm font-bold mb-2" %>
-        <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "shiroi_chizu@test.com",
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "shiroichizu@shiroichizu.app",
             class: "w-full px-4 py-3 rounded-xl border-none shadow-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-orange-300 outline-none" %>
       </div>
 
@@ -65,7 +66,7 @@
     <p class="text-center text-xs text-gray-400 mb-2">アカウントをお持ちでない方は</p>
 
     <%# 新規登録ボタン %>
-    <%= link_to new_registration_path(resource_name), class: "block w-full" do %>
+    <%= link_to new_email_verification_path, class: "block w-full" do %>
       <div class="bg-gradient-to-b from-orange-300 to-orange-500 text-white text-center font-bold text-lg py-4 rounded-2xl shadow-lg hover:opacity-90 transition">
         新規会員登録（無料）
       </div>

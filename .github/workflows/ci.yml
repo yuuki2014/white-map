@@ -46,6 +46,16 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          APP_HOST: "shiroichizu.app"
+          MAILER_SENDER: "noreply@shiroichizu.app"
+          RESEND_API_KEY: "dummy"
+          MAPTILER_API_KEY: "dummy"
+          GEOAPIFY_API_KEY: "dummy"
+          CLOUDFLARE_R2_BUCKET: "dummy"
+          CLOUDFLARE_ACCESS_KEY_ID: "dummy"
+          CLOUDFLARE_SECRET_ACCESS_KEY: "dummy"
+          CLARITY_ID: "dummy"
+          SENTRY_DSN: "dummy"
         ports:
           - 5432:5432
         options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3

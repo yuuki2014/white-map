@@ -35,6 +35,16 @@ class Users::PasswordsController < Devise::PasswordsController
 
   private
 
+  # ログインしている人は入れない設定
+  def require_no_authentication
+    # ゲストなら何もしない
+    if current_user&.role == "guest"
+      return
+    end
+    # ゲスト以外はDeviseの標準処理を実行
+    super
+  end
+
   def validate_reset_password_token
     raw_token =
       if action_name == "edit"

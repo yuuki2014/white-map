@@ -145,6 +145,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super(resource)
   # end
 
+  private
+
   # ログインしている人は入れない設定
   def require_no_authentication
     # ゲストなら何もしない
@@ -154,8 +156,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
     # ゲスト以外はDeviseの標準処理を実行
     super
   end
-
-  private
 
   def load_verified_email_from_token
     @token = params[:token]

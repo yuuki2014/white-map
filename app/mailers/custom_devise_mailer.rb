@@ -6,7 +6,7 @@ class CustomDeviseMailer < Devise::Mailer
     )
   }
 
-  default template_path: 'devise/mailer'
+  default template_path: "devise/mailer"
 
   protected
 

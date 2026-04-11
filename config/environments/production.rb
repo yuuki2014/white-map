@@ -101,7 +101,7 @@ Rails.application.configure do
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
   host = ENV.fetch("APP_HOST", "shiroichizu.app")
-  config.action_mailer.default_url_options = { host: host, protocol: 'https' }
+  config.action_mailer.default_url_options = { host: host, protocol: "https" }
 
   # メールの配信方法
   config.action_mailer.delivery_method = :resend

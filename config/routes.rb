@@ -95,7 +95,7 @@ Rails.application.routes.draw do
 
   # good_jobのダッシュボード
   authenticate :user, ->(user) { user.admin? } do
-    mount GoodJob::Engine => 'good_job'
+    mount GoodJob::Engine => "good_job"
   end
 
   # レターオープナー

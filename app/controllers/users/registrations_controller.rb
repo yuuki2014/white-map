@@ -162,9 +162,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
     @email = custom_verifier.verify(@token, purpose: :email_verifications).to_s.strip.downcase
 
     # userが登録ずみかチェック
-    return redirect_to mypage_path, alert: "すでに登録済みのメールアドレスです" if User.exists?(email: @email)
+    redirect_to mypage_path, alert: "すでに登録済みのメールアドレスです" if User.exists?(email: @email)
   # トークンが期限切れ、もしくは文字が書き換えられていた場合
   rescue ActiveSupport::MessageVerifier::InvalidSignature
-    return redirect_to mypage_path, alert: "リンクの有効期限が切れているか、無効なURLです。最初からやり直してください。"
+    redirect_to mypage_path, alert: "リンクの有効期限が切れているか、無効なURLです。最初からやり直してください。"
   end
 end

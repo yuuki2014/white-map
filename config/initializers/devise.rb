@@ -27,7 +27,7 @@ Devise.setup do |config|
   config.mailer_sender = ENV.fetch("MAILER_SENDER", "noreply@shiroichizu.app")
 
   # Configure the class responsible to send e-mails.
-  config.mailer = 'CustomDeviseMailer'
+  config.mailer = "CustomDeviseMailer"
 
   # Configure the parent class responsible to send e-mails.
   # config.parent_mailer = 'ActionMailer::Base'

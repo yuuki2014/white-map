@@ -35,10 +35,10 @@ class Rack::Attack
           </template>
         </turbo-stream>
       HTML
-      [429,{ "Content-Type" => "text/vnd.turbo-stream.html; charset=utf-8" },[body]]
+      [ 429, { "Content-Type" => "text/vnd.turbo-stream.html; charset=utf-8" }, [ body ] ]
     else
       body = File.read(Rails.root.join("public/429.html"))
-      [429, { "Content-Type" => "text/html; charset=utf-8" }, [body]]
+      [ 429, { "Content-Type" => "text/html; charset=utf-8" }, [ body ] ]
     end
   end
 end

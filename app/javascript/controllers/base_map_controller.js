@@ -4,6 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import ngeohash from 'ngeohash';
 import { get } from "@rails/request.js"
 import * as turf from "@turf/turf"
+import { Protocol } from "pmtiles";
 
 // 定数定義
 const INITIAL_ZOOM_LEVEL = 17;    // 初期のズームレベル
@@ -65,6 +66,10 @@ export default class extends Controller {
   async initializeMap(center){
     if (!this.ac) return;
 
+    // プロトコル登録
+    const protocol = new Protocol();
+    maplibregl.addProtocol("pmtiles", protocol.tile);
+
     const signal = this.ac.signal;
 
     try {
@@ -99,16 +104,10 @@ export default class extends Controller {
       return structuredClone(this.constructor.styleJsonCache);
     }
 
-    let apiKey = null;
-
-    if(DEBUG_MODE) {
-      apiKey = "test";
-    } else {
-      apiKey = this.element.dataset.maptilerKey;
-    }
+    const styleUrl = this.element.dataset.styleUrl;
 
     try {
-      const res = await fetch(`https://api.maptiler.com/maps/jp-mierune-dark/style.json?key=${apiKey}`, { signal: signal });
+      const res = await fetch(styleUrl, { signal: signal });
       if(!res.ok) throw new Error(`fetch失敗: ${res.status}`);
 
       const styleJson = await res.json();
@@ -123,7 +122,6 @@ export default class extends Controller {
     }
   }
 
-  // 自前のフォールバックスタイル
   getFallbackStyle() {
     return {
       version: 8,

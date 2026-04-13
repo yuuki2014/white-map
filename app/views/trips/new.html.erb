@@ -4,7 +4,7 @@
     data-map-ui-outlet="#ui"
     data-map-posts-outlet="#posts"
     class="absolute inset-0 h-full w-full"
-    data-maptiler-key="<%= ENV.fetch("MAPTILER_API_KEY") %>">
+    data-style-url="<%= ENV.fetch("STYLE_URL") %>">
 
     <%# 地図を覆うオーバーレイ要素 %>
     <div class="fixed inset-0 z-20 transition-opacity duration-1000 opacity-100 animate-fog-twinkle" data-map-target="mapOverlay">

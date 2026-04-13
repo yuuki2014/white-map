@@ -32,17 +32,17 @@ export default class extends BaseMapController {
 
     // 非表示にする地図上の情報
     const toHide = [
-      "Restaurant and shop",
-      "Store and mall",
-      "Pub",
-      "Hotel",
-      "Generic POI",
-      "Generic POI 11",
-      "Major POI",
-      "Doctor",
-      "Parking",
-      "Government",
-      "Golf pitch",
+      // "Restaurant and shop",
+      // "Store and mall",
+      // "Pub",
+      // "Hotel",
+      // "Generic POI",
+      // "Generic POI 11",
+      // "Major POI",
+      // "Doctor",
+      // "Parking",
+      // "Government",
+      // "Golf pitch",
     ];
 
     // 地図の読み込みが終わった後に実行
@@ -57,6 +57,9 @@ export default class extends BaseMapController {
       });
 
       this.executeFogClearing();
+
+      this.initRevealedAreaLayer();
+      this.updateRevealedArea();
 
       this.addMarkers();
 
@@ -133,11 +136,66 @@ export default class extends BaseMapController {
         type: "fill",
         source: 'fog',
         paint: {
-          "fill-color": "#ffffff",
-          "fill-opacity": 0.3,
+          "fill-color": "#f2eee8",
+          "fill-opacity": 0.55,
           'fill-antialias': false,
         }
       });
     }
+  }
+
+  initRevealedAreaLayer() {
+    if (!this.map.getSource('revealed-area')) {
+      this.map.addSource('revealed-area', {
+        type: 'geojson',
+        data: this.cumulativeFeature || turf.featureCollection([])
+      });
+    }
+
+    // ふわっとした外側の光
+    if (!this.map.getLayer('revealed-outline-glow')) {
+      this.map.addLayer({
+        id: 'revealed-outline-glow',
+        type: 'line',
+        source: 'revealed-area',
+        paint: {
+          'line-color': '#8b6b4a',
+          'line-opacity': 0.1,
+          'line-width': [
+            'interpolate', ['linear'], ['zoom'],
+            10, 2,
+            14, 4,
+            17, 6
+          ],
+          'line-blur': 3
+        }
+      });
+    }
+
+    // くっきりした境界線
+    if (!this.map.getLayer('revealed-outline')) {
+      this.map.addLayer({
+        id: 'revealed-outline',
+        type: 'line',
+        source: 'revealed-area',
+        paint: {
+          'line-color': '#ad8d6c',
+          'line-opacity': 0.5,
+          'line-width': [
+            'interpolate', ['linear'], ['zoom'],
+            10, 1,
+            14, 1,
+            17, 2
+          ]
+        }
+      });
+    }
+  }
+
+  updateRevealedArea() {
+    const source = this.map.getSource('revealed-area');
+    if (!source) return;
+
+    source.setData(this.cumulativeFeature || turf.featureCollection([]));
   }
 }

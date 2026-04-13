@@ -33,7 +33,7 @@
       data-history-map-ui-outlet="#ui"
       data-history-map-posts-outlet="#posts"
       class="absolute inset-0 h-full w-full"
-      data-maptiler-key="<%= ENV.fetch("MAPTILER_API_KEY") %>"
+      data-style-url="<%= ENV.fetch("STYLE_URL") %>"
       data-history-map-longitude-value="<%= @first_footprint&.longitude %>"
       data-history-map-latitude-value="<%= @first_footprint&.latitude %>"
       data-history-map-visited-geohashes-value="<%= @visited_geohashes.to_json %>"

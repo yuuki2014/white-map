@@ -197,17 +197,17 @@ export default class extends BaseMapController {
   setupMapLoadEvents() {
     // 非表示にする地図上の情報
     const toHide = [
-      "Restaurant and shop",
-      "Store and mall",
-      "Pub",
-      "Hotel",
-      "Generic POI",
-      "Generic POI 11",
-      "Major POI",
-      "Doctor",
-      "Parking",
-      "Government",
-      "Golf pitch",
+      // "Restaurant and shop",
+      // "Store and mall",
+      // "Pub",
+      // "Hotel",
+      // "Generic POI",
+      // "Generic POI 11",
+      // "Major POI",
+      // "Doctor",
+      // "Parking",
+      // "Government",
+      // "Golf pitch",
     ];
 
     // 地図の読み込みが終わった後に実行

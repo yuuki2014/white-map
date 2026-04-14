@@ -1,7 +1,7 @@
 <%
   text_body = "#{trip.title}"
   url = trip_url(trip)
-  hashtags = "#しろいちず"
+  hashtags = "#シロイチズ"
   share_text = "#{text_body}\n#{hashtags}\n#{url}"
 %>
 <div class="flex flex-col gap-2" data-controller="share-button" data-share-button-title-value="<%= trip.title %>" data-share-button-text-value="<%= hashtags %>" data-share-button-url-value="<%= url %>">

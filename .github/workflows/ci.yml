@@ -41,6 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APP_HOST: "shiroichizu.app"
+      OLD_HOST: "shiroichizu.fly.dev"
       MAILER_SENDER: "noreply@shiroichizu.app"
       RESEND_API_KEY: "dummy"
       MAPTILER_API_KEY: "dummy"

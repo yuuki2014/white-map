@@ -9,6 +9,15 @@ console_command = '/rails/bin/rails console'
 
 [build]
 
+[env]
+  APP_HOST = "shiroichizu.app"
+  OLD_HOST = "shiroichizu.fly.dev"
+  MAILER_SENDER = "noreply@shiroichizu.app"
+  RAILS_ENV = "production"
+  STYLE_URL = 'https://tiles.shiroichizu.app/json/style_2026_04_13_v2.json'
+  WEB_CONCURRENCY = "1"
+  RAILS_MAX_THREADS = "3"
+
 [http_service]
   internal_port = 3000
   force_https = true

@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
-  before_action :redirect_old_render_domain, if: -> { request.host == "white-map.onrender.com" }
+  before_action :redirect_old_render_domain, if: -> { request.host == ENV.fetch("OLD_HOST") }
   before_action :set_initial_cookies, if: -> { user_signed_in? }
   before_action :set_back_url
   before_action :set_locale
@@ -49,8 +49,8 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_old_render_domain
-    old_host = "shiroichizu.fly.dev"
-    new_host = "shiroichizu.app"
+    old_host = ENV.fetch("OLD_HOST")
+    new_host = ENV.fetch("APP_HOST")
 
     if request.host == old_host
       redirect_to "https://#{new_host}#{request.fullpath}", allow_other_host: true, status: :moved_permanently

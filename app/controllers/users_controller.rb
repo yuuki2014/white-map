@@ -86,7 +86,7 @@ class UsersController < ApplicationController
     response = conn.post("/client/v4/zones/#{ENV.fetch("CLOUDFLARE_ZONE_ID")}/purge_cache") do |req|
       req.headers["Authorization"] = "Bearer #{ENV.fetch("CLOUDFLARE_CACHE_PURGE_API_TOKEN")}"
       req.headers["Content-Type"] = "application/json"
-      req.body = { files: [url] }.to_json
+      req.body = { files: [ url ] }.to_json
     end
 
     Rails.logger.info("Cloudflare purge response: #{response.status} #{response.body}")

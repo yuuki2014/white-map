@@ -51,7 +51,7 @@ jobs:
       CLOUDFLARE_SECRET_ACCESS_KEY: "dummy"
       CLARITY_ID: "dummy"
       SENTRY_DSN: "dummy"
-      R2_ENDPOINT: "dummy"
+      R2_ENDPOINT: "https://dummy"
       CLOUDFLARE_ZONE_ID: "dummy"
       CLOUDFLARE_CACHE_PURGE_API_TOKEN: "dummy"
       R2_PUBLIC_ASSETS_HOST: "dummy"

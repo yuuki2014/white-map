@@ -16,7 +16,7 @@
 
             <%# アイコン %>
             <% if @post.user.avatar.attached? %>
-              <%= image_tag @post.user.avatar, class: "w-10 h-10 object-cover rounded-full shadow-sm" %>
+              <%= image_tag avatar_url(@post.user), class: "w-10 h-10 object-cover rounded-full shadow-sm" %>
             <% else %>
               <div class="w-10 h-10 bg-orange-400 rounded-full flex items-center justify-center shadow-sm">
                 <%= lucide_icon('user-round', class: "w-6 h-6 text-white") %>

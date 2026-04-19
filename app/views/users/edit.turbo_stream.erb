@@ -7,7 +7,7 @@
       <% has_avatar = @user.avatar.attached? %>
 
       <%# プレビュー画像 %>
-      <%= image_tag (has_avatar ? @user.avatar : ""),
+      <%= image_tag (has_avatar ? avatar_url(@user) : ""),
             class: "w-full h-full object-cover rounded-full #{has_avatar ? '' : 'hidden'}",
             data: { avatar_compress_target: "preview" } %>
 

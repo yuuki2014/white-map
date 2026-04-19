@@ -56,7 +56,16 @@ COPY . .
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+RUN AWS_EC2_METADATA_DISABLED=true \
+    SECRET_KEY_BASE_DUMMY=1 \
+    CLOUDFLARE_ACCESS_KEY_ID=dummy_for_build \
+    CLOUDFLARE_SECRET_ACCESS_KEY=dummy_for_build \
+    CLOUDFLARE_R2_BUCKET=dummy_bucket \
+    R2_PUBLIC_ACCESS_KEY_ID=dummy_for_build \
+    R2_PUBLIC_SECRET_ACCESS_KEY=dummy_for_build \
+    R2_PUBLIC_BUCKET=dummy_bucket \
+    R2_ENDPOINT=https://dummy.r2.cloudflarestorage.com \
+    ./bin/rails assets:precompile
 
 
 RUN rm -rf node_modules

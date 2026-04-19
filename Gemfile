@@ -82,3 +82,5 @@ gem "http_accept_language", "~> 2.1"
 gem "bullet", "~> 8.1", group: :development
 
 gem "rack-attack", "~> 6.8"
+
+gem "faraday", "~> 2.14"

@@ -5,7 +5,8 @@ class User < ApplicationRecord
   before_validation :normalize_email
 
   # active storage設定
-  has_one_attached :avatar
+  has_one_attached :avatar, service: :cloudflare_public
+  # has_one_attached :avatar, service: Rails.env.production? ? :cloudflare_public : :local
 
   attr_accessor :remove_avatar
 

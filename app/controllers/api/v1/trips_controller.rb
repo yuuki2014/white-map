@@ -94,12 +94,14 @@ class Api::V1::TripsController < ApplicationController
     footprints = trip.footprints.order(recorded_at: :asc)
     return false if footprints.empty?
 
+    title = Trips::BuildDefaultTitleFromStartPlaceService.call(trip: trip)
     started_at = footprints.first.recorded_at # 開始時刻
     ended_at   = footprints.last.recorded_at  # 終了時刻
     activity_time = ended_at - started_at     # 活動時間
     total_distance = 0 # 総合距離
 
     trip.update(
+      title: title,
       started_at: started_at,
       ended_at: ended_at,
       activity_time: activity_time,

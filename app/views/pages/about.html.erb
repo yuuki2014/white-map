@@ -1,0 +1,46 @@
+<%# このサービスについて %>
+<%# ヘッダー %>
+<% content_for :header do %>
+  <%= render 'shared/header', back_path: mypage_path, title: "", bg_color: "" %>
+<% end %>
+
+<div class="min-h-screen pb-20 pt-6 bg-gray-100 flex justify-center">
+
+  <%# 各カードを包むコンテナ %>
+  <div class="max-w-md w-full flex flex-col gap-4 p-4">
+
+    <div class="bg-white rounded-xl shadow-md p-4 mb-4 flex flex-col justify-between">
+      <h1 class="text-2xl font-bold mb-4">このサービスについて</h1>
+
+      <p class="mb-8 leading-7 text-gray-700">
+        シロイチズは、訪れた場所を記録しながら、
+        自分だけの白い地図を少しずつ開拓していくサービスです。
+        サービスの利用に関する情報は、以下のページをご確認ください。
+      </p>
+
+    </div>
+
+    <nav class="space-y-3">
+      <%= link_to terms_path, class: "block rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm", data: { turbo_stream: true }  do %>
+        <div class="font-bold">利用規約</div>
+        <div class="mt-1 text-sm text-gray-600">サービスをご利用いただく際のルール</div>
+      <% end %>
+
+      <%= link_to privacy_policy_path, class: "block rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm", data: { turbo_stream: true } do %>
+        <div class="font-bold">プライバシーポリシー</div>
+        <div class="mt-1 text-sm text-gray-600">取得する情報やCookieの利用について</div>
+      <% end %>
+
+      <%= link_to licenses_path, class: "block rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm", data: { turbo_stream: true }  do %>
+        <div class="font-bold">出典・ライセンス</div>
+        <div class="mt-1 text-sm text-gray-600">地図・地名データ、アイコン等の出典</div>
+      <% end %>
+
+      <%= link_to contact_path, class: "block rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm", data: { turbo_stream: true }  do %>
+        <div class="font-bold">お問い合わせ</div>
+        <div class="mt-1 text-sm text-gray-600">ご質問、不具合報告、削除依頼など</div>
+      <% end %>
+    </nav>
+
+  </div>
+</div>

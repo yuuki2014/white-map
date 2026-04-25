@@ -70,8 +70,13 @@ Rails.application.routes.draw do
   get "location_denied", to: "tutorials#location_denied", as: :location_denied
   root "trips#new"
 
+  get "about", to: "pages#about"
   get "privacy_policy", to: "pages#privacy_policy"
   get "terms", to: "pages#terms"
+  get "licenses", to: "pages#licenses"
+
+  resource :contact, only: %i[ show create ]
+
   resource :my_map, only: :show
 
   namespace :api do

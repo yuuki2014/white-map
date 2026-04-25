@@ -1,0 +1,86 @@
+<%# --- モーダル全体 --- %>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-6 transition-opacity duration-300" 
+  data-controller="modal">
+
+  <%# 背景 %>
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+    data-action="click->modal#close">
+  </div>
+
+  <%# --- モーダル本体 --- %>
+  <div class="relative flex h-[100dvh] sm:h-auto sm:max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden sm:rounded-xl bg-white shadow-2xl animate-fade-in-up transition-all duration-300"
+    data-modal-target="modalBox">
+
+    <%# ヘッダー %>
+    <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white z-10">
+      <h2 class="text-xl font-bold text-gray-800">出典・ライセンス</h2>
+      <button type="button" class="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
+              data-action="click->modal#close">
+        <%= lucide_icon('x', class: "w-6 h-6") %>
+      </button>
+    </div>
+
+    <%# コンテンツエリア %>
+    <div class="flex-1 overflow-y-auto px-6 py-6 text-sm leading-relaxed text-gray-600">
+      <div class="space-y-6">
+
+        <div class="mx-auto max-w-2xl px-4 py-10">
+
+          <section class="mb-8">
+            <h2 class="text-lg font-bold mb-3">地図データについて</h2>
+            <p class="leading-7 text-gray-700">
+              本サービスの地図表示には、OpenStreetMap 由来の地図データ、
+              Protomaps / PMTiles、Geoapify などを利用しています。
+              地図画面上には、各データ提供元の attribution を表示しています。
+            </p>
+          </section>
+
+          <section class="mb-8">
+            <h2 class="text-lg font-bold mb-3">地名情報について</h2>
+            <p class="leading-7 text-gray-700">
+              地図タイトルの自動生成のため、
+              一部の地名情報に HeartRails Geo API を利用しています。
+            </p>
+            <p class="mt-3 text-sm leading-6 text-gray-600">
+              出典：<%= link_to "「位置参照情報ダウンロードサービス」（国土交通省）", "https://nlftp.mlit.go.jp/isj/" %>を加工して作成
+            </p>
+          </section>
+
+          <section class="mb-8">
+            <h2 class="text-lg font-bold mb-3">アイコンについて</h2>
+            <p>
+              一部のアイコンには
+              <%= link_to "Lucide Icons", "https://lucide.dev/", target: "_blank", rel: "noopener" %>
+              を利用しています。
+            </p>
+            <p>
+              Lucide Icons is licensed under the
+              <%= link_to "MIT License", "https://lucide.dev/license", target: "_blank", rel: "noopener" %>.
+              Copyright (c) 2013-present Cole Bemis.
+            </p>
+          </section>
+
+          <section>
+            <h2 class="text-lg font-bold mb-3">表示内容に関する注意</h2>
+            <p class="leading-7 text-gray-700">
+              本サービスで表示される地図、地名、位置情報、開拓範囲などは、
+              記録や表示の都合により、実際の位置・境界・名称と異なる場合があります。
+              正確な住所、境界、経路、安全情報などの確認には、公式情報をご利用ください。
+            </p>
+          </section>
+        </div>
+
+      </div>
+    </div>
+
+    <%# フッター %>
+    <div class="border-t border-gray-100 bg-gray-50 px-6 py-4 flex justify-end">
+      <button type="button"
+              class="rounded-lg bg-gray-800 px-6 py-2.5 text-sm font-medium text-white shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition"
+              data-action="click->modal#close">
+        閉じる
+      </button>
+    </div>
+
+  </div>
+</div>

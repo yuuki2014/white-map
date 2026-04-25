@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <body style="margin:0; padding:0; background:#f6f7f9; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color:#111827;">
+    <div style="max-width:640px; margin:0 auto; padding:32px 16px;">
+      <div style="background:#ffffff; border-radius:16px; padding:24px; border:1px solid #e5e7eb;">
+        <h1 style="margin:0 0 8px; font-size:20px; line-height:1.5;">
+          シロイチズにお問い合わせが届きました
+        </h1>
+
+        <p style="margin:0 0 24px; color:#6b7280; font-size:14px;">
+          ユーザーから送信されたお問い合わせ内容です。
+        </p>
+
+        <section style="margin-bottom:24px;">
+          <h2 style="font-size:15px; margin:0 0 12px; padding-bottom:8px; border-bottom:1px solid #e5e7eb;">
+            ユーザー情報
+          </h2>
+
+          <table style="width:100%; border-collapse:collapse; font-size:14px;">
+            <tr>
+              <th align="left" style="width:140px; padding:8px 0; color:#6b7280; font-weight:600;">ID</th>
+              <td style="padding:8px 0;"><%= @user.id %></td>
+            </tr>
+            <tr>
+              <th align="left" style="width:140px; padding:8px 0; color:#6b7280; font-weight:600;">名前</th>
+              <td style="padding:8px 0;"><%= @user.nickname.presence || "未設定" %></td>
+            </tr>
+            <tr>
+              <th align="left" style="width:140px; padding:8px 0; color:#6b7280; font-weight:600;">メール</th>
+              <td style="padding:8px 0;">
+                <a href="mailto:<%= @user.email.presence  || ""  %>" style="color:#2563eb; text-decoration:none;">
+                  <%= @user.email.presence  || ""  %>
+                </a>
+              </td>
+            </tr>
+          </table>
+        </section>
+
+        <section style="margin-bottom:24px;">
+          <h2 style="font-size:15px; margin:0 0 12px; padding-bottom:8px; border-bottom:1px solid #e5e7eb;">
+            お問い合わせ内容
+          </h2>
+
+          <div style="white-space:pre-wrap; background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px; font-size:14px; line-height:1.8;">
+            <%= @body %>
+          </div>
+        </section>
+
+        <section>
+          <h2 style="font-size:15px; margin:0 0 12px; padding-bottom:8px; border-bottom:1px solid #e5e7eb;">
+            送信情報
+          </h2>
+
+          <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <tr>
+              <th align="left" style="width:140px; padding:8px 0; color:#6b7280; font-weight:600;">IP</th>
+              <td style="padding:8px 0;"><%= @ip %></td>
+            </tr>
+            <tr>
+              <th align="left" style="width:140px; padding:8px 0; color:#6b7280; font-weight:600;">User-Agent</th>
+              <td style="padding:8px 0; word-break:break-all;"><%= @user_agent %></td>
+            </tr>
+            <tr>
+              <th align="left" style="width:140px; padding:8px 0; color:#6b7280; font-weight:600;">送信時刻</th>
+              <td style="padding:8px 0;"><%= Time.current.strftime("%Y年%m月%d日 %H:%M") %></td>
+            </tr>
+          </table>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>

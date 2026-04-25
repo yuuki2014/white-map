@@ -61,14 +61,25 @@ export default {
 				cacheTtlByStatus: {
 					"200-299": 31536000,
 					"304": 31536000,
-					"404": -1,
-					"500-599": -1,
+					"404": 0,
+					"500-599": 0,
 				},
 			},
 		});
 
 		const res = new Response(originRes.body, originRes);
-		res.headers.set("Cache-Control", "public, max-age=1800, s-maxage=31536000, immutable");
+
+		if ((originRes.status >= 200 && originRes.status < 300) || originRes.status === 304) {
+			res.headers.set(
+				"Cache-Control",
+				"public, max-age=1800, s-maxage=31536000, immutable"
+			);
+		} else if (originRes.status === 404) {
+			res.headers.set("Cache-Control", "public, max-age=60, s-maxage=60");
+		} else {
+			res.headers.set("Cache-Control", "no-store");
+		}
+
 		return res;
 	}
 };

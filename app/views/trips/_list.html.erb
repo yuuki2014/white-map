@@ -16,7 +16,7 @@
       </div>
 
       <%# 地図画像コンテナ %>
-      <%= link_to trip_path(trip) do %>
+      <%= link_to trip_path(trip), data: { turbo_frame: "_top" }  do %>
         <div class="mb-4 h-64 w-64 overflow-hidden rounded-2xl border border-gray-400 bg-white shadow-sm">
           <%# <%= image_tag trip.image_url, class: "h-full w-full object-cover" %>
           <div class="flex h-full w-full items-center justify-center bg-gray-50 text-gray-400">

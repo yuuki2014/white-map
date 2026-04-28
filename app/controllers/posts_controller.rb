@@ -1,6 +1,16 @@
 class PostsController < ApplicationController
   before_action :set_trip, only: %i[ new create select_position ]
 
+  def index
+    @posts = current_user
+                .posts
+                .includes(:trip, user: { avatar_attachment: :blob })
+                .with_attached_images
+                .order(visited_at: :desc)
+
+    MediaAccessGrantService.call(posts: @posts, cookies: cookies)
+  end
+
   def new
     return respond_modal("shared/flash_message", flash_message: { alert: "場所を選択してください" }) if params[:lat].nil? || params[:lng].nil?
 
@@ -88,10 +98,11 @@ class PostsController < ApplicationController
     end
 
     urls = media_origin_urls(@post)
+    @post_dom_id = helpers.dom_id(@post)
 
     if @post.destroy
       PurgeCloudflareUrlsJob.perform_later(urls)
-      respond_modal(flash_message: { alert: "記録を削除しました" })
+      respond_modal(flash_message: { notice: "記録を削除しました" })
     else
       respond_modal("shared/flash_and_error", locals: { object: @post }, flash_message: { alert: "記録の削除に失敗しました" })
     end
@@ -122,6 +133,6 @@ class PostsController < ApplicationController
   end
 
   def set_trip
-    @trip = current_user.trips.find_by(public_uid: params[:id])
+    @trip = current_user.trips.find_by(public_uid: params[:trip_id])
   end
 end

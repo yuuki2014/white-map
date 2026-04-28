@@ -24,7 +24,7 @@
       <%# 現在地に記録するボタン %>
       <% if @trip && @trip.user_id == current_user&.id %>
         <% unless request.referer&.include?("/trips/") %>
-          <%= button_to new_post_path(@trip),
+          <%= button_to new_trip_post_path(@trip),
                 method: :get,
                 params: { format: :turbo_stream, lat: "", lng: "" },
                 form: { class: "contents" },
@@ -54,7 +54,7 @@
 
       <%# 地図上から場所を選ぶボタン %>
       <% if @trip && @trip.user_id == current_user&.id %>
-        <%= button_to select_position_trip_path(@trip),
+        <%= button_to trip_select_position_path(@trip),
               method: :get,
               params: { format: :turbo_stream },
               data: { action: "click->ui#enablePostPositionMode click->bottom-sheet#close" },

@@ -14,9 +14,6 @@ export default {
 		const url = new URL(request.url);
 		const match = url.pathname.match(/^\/(?:variants\/)?posts\/(\d+)\/(.+)$/);
 
-		console.log(url)
-		console.log(match)
-
 		if (!match) {
 			return new Response("Not Found", { status: 404 });
 		}
@@ -79,6 +76,8 @@ export default {
 		} else {
 			res.headers.set("Cache-Control", "no-store");
 		}
+
+		console.log(res)
 
 		return res;
 	}

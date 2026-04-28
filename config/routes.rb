@@ -48,15 +48,12 @@ Rails.application.routes.draw do
       get :edit_status
       get :edit_title
       patch :update_title
-      get "select_position", to: "posts#select_position"
-      resources :posts, only: %i[ new create ] do
-        collection do
-        end
-      end
     end
+    get "select_position", to: "posts#select_position"
+    resources :posts, only: %i[ new create ]
   end
 
-  resources :posts, only: %i[ show destroy ] do
+  resources :posts, only: %i[ index show destroy ] do
     member do
       get :preview
       get :image_viewer

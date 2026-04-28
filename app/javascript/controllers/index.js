@@ -13,6 +13,9 @@ application.register("base-map", BaseMapController)
 import BottomSheetController from "./bottom_sheet_controller"
 application.register("bottom-sheet", BottomSheetController)
 
+import ClickableCardController from "./clickable_card_controller"
+application.register("clickable-card", ClickableCardController)
+
 import CookieConsentController from "./cookie_consent_controller"
 application.register("cookie-consent", CookieConsentController)
 
@@ -57,6 +60,9 @@ application.register("modal", ModalController)
 
 import PostsController from "./posts_controller"
 application.register("posts", PostsController)
+
+import ScrollResetController from "./scroll_reset_controller"
+application.register("scroll-reset", ScrollResetController)
 
 import ShareButtonController from "./share_button_controller"
 application.register("share-button", ShareButtonController)

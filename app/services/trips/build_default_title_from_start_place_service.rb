@@ -18,12 +18,20 @@ class Trips::BuildDefaultTitleFromStartPlaceService
 
     return DEFAULT_TITLE unless response.success?
 
-    location_data = JSON.parse(response.body).dig("response", "location")&.first
-    return DEFAULT_TITLE if location_data.nil?
+    locations = Array(JSON.parse(response.body).dig("response", "location"))
+    return DEFAULT_TITLE if locations.blank?
 
-    prefecture = location_data["prefecture"]
-    city       = location_data["city"]
-    town       = location_data["town"]
+    nearest =
+      if locations.all? { |location| location.key?("distance") }
+        locations.min_by { |location| location["distance"].to_f }
+      else
+        locations.first
+      end
+    return DEFAULT_TITLE if nearest.blank?
+
+    prefecture = nearest["prefecture"]
+    city       = nearest["city"]
+    town       = nearest["town"]
 
     title = [ prefecture, city, town ].compact_blank.join
     return DEFAULT_TITLE if title.blank?

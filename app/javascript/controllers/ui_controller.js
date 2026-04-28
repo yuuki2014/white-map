@@ -350,6 +350,8 @@ export default class extends Controller {
   removeMarker(event){
     const postUuid = event.currentTarget.dataset.postUuid;
 
+    console.log(event.currentTarget)
+
     if(this.hasMapOutlet){
       this.mapOutlet.removeMarker(postUuid);
     }

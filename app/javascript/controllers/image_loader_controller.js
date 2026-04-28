@@ -11,6 +11,11 @@ export default class extends Controller {
   connect() {
     this.originalSrc = this.imageTarget.getAttribute("src") || null // 画像へのリダイレクトリンクを取得
     this.retryCount = 0;
+
+    // すでに読み込み済みなら、loadイベントを待たずに表示する
+    if (this.imageTarget.complete && this.imageTarget.naturalWidth > 0) {
+      this.loaded()
+    }
   }
 
   // 画像ロード完了後

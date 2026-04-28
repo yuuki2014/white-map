@@ -58,6 +58,12 @@ module ApplicationHelper
       end
     end
 
+    if controller_name == "posts"
+      if action_name.in?(%w[ index ])
+        return true
+      end
+    end
+
     false
   end
 
@@ -97,6 +103,12 @@ module ApplicationHelper
 
     if controller_name == "account_settings"
       if action_name.in?(%w[ show ])
+        return true
+      end
+    end
+
+    if controller_name == "posts"
+      if action_name.in?(%w[ index ])
         return true
       end
     end

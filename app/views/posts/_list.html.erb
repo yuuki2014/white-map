@@ -2,127 +2,96 @@
 <% if posts.present? %>
   <% posts.each do |post| %>
     <%# --- 投稿全体コンテナ --- %>
-    <%= turbo_frame_tag dom_id(post), class: "block" do %>
-    <div
-      class="border-b border-gray-200 py-4 px-2 last:border-none max-w-2xl mx-auto hover:bg-[#fff5e6] transition-colors duration-200 cursor-pointer"
-      data-controller="clickable-card"
-      data-action="click->clickable-card#open">
-      <%= link_to "", post_path(post), class: "hidden", data: { turbo_stream: true, clickable_card_target: "link" } %>
+    <%= turbo_frame_tag dom_id(post), class: "block border-b border-gray-300 last:border-none" do %>
+      <div
+        class="py-4 px-2  max-w-2xl mx-auto hover:bg-[#fff5e6] transition-colors duration-200 cursor-pointer"
+        data-controller="clickable-card"
+        data-action="click->clickable-card#open">
+        <%= link_to "", post_path(post), class: "hidden", data: { turbo_stream: true, clickable_card_target: "link" } %>
 
-      <div class="flex gap-3">
-        <%# --- 左カラム: アイコン --- %>
-        <div class="shrink-0">
-          <% if post.user.avatar.attached? %>
-            <%= image_tag avatar_url(post.user), class: "w-10 h-10 object-cover rounded-full shadow-sm" %>
-          <% else %>
-            <div class="w-10 h-10 bg-orange-400 rounded-full flex items-center justify-center shadow-sm">
-              <%= lucide_icon('user-round', class: "w-6 h-6 text-white") %>
-            </div>
-          <% end %>
-        </div>
-
-        <%# --- 右カラム: メインコンテンツ --- %>
-        <div class="flex-1 min-w-0">
-
-          <%# --- ヘッダー (ユーザー名, 日時, 三点リーダ) --- %>
-          <div class="flex items-start justify-between">
-
-            <%# 名前と日付を横並びに %>
-            <div class="flex items-baseline gap-1.5 truncate pr-2 mt-0.5">
-              <span class="font-bold text-[13px] text-gray-900 truncate">
-                <%= post.user.nickname %>
-              </span>
-            </div>
-
-            <div class="flex gap-3">
-              <span class="text-xs text-gray-500 whitespace-nowrap">
-                <%= post.visited_at&.strftime("%Y/%m/%d %H:%M") %>
-              </span>
-              <%# 三点リーダボタン %>
-              <div class="relative shrink-0 -mt-1 -mr-2" data-controller="dropdown" data-dropdown-post-url-value="<%= confirm_destroy_post_path(post) %>">
-                <button type="button"
-                        class="h-8 w-8 flex items-center justify-center text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition"
-                        data-action="click->dropdown#toggle">
-                  <%= lucide_icon('ellipsis', class: "w-5 h-5") %>
-                </button>
+        <div class="flex gap-3">
+          <%# --- 左カラム: アイコン --- %>
+          <div class="shrink-0">
+            <% if post.user.avatar.attached? %>
+              <%= image_tag avatar_url(post.user), class: "w-10 h-10 object-cover rounded-full shadow-sm" %>
+            <% else %>
+              <div class="w-10 h-10 bg-orange-400 rounded-full flex items-center justify-center shadow-sm">
+                <%= lucide_icon('user-round', class: "w-6 h-6 text-white") %>
               </div>
-            </div>
+            <% end %>
           </div>
 
-          <%# --- 本文 --- %>
-          <% if post.body.present? %>
-            <div class="mt-1 text-[15px] leading-snug text-gray-900 whitespace-pre-line break-words line-clamp-6"><%= post.body %></div>
-          <% end %>
+          <%# --- 右カラム: メインコンテンツ --- %>
+          <div class="flex-1 min-w-0">
 
-          <%# --- 画像 --- %>
-          <% if post.images.attached? %>
-            <% image_count = post.images.size %>
+            <%# --- ヘッダー (ユーザー名, 日時, 三点リーダ) --- %>
+            <div class="flex items-start justify-between">
 
-            <%# 外枠 %>
-            <div class="mt-3 w-full overflow-hidden rounded-xl">
+              <%# 名前と日付を横並びに %>
+              <div class="flex items-baseline gap-1.5 truncate pr-2 mt-0.5">
+                <span class="font-bold text-[13px] text-gray-900 truncate">
+                  <%= post.user.nickname %>
+                </span>
+              </div>
 
-              <% if image_count == 1 %>
-                <% image = post.images.first %>
-                <%# 1枚画像 %>
-                <div class="relative w-full h-[260px] max-h-[260px] bg-gray-100 overflow-hidden" data-controller="image-loader">
-                  <div class="absolute inset-0 flex items-center justify-center transition-opacity" data-image-loader-target="placeholder">
-                    <div class="w-10 h-10 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
-                  </div>
-                  <%= link_to image_viewer_post_path(post, index: 0), data: { turbo_stream: true }, class: "block w-full h-full" do %>
-                    <%= image_tag media_image_url(image.variant(:thumb).key),
-                        loading: "lazy",
-                        class: "w-full h-full object-cover opacity-0",
-                        data: { image_loader_target: "image",
-                                action: "load->image-loader#loaded error->image-loader#error" } %>
-                  <% end %>
+              <div class="flex gap-3">
+                <span class="text-xs text-gray-500 whitespace-nowrap">
+                  <%= post.visited_at&.strftime("%Y/%m/%d %H:%M") %>
+                </span>
+                <%# 三点リーダボタン %>
+                <div class="relative shrink-0 -mt-1 -mr-2" data-controller="dropdown" data-dropdown-post-url-value="<%= confirm_destroy_post_path(post) %>">
+                  <button type="button"
+                          class="h-8 w-8 flex items-center justify-center text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition"
+                          data-action="click->dropdown#toggle">
+                    <%= lucide_icon('ellipsis', class: "w-5 h-5") %>
+                  </button>
                 </div>
+              </div>
+            </div>
 
-              <% elsif image_count == 2 %>
-                <%# 2枚画像：2列 %>
-                <div class="grid grid-cols-2 gap-0.5">
-                  <% post.images.each_with_index do |image, index| %>
-                    <div class="relative aspect-square bg-gray-100 overflow-hidden" data-controller="image-loader">
-                      <div class="absolute inset-0 flex items-center justify-center transition-opacity" data-image-loader-target="placeholder">
-                        <div class="w-10 h-10 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
-                      </div>
-                      <%= link_to image_viewer_post_path(post, index: index),
-                          class: "block w-full h-full",
-                          data: { turbo_stream: true } do %>
-                        <%= image_tag media_image_url(image.variant(:thumb).key),
-                            loading: "lazy",
-                            class: "w-full h-full object-cover opacity-0",
-                            data: { image_loader_target: "image",
-                                    action: "load->image-loader#loaded error->image-loader#error" } %>
-                      <% end %>
-                    </div>
-                  <% end %>
-                </div>
+            <%# --- 本文 --- %>
+            <% if post.body.present? %>
+              <div class="mt-1 text-[15px] leading-snug text-gray-900 whitespace-pre-line break-words line-clamp-6 py-1"><%= post.body %></div>
+            <% end %>
 
-              <% elsif image_count == 3 %>
-                <%# 3枚画像 %>
-                <div class="grid grid-cols-2 gap-0.5 h-[260px] max-h-[260px] overflow-hidden">
-                  <% first_image = post.images.first %>
+            <%# --- 画像 --- %>
+            <% if post.images.attached? %>
+              <% image_count = post.images.size %>
 
-                  <div class="relative bg-gray-100 overflow-hidden" data-controller="image-loader">
-                    <div class="absolute inset-0 flex items-center justify-center transition-opacity" data-image-loader-target="placeholder">
+              <%# 外枠 %>
+              <div class="mt-3 w-full overflow-hidden rounded-xl">
+
+                <% if image_count == 1 %>
+                  <% image = post.images.first %>
+                  <%# 1枚画像 %>
+                  <div class="<%= single_post_image_frame_class(image) %>" data-controller="image-loader">
+
+                    <div class="absolute inset-0 flex bg-gray-100 items-center justify-center transition-opacity" data-image-loader-target="placeholder">
                       <div class="w-10 h-10 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
                     </div>
+
                     <%= link_to image_viewer_post_path(post, index: 0), data: { turbo_stream: true }, class: "block w-full h-full" do %>
-                      <%= image_tag media_image_url(first_image.variant(:thumb).key),
+                      <%= image_tag media_image_url(image.variant(:thumb).key),
                           loading: "lazy",
-                          class: "w-full h-full object-cover opacity-0",
+                          class: single_post_image_class(image),
                           data: { image_loader_target: "image",
                                   action: "load->image-loader#loaded error->image-loader#error" } %>
                     <% end %>
                   </div>
 
-                  <div class="grid grid-rows-2 gap-0.5 min-h-0">
-                    <% post.images.drop(1).each_with_index do |image, index| %>
-                      <div class="relative bg-gray-100 overflow-hidden min-h-0" data-controller="image-loader">
-                        <div class="absolute inset-0 flex items-center justify-center transition-opacity" data-image-loader-target="placeholder">
+                <% elsif image_count == 2 %>
+                  <%# 2枚画像：2列 %>
+                  <div class="grid grid-cols-2 gap-0.5">
+                    <% post.images.each_with_index do |image, index| %>
+                      <div class="relative aspect-square overflow-hidden" data-controller="image-loader">
+
+                        <div class="absolute inset-0 flex items-center bg-gray-100 justify-center transition-opacity" data-image-loader-target="placeholder">
                           <div class="w-10 h-10 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
                         </div>
-                        <%= link_to image_viewer_post_path(post, index: index + 1), data: { turbo_stream: true }, class: "block w-full h-full" do %>
+
+                        <%= link_to image_viewer_post_path(post, index: index),
+                            class: "block w-full h-full",
+                            data: { turbo_stream: true } do %>
                           <%= image_tag media_image_url(image.variant(:thumb).key),
                               loading: "lazy",
                               class: "w-full h-full object-cover opacity-0",
@@ -132,47 +101,88 @@
                       </div>
                     <% end %>
                   </div>
-                </div>
 
-              <% else %>
-                <%# 4枚以上 %>
-                <div class="grid grid-cols-2 gap-0.5 md:grid-cols-3">
-                  <% post.images.first(6).each_with_index do |image, index| %>
-                    <div class="relative aspect-square bg-gray-100 overflow-hidden" data-controller="image-loader">
-                      <div class="absolute inset-0 flex items-center justify-center transition-opacity" data-image-loader-target="placeholder">
+                <% elsif image_count == 3 %>
+                  <%# 3枚画像 %>
+                  <div class="grid grid-cols-2 gap-0.5 h-[260px] max-h-[260px] overflow-hidden">
+                    <% first_image = post.images.first %>
+
+                    <div class="relative overflow-hidden" data-controller="image-loader">
+
+                      <div class="absolute inset-0 flex items-center bg-gray-100 justify-center transition-opacity" data-image-loader-target="placeholder">
                         <div class="w-10 h-10 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
                       </div>
-                      <%= link_to image_viewer_post_path(post, index: index), data: { turbo_stream: true }, class: "block w-full h-full" do %>
-                        <%= image_tag media_image_url(image.variant(:thumb).key),
+
+                      <%= link_to image_viewer_post_path(post, index: 0), data: { turbo_stream: true }, class: "block w-full h-full" do %>
+                        <%= image_tag media_image_url(first_image.variant(:thumb).key),
                             loading: "lazy",
                             class: "w-full h-full object-cover opacity-0",
                             data: { image_loader_target: "image",
                                     action: "load->image-loader#loaded error->image-loader#error" } %>
                       <% end %>
-                      <% if index == 5 && image_count > 6 %>
-                        <div class="pointer-events-none absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <span class="text-white text-xl font-bold">+<%= image_count - 6 %></span>
+                    </div>
+
+                    <div class="grid grid-rows-2 gap-0.5 min-h-0">
+                      <% post.images.drop(1).each_with_index do |image, index| %>
+                        <div class="relative overflow-hidden min-h-0" data-controller="image-loader">
+
+                          <div class="absolute inset-0 flex bg-gray-100 items-center justify-center transition-opacity" data-image-loader-target="placeholder">
+                            <div class="w-10 h-10 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+                          </div>
+
+                          <%= link_to image_viewer_post_path(post, index: index + 1), data: { turbo_stream: true }, class: "block w-full h-full" do %>
+                            <%= image_tag media_image_url(image.variant(:thumb).key),
+                                loading: "lazy",
+                                class: "w-full h-full object-cover opacity-0",
+                                data: { image_loader_target: "image",
+                                        action: "load->image-loader#loaded error->image-loader#error" } %>
+                          <% end %>
                         </div>
                       <% end %>
                     </div>
-                  <% end %>
-                </div>
-              <% end %>
+                  </div>
 
-            </div>
-          <% end %>
+                <% else %>
+                  <%# 4枚以上 %>
+                  <div class="grid grid-cols-2 gap-0.5 md:grid-cols-3">
+                    <% post.images.first(6).each_with_index do |image, index| %>
+                      <div class="relative aspect-square overflow-hidden" data-controller="image-loader">
 
-          <%# --- 地図タイトル--- %>
-          <% if post.trip&.title.present? %>
-            <div class="mt-3 flex items-center gap-1.5 text-[13px] text-gray-400">
-              <%= lucide_icon('map-pin', class: "w-3.5 h-3.5") %>
-              <span><%= link_to post.trip.title, trip_path(post.trip), data: { turbo_frame: "_top" } %></span>
-            </div>
-          <% end %>
+                        <div class="absolute inset-0 flex bg-gray-100 items-center justify-center transition-opacity" data-image-loader-target="placeholder">
+                          <div class="w-10 h-10 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+                        </div>
 
+                        <%= link_to image_viewer_post_path(post, index: index), data: { turbo_stream: true }, class: "block w-full h-full" do %>
+                          <%= image_tag media_image_url(image.variant(:thumb).key),
+                              loading: "lazy",
+                              class: "w-full h-full object-cover opacity-0",
+                              data: { image_loader_target: "image",
+                                      action: "load->image-loader#loaded error->image-loader#error" } %>
+                        <% end %>
+                        <% if index == 5 && image_count > 6 %>
+                          <div class="pointer-events-none absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <span class="text-white text-xl font-bold">+<%= image_count - 6 %></span>
+                          </div>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+
+              </div>
+            <% end %>
+
+            <%# --- 地図タイトル--- %>
+            <% if post.trip&.title.present? %>
+              <div class="mt-3 flex items-center gap-1.5 text-[13px] text-gray-400">
+                <%= lucide_icon('map-pin', class: "w-3.5 h-3.5") %>
+                <span><%= link_to post.trip.title, trip_path(post.trip), data: { turbo_frame: "_top" } %></span>
+              </div>
+            <% end %>
+
+          </div>
         </div>
       </div>
-    </div>
     <% end %>
   <% end %>
 <% else %>

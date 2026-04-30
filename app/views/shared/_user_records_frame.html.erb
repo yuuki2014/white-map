@@ -43,8 +43,8 @@
   <%# --- メインリスト部分 --- %>
   <div
     class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-28 block w-full"
-    data-controller="scroll-reset"
-    data-action="turbo:frame-load->scroll-reset#top">
+    data-controller="scroll-reset">
+    <%# data-action="turbo:frame-load->scroll-reset#top"> %>
 
     <% if active_tab == :trips %>
       <%= render "trips/list", trips: trips, geohash_counts: geohash_counts %>

@@ -111,7 +111,8 @@ export default class extends Controller {
     this.mapOutlet.postFootprint();
     this.mapOutlet.setFlushTimer();
     this.mapOutlet.addMarkers();
-    this.mapOutlet.executeFogClearing(true);
+    // this.mapOutlet.executeFogClearing(true);
+    this.mapOutlet.updateRealtimeFogClearing(true);
 
     // デバウンスイベントをセット
     this.documentSetHiddenTimer();

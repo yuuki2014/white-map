@@ -133,10 +133,18 @@ module ApplicationHelper
   end
 
   def format_duration(seconds)
+    seconds = seconds.to_i
+
     hours = (seconds / 3600) || 0
     minutes = ((seconds % 3600) / 60) || 0
     sec = ((seconds % 3600) % 60) || 0
 
-    "#{hours}時間#{minutes}分#{sec}秒"
+    complete_time = ""
+
+    complete_time << "#{hours}h" if hours > 0
+    complete_time << "#{minutes}m" if minutes > 0
+    complete_time << "#{sec}s" if sec > 0
+
+    complete_time.presence || "0s"
   end
 end

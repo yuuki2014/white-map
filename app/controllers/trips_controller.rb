@@ -110,8 +110,16 @@ class TripsController < ApplicationController
       return
     end
 
+    @trip_dom_id = helpers.dom_id(@trip)
+
+    is_current_trip_page = request.referer.to_s.include?(@trip.public_uid)
+
     if @trip.destroy
-      redirect_to trips_path, notice: "地図を削除しました"
+      if is_current_trip_page
+        redirect_to trips_path, notice: "地図を削除しました", status: :see_other
+      else
+        respond_modal(flash_message: { notice: "地図を削除しました" })
+      end
     else
       respond_modal("shared/flash_and_error", locals: { object: @trip }, flash_message: { alert: "地図の削除に失敗しました" })
     end

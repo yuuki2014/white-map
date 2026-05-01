@@ -1,0 +1,2 @@
+module Explore::TripsHelper
+end

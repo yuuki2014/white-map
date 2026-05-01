@@ -95,6 +95,10 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :explore do
+    resources :trips, only: %i[ index ]
+  end
+
   # good_jobのダッシュボード
   authenticate :user, ->(user) { user.admin? } do
     mount GoodJob::Engine => "good_job"

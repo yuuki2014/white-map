@@ -62,7 +62,7 @@ class PostsController < ApplicationController
       return respond_modal("shared/flash_message", flash_message: { alert: "投稿が見つかりません" })
     end
 
-    if @post.user == current_user || ((@post.trip.visibility_unlisted? || @post.trip.visibility_public?) && @post.visibility_public?)
+    if @post.visible_to?(current_user)
       MediaAccessGrantService.call(posts: @post, cookies: cookies)
       respond_modal
     else

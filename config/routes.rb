@@ -97,6 +97,7 @@ Rails.application.routes.draw do
 
   namespace :explore do
     resources :trips, only: %i[ index ]
+    resources :posts, only: %i[ index ]
   end
 
   # good_jobのダッシュボード

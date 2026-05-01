@@ -1,0 +1,20 @@
+<%# 全体の背景コンテナ %>
+<div class="h-full bg-[#FFFBE6] flex flex-col">
+
+  <%# --- ヘッダー部分 --- %>
+  <header class="sticky top-0 z-10 flex items-center justify-center bg-orange-300 py-2 px-4 shadow-sm">
+
+    <%# タイトル %>
+    <div class="text-xl font-bold text-gray-800">
+      みんなの記録
+    </div>
+
+  </header>
+
+  <%= render "shared/explore_records_frame",
+      active_tab: :posts,
+      trips: nil,
+      geohash_counts: nil,
+      posts: @posts %>
+
+</div>

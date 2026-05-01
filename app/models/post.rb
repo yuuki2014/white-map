@@ -29,8 +29,19 @@ class Post < ApplicationRecord
 
   # enum 定義
   # 投稿の公開ステータス
-  # 公開:0, フォロワー限定:10, 非公開:20
-  enum :visibility, { public: 0, follower: 10, private: 20 }, prefix: true
+  # 地図に合わせる:0, 全体公開:10 フォロワー限定:10, 非公開:20
+  enum :visibility, { inherit_trip: 0, public: 10, follower: 20, private: 30 }, prefix: true
+
+  scope :listed_publicly, -> {
+    joins(:trip).where(
+      "posts.visibility = :public OR (posts.visibility = :inherit_trip AND trips.status = :trip_public)",
+      public: visibilities[:public],
+      inherit_trip: visibilities[:inherit_trip],
+      trip_public: Trip.statuses[:public]
+    )
+  }
+
+
 
   # バリデーション定義
   validates :user_id, :latitude, :longitude, :visibility, :visited_at, presence: true
@@ -61,6 +72,10 @@ class Post < ApplicationRecord
 
   def to_param
     public_uid
+  end
+
+  def visible_to?(user)
+    user == self.user || visibility_public? || (visibility_inherit_trip? && (trip.visibility_unlisted? || trip.visibility_public?))
   end
 
   private

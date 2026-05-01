@@ -1,4 +1,4 @@
-<div class="flex flex-col flex-1 min-h-0 w-full bg-[#FFFBE6]">
+<%= turbo_frame_tag "explore_records", class: "flex flex-col flex-1 min-h-0 w-full bg-[#FFFBE6]" do %>
   <%# --- 地図一覧 / 投稿一覧 タブ --- %>
   <div class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-gray-200">
     <div class="grid grid-cols-2 text-sm font-semibold">
@@ -20,7 +20,7 @@
         <% end %>
       <% end %>
 
-      <%= link_to posts_path,
+      <%= link_to explore_posts_path,
           class: [
             "relative flex items-center justify-center gap-2 py-3 transition",
             active_tab == :posts ? "text-orange-600" : "text-gray-500 hover:text-gray-900"
@@ -41,13 +41,12 @@
   </div>
 
   <%# --- メインリスト部分 --- %>
-  <%= turbo_frame_tag "explore_records", class: "flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-28 block w-full" do %>
-    <%# data-action="turbo:frame-load->scroll-reset#top"> %>
+  <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-28 block w-full">
 
     <% if active_tab == :trips %>
       <%= render "explore/trips/list", trips: trips, geohash_counts: geohash_counts %>
     <% elsif active_tab == :posts %>
-      <%= render "posts/list", posts: posts %>
+      <%= render "explore/posts/list", posts: posts %>
     <% end %>
-  <% end %>
-</div>
+  </div>
+<% end %>

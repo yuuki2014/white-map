@@ -27,12 +27,7 @@ class Internal::PostImagesController < ApplicationController
     return render json: { ok: false }, status: :not_found unless post
 
     # 認可設定
-    allowed =
-      post.user == current_user ||
-      (
-        (post.trip.visibility_unlisted? || post.trip.visibility_public?) &&
-        post.visibility_public?
-      )
+    allowed = post.visible_to?(current_user)
 
     render json: { ok: allowed }
   end

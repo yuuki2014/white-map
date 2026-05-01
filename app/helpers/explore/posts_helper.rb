@@ -1,0 +1,2 @@
+module Explore::PostsHelper
+end
